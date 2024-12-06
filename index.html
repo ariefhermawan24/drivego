@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drive Go - rental mobil termurah</title>
+    <link rel="shortcut icon" type="image/png" href="../drivego/source/image/tittle-logo.png" />
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
+    <style>
+    /* Navbar Sticky */
+    .navbar {
+        position: sticky;
+        top: 0;
+        z-index: 1020;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+
+    /* Section Full Height for Desktop */
+    @media (min-width: 992px) {
+        section {
+            min-height: 100vh;
+        }
+
+        .mobile-login {
+            width: 100%;
+            /* Lebar penuh */
+            display: flex;
+            /* Gunakan flexbox */
+            justify-content: center;
+            /* Pusatkan secara horizontal */
+            align-items: center;
+            /* Pusatkan secara vertikal */
+            margin-top: 1rem;
+            /* Beri jarak sedikit dari menu */
+        }
+    }
+
+    section {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+    }
+
+    /* Menambahkan styling pada tombol */
+    button[type="submit"] {
+        margin-top: 15px;
+        /* Memberikan jarak di atas tombol */
+        align-self: flex-end;
+        /* Memindahkan tombol ke kanan */
+        padding: 10px 20px;
+        /* Padding untuk ukuran tombol */
+    }
+
+    /* Service Section */
+    .service-item {
+        text-align: center;
+        padding: 20px;
+        flex: 1 1 18%;
+        /* Proporsi untuk 5 kolom */
+        max-width: 18%;
+    }
+
+    .service-item i {
+        font-size: 50px;
+        color: #007BFF;
+    }
+
+    .service-item h4 {
+        margin-top: 10px;
+    }
+
+    /* Responsive Service Section */
+    @media (max-width: 1199.98px) {
+        .daftar-service {
+            margin-top: 20px !important;
+        }
+
+        .daftar-garasi {
+            margin-top: 20px !important;
+        }
+
+        section {
+            min-height: 100vh;
+        }
+
+        .service-item {
+            flex: 1 1 30%;
+            /* 3 kolom pada tablet */
+            max-width: 30%;
+        }
+
+        .mobile-login {
+            width: 100%;
+            /* Lebar penuh */
+            display: flex;
+            /* Gunakan flexbox */
+            justify-content: center;
+            /* Pusatkan secara horizontal */
+            align-items: center;
+            /* Pusatkan secara vertikal */
+            margin-top: 1rem;
+            /* Beri jarak sedikit dari menu */
+        }
+    }
+
+    .cursor {
+        cursor: pointer;
+    }
+
+    /* Garasi Section */
+    .garasi .card {
+        margin-bottom: 20px;
+    }
+
+
+    .garasi .card img {
+        height: 200px;
+        object-fit: cover;
+    }
+
+    /* Responsive Garasi Section */
+    @media (max-width: 992px) {
+        button[type="submit"] {
+            margin-top: 15px;
+            /* Memberikan jarak di atas tombol */
+            align-self: center;
+            /* Memindahkan tombol ke kanan */
+            padding: 10px 20px;
+            /* Padding untuk ukuran tombol */
+        }
+
+        .garasi .col-md-4 {
+            flex: 1 1 45%;
+            /* 2 kolom pada tablet */
+            max-width: 45%;
+        }
+
+        .mobile-login {
+            width: 100%;
+            /* Lebar penuh */
+            display: flex;
+            /* Gunakan flexbox */
+            justify-content: center;
+            /* Pusatkan secara horizontal */
+            align-items: center;
+            /* Pusatkan secara vertikal */
+            margin-top: 1rem;
+            /* Beri jarak sedikit dari menu */
+        }
+    }
+
+    @media (max-width: 576px) {
+        button[type="submit"] {
+            margin-top: 15px;
+            /* Memberikan jarak di atas tombol */
+            align-self: center;
+            /* Memindahkan tombol ke kanan */
+            padding: 10px 20px;
+            /* Padding untuk ukuran tombol */
+        }
+
+        .garasi .col-md-4 {
+            flex: 1 1 100%;
+            /* 1 kolom pada mobile */
+            max-width: 100%;
+        }
+
+        .mobile-login {
+            width: 100%;
+            /* Lebar penuh */
+            display: flex;
+            /* Gunakan flexbox */
+            justify-content: center;
+            /* Pusatkan secara horizontal */
+            align-items: center;
+            /* Pusatkan secara vertikal */
+            margin-top: 1rem;
+            /* Beri jarak sedikit dari menu */
+        }
+    }
+
+
+    .card img {
+        height: 200px;
+        object-fit: cover;
+    }
+
+    .card-specs {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .card-specs div {
+        flex: 1 1 45%;
+        /* Membagi menjadi dua kolom */
+    }
+
+    .card:hover {
+        cursor: pointer;
+        transform: translateY(-5px);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .service-item {
+        text-align: center;
+        padding: 20px;
+    }
+
+    .service-item i {
+        font-size: 50px;
+        color: #007BFF;
+    }
+
+    .service-item h4 {
+        margin-top: 10px;
+    }
+
+    #contact {
+    padding-top: 3rem;
+    padding-bottom: 3rem;
+    }
+
+    #contact .row {
+        margin: 0;
+    }
+
+    #contact .bg-secondary {
+        background-color: #6c757d;
+        padding: 1.5rem;
+        border-radius: 0.5rem;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    #contact .bg-secondary:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    #contact h4 {
+        font-size: 1.5rem;
+        color: #ffffff;
+        margin-bottom: 1rem;
+    }
+
+    #contact p {
+        font-size: 1.1rem;
+        line-height: 1.5;
+    }
+
+    #contact a {
+        text-decoration: none;
+        color: #ffd700;
+    }
+
+    #contact a:hover {
+        text-decoration: underline;
+        color: #ffcc33;
+    }
+
+    .icon-container {
+        width: 50px;
+        height: 50px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 1.5rem;
+        background-color: #ffffff;
+        border-radius: 50%;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    @media (max-width: 768px) {
+        #contact .row {
+            flex-direction: column;
+        }
+
+        #contact h4 {
+            text-align: center; /* Memastikan judul kota berada di tengah */
+            margin: 0; /* Menghapus margin bawaan jika ada */
+        }
+
+        #contact .d-flex {
+            justify-content: center; /* Menyelaraskan ikon dan judul ke tengah */
+            flex-direction: column; /* Membuat ikon dan judul dalam satu kolom */
+            align-items: center; /* Menyelaraskan keduanya secara horizontal */
+        }
+
+        #contact .icon-container {
+            margin-bottom: 0.5rem; /* Memberikan jarak antara ikon dan judul kota */
+            margin-left: 20px;
+        }
+    }
+    .bg-first {
+        background-image: url('../drivego/source/image/first-page-bg.png'); /* Ganti dengan path ke file gambar Anda */
+        background-size: cover; /* Agar gambar memenuhi seluruh elemen */
+        background-position: center; /* Memposisikan gambar di tengah */
+        background-repeat: no-repeat; /* Agar gambar tidak diulang */
+        height: 100vh; /* Tinggi elemen sesuai tinggi layar */
+        width: 100%; /* Lebar elemen 100% */
+        color: white;
+        /* Tambahkan efek gelap */
+        background-color: rgba(0, 0, 0, 0.5); /* Warna hitam dengan transparansi 50% */
+        background-blend-mode: darken; /* Menggabungkan warna latar dengan gambar */
+    }
+
+    .bg-second {
+        background-image: url('../drivego/source/image/second-page-bg.png'); /* Ganti dengan path ke file gambar Anda */
+        background-size: cover; /* Agar gambar memenuhi seluruh elemen */
+        background-position: center; /* Memposisikan gambar di tengah */
+        background-repeat: no-repeat; /* Agar gambar tidak diulang */
+        height: 100vh; /* Tinggi elemen sesuai tinggi layar */
+        width: 100%; /* Lebar elemen 100% */
+        color: white;
+        /* Tambahkan efek gelap */
+        background-color: rgba(0, 0, 0, 0.5); /* Warna hitam dengan transparansi 50% */
+        background-blend-mode: darken; /* Menggabungkan warna latar dengan gambar */
+    }
+
+    /* Hero Section Container */
+    .hero-content {
+        display: flex;
+        justify-content: flex-start; /* Text ke kiri pada mode desktop */
+        align-items: center;
+        height: 100%; /* Pastikan konten vertikal di tengah */
+    }
+
+    /* Hero Text Styling */
+    .hero-text {
+        max-width: 600px; /* Batasi lebar teks untuk tata letak yang rapi */
+    }
+
+    /* Buttons in Hero Section */
+    .hero-buttons {
+        margin-top: 20px; /* Spasi antara teks dan tombol */
+        display: flex;
+        gap: 15px; /* Jarak antara tombol */
+    }
+
+    /* Responsiveness: Center text on smaller screens */
+    @media (max-width: 768px) {
+        .hero-content {
+            flex-direction: column; /* Stack teks dan tombol vertikal */
+            justify-content: center; /* Teks di tengah pada mode mobile */
+            text-align: center; /* Teks rata tengah */
+        }
+
+        .hero-buttons {
+            flex-direction: column; /* Tombol ditumpuk vertikal */
+            gap: 10px; /* Jarak antar tombol pada mobile */
+        }
+    }
+    </style>
+</head>
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg bg-dark">
+    <div class="container">
+        <!-- Navbar Brand (Logo) -->
+        <a class="navbar-brand" href="#">
+            <img src="../drivego/source/image/navbar-logo.png" alt="Logo Rental Mobil" width="120" height="auto" class="d-inline-block align-text-top">
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon bg-white"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <!-- Menu navigasi -->
+            <ul class="navbar-nav mx-lg-auto align-items-center">
+                <li class="nav-item"><a class="nav-link text-white" href="#home">Home</a></li>
+                <li class="nav-item"><a class="nav-link text-white" href="#service">Service</a></li>
+                <li class="nav-item"><a class="nav-link text-white" href="#garasi">Garasi</a></li>
+                <li class="nav-item"><a class="nav-link text-white" href="#contact">Contact</a></li>
+            </ul>
+            <!-- Tombol login -->
+            <a href="../drivego/authentication-login.html" class="text-white d-none d-lg-inline ms-lg-3">
+                <i class="bi bi-person-circle fs-4"></i>
+            </a>
+            <!-- Ikon login untuk mobile -->
+            <li class="nav-item d-lg-none mobile-login">
+                <a class="nav-link text-white" href="../drivego/authentication-login.html">
+                    <i class="bi bi-person-circle fs-4"></i>
+                </a>
+            </li>
+        </div>
+    </div>
+</nav>
+
+<!-- Hero Section -->
+<section id="home" class="bg-first">
+    <div class="container hero-content">
+        <div class="hero-text">
+            <h1>Rental Mobil Terbaik</h1>
+            <p>Sewa mobil dengan harga terjangkau dengan pelayanan terbaik.</p>
+            <div class="hero-buttons">
+                <a href="#garasi" class="btn btn-light btn-lg">Lihat Mobil</a>
+                <a href="#contact" class="btn btn-outline-light btn-lg">Hubungi Kami</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<section id="service" class="py-5 bg-dark text-light">
+    <div class="container daftar-service">
+        <h2 class="text-center mb-5 text-white">Layanan Kami</h2>
+        <div class="row justify-content-center">
+            <!-- Service Item 1 -->
+            <div class="col-lg-2 col-md-4 col-12 mb-4">
+                <div class="card text-center h-100 bg-secondary text-light border-0">
+                    <div class="card-body">
+                        <i class="fas fa-car fa-2x text-light mb-3"></i>
+                        <h5 class="card-title">Pilihan Mobil Lengkap</h5>
+                        <p class="card-text">Kami menyediakan berbagai pilihan mobil yang dapat disesuaikan dengan kebutuhan Anda.</p>
+                    </div>
+                </div>
+            </div>
+            <!-- Service Item 2 -->
+            <div class="col-lg-2 col-md-4 col-12 mb-4">
+                <div class="card text-center h-100 bg-secondary text-light border-0">
+                    <div class="card-body">
+                        <i class="fas fa-clock fa-2x text-light mb-3"></i>
+                        <h5 class="card-title">Proses Booking Cepat</h5>
+                        <p class="card-text">Proses pemesanan mudah dan cepat hanya dalam beberapa klik saja.</p>
+                    </div>
+                </div>
+            </div>
+            <!-- Service Item 3 -->
+            <div class="col-lg-2 col-md-4 col-12 mb-4">
+                <div class="card text-center h-100 bg-secondary text-light border-0">
+                    <div class="card-body">
+                        <i class="fas fa-tags fa-2x text-light mb-3"></i>
+                        <h5 class="card-title">Harga Transparan</h5>
+                        <p class="card-text">Harga jelas tanpa biaya tersembunyi, sesuaikan dengan anggaran Anda.</p>
+                    </div>
+                </div>
+            </div>
+            <!-- Service Item 4 -->
+            <div class="col-lg-2 col-md-4 col-12 mb-4">
+                <div class="card text-center h-100 bg-secondary text-light border-0">
+                    <div class="card-body">
+                        <i class="fas fa-shield-alt fa-2x text-light mb-3"></i>
+                        <h5 class="card-title">Keamanan & Kenyamanan</h5>
+                        <p class="card-text">Kami menjaga keamanan dan kenyamanan selama perjalanan Anda.</p>
+                    </div>
+                </div>
+            </div>
+            <!-- Service Item 5 -->
+            <div class="col-lg-2 col-md-4 col-12 mb-4">
+                <div class="card text-center h-100 bg-secondary text-light border-0">
+                    <div class="card-body">
+                        <i class="fas fa-key fa-2x text-light mb-3"></i>
+                        <h5 class="card-title">Lepas Kunci</h5>
+                        <p class="card-text">Kami menyediakan opsi lepas kunci tanpa sopir untuk kenyamanan Anda.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Garasi Section -->
+<section id="garasi" class="py-5">
+    <div class="container daftar-mobil" >
+        <h2 class="text-center" style="margin-bottom: 20px; margin-top: 20px">Daftar Mobil</h2>
+        <!-- Search Bar -->
+        <div class="search-bar" style="margin-bottom: 20px">
+            <div class="input-group">
+                <!-- Tambahkan ikon di sini -->
+                <span class="input-group-text" id="searchIcon"><i class="fas fa-search"></i></span>
+                <input type="text" class="form-control" id="searchInput" placeholder="Cari Mobil..."
+                    aria-label="Cari Mobil" aria-describedby="searchIcon">
+            </div>
+        </div>
+        <div class="row">
+        </div>
+    </div>
+</section>
+
+<!-- contact section -->
+<section id="contact" class="py-5 bg-dark">
+    <div class="container">
+        <h2 class="text-center text-light mb-5" style="margin-top: 20px;">Kontak Kami</h2>
+        <div class="row daftar-garasi text-light align-items-center">
+            <!-- Data garasi akan dimuat di sini secara dinamis -->
+        </div>
+    </div>
+</section>
+
+<!-- Tambahkan Firebase SDK -->
+<script src="../drivego/script/landingpage.js" type="module"></script>
+
+<!-- Bootstrap JS & Popper -->
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+</body>
+<!-- Modal -->
+<div class="modal fade" id="transaksiModal" tabindex="-1" aria-labelledby="transaksiModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="transaksiModalLabel">Transaksi</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Transaksi untuk mobil ini akan diproses segera.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+</html>
