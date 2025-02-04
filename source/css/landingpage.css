@@ -1,0 +1,485 @@
+@import url('https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Lora:ital,wght@0,400..700;1,400..700&family=Old+Standard+TT&family=Roboto+Slab:wght@100..900&display=swap');
+
+/* Navbar Sticky */
+.navbar {
+    position: sticky;
+    top: 0;
+    z-index: 1020;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.blocked-cursor {
+    cursor: not-allowed !important;
+}
+
+.harga {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #008080;
+    /* Biru tosca */
+    margin: 10px 0px 10px 0px;
+    text-align: center;
+    border: 2px solid #008080;
+    border-radius: 10px;
+    padding: 5px;
+    background-color: #e0f7f7;
+    /* Latar belakang lebih lembut */
+}
+
+.nama-mobil {
+    font-family: "Roboto Slab", serif;
+    font-optical-sizing: auto;
+    text-align: center;
+    font-weight: bold;
+    font-size: 25px;
+}
+
+/* Section Full Height for Desktop */
+@media (min-width: 992px) {
+    section {
+        min-height: 100vh;
+    }
+
+    .mobile-login {
+        width: 100%;
+        /* Lebar penuh */
+        display: flex;
+        /* Gunakan flexbox */
+        justify-content: center;
+        /* Pusatkan secara horizontal */
+        align-items: center;
+        /* Pusatkan secara vertikal */
+        margin-top: 1rem;
+        /* Beri jarak sedikit dari menu */
+    }
+}
+
+section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+/* Menambahkan styling pada tombol */
+button[type="submit"] {
+    margin-top: 15px;
+    /* Memberikan jarak di atas tombol */
+    align-self: flex-end;
+    /* Memindahkan tombol ke kanan */
+    padding: 10px 20px;
+    /* Padding untuk ukuran tombol */
+}
+
+/* Service Section */
+.service-item {
+    text-align: center;
+    padding: 20px;
+    flex: 1 1 18%;
+    /* Proporsi untuk 5 kolom */
+    max-width: 18%;
+}
+
+.service-item i {
+    font-size: 50px;
+    color: #007BFF;
+}
+
+.service-item h4 {
+    margin-top: 10px;
+}
+
+/* Responsive Service Section */
+@media (max-width: 1199.98px) {
+    .daftar-service {
+        margin-top: 20px !important;
+    }
+
+    .daftar-garasi {
+        margin-top: 20px !important;
+    }
+
+    section {
+        min-height: 100vh;
+    }
+
+    .service-item {
+        flex: 1 1 30%;
+        /* 3 kolom pada tablet */
+        max-width: 30% !important;
+    }
+
+    .mobile-login {
+        width: 100%;
+        /* Lebar penuh */
+        display: flex;
+        /* Gunakan flexbox */
+        justify-content: center;
+        /* Pusatkan secara horizontal */
+        align-items: center;
+        /* Pusatkan secara vertikal */
+        margin-top: 1rem;
+        /* Beri jarak sedikit dari menu */
+    }
+}
+
+.cursor {
+    cursor: pointer;
+}
+
+/* Garasi Section */
+.garasi .card {
+    margin-bottom: 20px;
+}
+
+
+.garasi .card img {
+    height: 200px;
+    object-fit: cover;
+}
+
+/* Responsive Garasi Section */
+@media (max-width: 992px) {
+    button[type="submit"] {
+        margin-top: 15px;
+        /* Memberikan jarak di atas tombol */
+        align-self: center;
+        /* Memindahkan tombol ke kanan */
+        padding: 10px 20px;
+        /* Padding untuk ukuran tombol */
+    }
+
+    .garasi .col-md-4 {
+        flex: 1 1 45%;
+        /* 2 kolom pada tablet */
+        max-width: 45%;
+    }
+
+    .mobile-login {
+        width: 100%;
+        /* Lebar penuh */
+        display: flex;
+        /* Gunakan flexbox */
+        justify-content: center;
+        /* Pusatkan secara horizontal */
+        align-items: center;
+        /* Pusatkan secara vertikal */
+        margin-top: 1rem;
+        /* Beri jarak sedikit dari menu */
+    }
+}
+
+@media (max-width: 576px) {
+    button[type="submit"] {
+        margin-top: 15px;
+        /* Memberikan jarak di atas tombol */
+        align-self: center;
+        /* Memindahkan tombol ke kanan */
+        padding: 10px 20px;
+        /* Padding untuk ukuran tombol */
+    }
+
+    .garasi .col-md-4 {
+        flex: 1 1 100%;
+        /* 1 kolom pada mobile */
+        max-width: 100%;
+    }
+
+    .mobile-login {
+        width: 100%;
+        /* Lebar penuh */
+        display: flex;
+        /* Gunakan flexbox */
+        justify-content: center;
+        /* Pusatkan secara horizontal */
+        align-items: center;
+        /* Pusatkan secara vertikal */
+        margin-top: 1rem;
+        /* Beri jarak sedikit dari menu */
+    }
+}
+
+
+.card img {
+    height: 200px;
+    object-fit: cover;
+}
+
+.card-specs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.card-specs div {
+    flex: 1 1 45%;
+    /* Membagi menjadi dua kolom */
+}
+
+.card:hover {
+    cursor: pointer;
+    transform: translateY(-5px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.service-item {
+    text-align: center;
+    padding: 20px;
+}
+
+.service-item i {
+    font-size: 50px;
+    color: #007BFF;
+}
+
+.service-item h4 {
+    margin-top: 10px;
+}
+
+#contact {
+    padding-top: 3rem;
+    padding-bottom: 3rem;
+}
+
+#contact .row {
+    margin: 0;
+}
+
+#contact .bg-secondary {
+    background-color: #6c757d;
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+#contact .bg-secondary:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+#contact h4 {
+    font-size: 1.5rem;
+    color: #ffffff;
+    margin-bottom: 1rem;
+}
+
+#contact p {
+    font-size: 1.1rem;
+    line-height: 1.5;
+}
+
+#contact a {
+    text-decoration: none;
+    color: #ffd700;
+}
+
+#contact a:hover {
+    text-decoration: underline;
+    color: #ffcc33;
+}
+
+.icon-container {
+    width: 50px;
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.5rem;
+    background-color: #ffffff;
+    border-radius: 50%;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+@media (max-width: 768px) {
+    #contact .row {
+        flex-direction: column;
+    }
+
+    #contact h4 {
+        text-align: center;
+        /* Memastikan judul kota berada di tengah */
+        margin: 0;
+        /* Menghapus margin bawaan jika ada */
+    }
+
+    #contact .d-flex {
+        justify-content: center;
+        /* Menyelaraskan ikon dan judul ke tengah */
+        flex-direction: column;
+        /* Membuat ikon dan judul dalam satu kolom */
+        align-items: center;
+        /* Menyelaraskan keduanya secara horizontal */
+    }
+
+    #contact .icon-container {
+        margin-bottom: 0.5rem;
+        /* Memberikan jarak antara ikon dan judul kota */
+        margin-left: 20px;
+    }
+}
+
+/* Hero Section Container */
+.hero-content {
+    display: flex;
+    justify-content: flex-start;
+    /* Text ke kiri pada mode desktop */
+    align-items: center;
+    height: 100%;
+    /* Pastikan konten vertikal di tengah */
+}
+
+/* Hero Text Styling */
+.hero-text {
+    max-width: 600px;
+    /* Batasi lebar teks untuk tata letak yang rapi */
+}
+
+/* Buttons in Hero Section */
+.hero-buttons {
+    margin-top: 20px;
+    /* Spasi antara teks dan tombol */
+    display: flex;
+    gap: 15px;
+    /* Jarak antara tombol */
+}
+
+/* Responsiveness: Center text on smaller screens */
+@media (max-width: 768px) {
+    .hero-content {
+        flex-direction: column;
+        /* Stack teks dan tombol vertikal */
+        justify-content: center;
+        /* Teks di tengah pada mode mobile */
+        text-align: center;
+        /* Teks rata tengah */
+    }
+
+    .hero-buttons {
+        flex-direction: column;
+        /* Tombol ditumpuk vertikal */
+        gap: 10px;
+        /* Jarak antar tombol pada mobile */
+    }
+}
+
+.text-nav {
+    position: relative;
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 16px;
+    transition: color 0.3s ease;
+}
+
+.text-nav:hover {
+    color: #f4a261 !important;
+    /* Warna hover */
+}
+
+.text-nav.active {
+    color: #f4a261 !important;
+    /* Warna aktif */
+    font-weight: bold;
+    /* Teks lebih tebal untuk menonjolkan */
+}
+
+/* Menambahkan garis bawah animasi */
+.text-nav::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -5px;
+    width: 0;
+    height: 2px;
+    background-color: #f4a261;
+    /* Warna garis */
+    transition: width 0.3s ease;
+}
+
+.text-nav:hover::after,
+.text-nav.active::after {
+    width: 100%;
+}
+
+/* Modal Header */
+.modal-header {
+    background-color: #007bff;
+    color: white;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+
+.modal-title {
+    font-weight: bold;
+}
+
+/* Foto Mobil */
+.foto-container {
+    position: relative;
+    display: inline-block;
+}
+
+.foto-mobil {
+    border-radius: 10px;
+    object-fit: cover;
+    width: 100%;
+    transition: opacity 0.3s ease;
+}
+
+/* Efek Gelap Saat Hover */
+.foto-container:hover .foto-mobil {
+    opacity: 0.3;
+}
+
+/* Detail Mobil (Tersembunyi Secara Default) */
+.detail-mobil {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+/* Menampilkan Detail Mobil Saat Hover */
+.foto-container:hover .detail-mobil {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Modal Body */
+.modal-body {
+    padding: 2rem;
+}
+
+.form-control {
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.btn-primary {
+    width: 100%;
+    background-color: #007bff;
+    border: none;
+    border-radius: 8px;
+    padding: 10px;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+}
+
+.detail-mobil p strong {
+    font-weight: 600;
+}
+
+/* Formulir Transaksi */
+.form-control {
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
