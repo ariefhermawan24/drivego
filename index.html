@@ -177,6 +177,19 @@
                     aria-label="Cari Mobil" aria-describedby="searchIcon">
             </div>
         </div>
+
+        <!-- Loading Container -->
+        <div class="loading-container">
+            <!-- Loading Animation (Horizontal) -->
+            <div class="loading-box">
+                <div class="WH animation color"></div>
+                <div class="WH animation color"></div>
+                <div class="WH animation color"></div>
+            </div>
+            <!-- Loading Text -->
+            <p class="loading-text">Rendering Car , Wait For A Moment...</p>
+        </div>
+
         <div class="row">
         </div>
     </div>
@@ -199,61 +212,449 @@
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
 </body>
+
 <div id="transaksiModal" class="modal fade" tabindex="-1" aria-labelledby="transaksiModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content position-relative">
+            <!-- Progress Bar -->
+            <div class="progress bg-white position-absolute w-100 z-1" style="top: 0; left: 0; margin-top:60px !important;">
+                <div class="progress-bar" id="progressBar" role="progressbar" style="width: 25%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">1/4</div>
+            </div>
             <div class="modal-header bg-dark">
                 <h5 class="modal-title nama-mobil" id="transaksiModalLabel">Nama Mobil</h5>
                 <button type="button" class="btn-close bg-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <div class="row">
-                    <!-- Kolom Kiri - Formulir Transaksi -->
-                    <div class="col-md-6">
-                        <h5 class="mb-3">Formulir Transaksi</h5>
-                        <form id="transaksiForm">
-                            <div class="mb-3">
-                                <label for="namaPenyewa" class="form-label">Nama Penyewa</label>
-                                <input type="text" class="form-control" id="namaPenyewa" placeholder="Masukkan Nama Anda" required>
+                <div id="detail-mobil">
+                    <h5>Detail Mobil</h5>
+                    <div class="col-md-12">
+                        <div class="row">
+                            <!-- Gambar di kiri (desktop) / atas (mobile) -->
+                            <div class="col-md-4 mb-3 mb-md-0 d-flex justify-content-center">
+                                <div class="foto-container position-relative">
+                                    <img class="foto-mobil img-fluid w-100 rounded" src="" alt="Foto Mobil" style="max-height: 300px; object-fit: cover;">
+                                </div>
                             </div>
-                            <div class="mb-3">
-                                <label for="tanggalSewa" class="form-label">Tanggal Sewa</label>
-                                <input type="date" class="form-control" id="tanggalSewa" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="durasiSewa" class="form-label">Durasi Sewa (Hari)</label>
-                                <input type="number" class="form-control" id="durasiSewa" placeholder="Jumlah Hari" required>
-                            </div>
-                            <button type="submit" class="btn btn-primary">Konfirmasi Sewa</button>
-                        </form>
-                    </div>
-
-                     <!-- Kolom Kanan - Foto Mobil dan Detail -->
-                    <div class="col-md-6 position-relative">
-                        <div class="d-flex flex-column align-items-center">
-                            <!-- Gambar Mobil -->
-                            <div class="foto-container position-relative">
-                                <img class="foto-mobil img-fluid mb-3" src="" alt="Foto Mobil" style="max-height: 300px; object-fit: cover; border-radius: 10px;">
-                                <!-- Detail Mobil yang Tersembunyi dan Muncul Saat Hover -->
-                                <div class="detail-mobil p-3">
-                                    <h5 class="harga-mobil text-center text-success mb-3" style="font-size: 1.5rem;">Rp <span class="harga">0</span>/hari</h5>
-                                    <p class="tipe-mobil"><strong>Tipe:</strong> <span class="text-muted">Sedan</span></p>
-                                    <p class="tempat-duduk"><strong>Tempat Duduk:</strong> <span class="text-muted">4</span></p>
-                                    <p class="bahan-bakar"><strong>Bahan Bakar:</strong> <span class="text-muted">Bensin</span></p>
-                                    <p class="transmisi"><strong>Transmisi:</strong> <span class="text-muted">Manual</span></p>
-                                    <p class="warna"><strong>Warna:</strong> <span class="text-muted">Hitam</span></p>
-                                    <p class="tahun"><strong>Tahun:</strong> <span class="text-muted">2020</span></p>
-                                    <p class="garasi"><strong>Garasi:</strong> <span class="text-muted">Garasi A</span></p>
-                                    <p class="status"><strong>Status:</strong> <span class="text-success">Tersedia</span></p>
+                                
+                            <!-- Detail di kanan (desktop) / bawah (mobile) -->
+                            <div class="col-md-8">
+                                <div class="detail-mobil text-center text-md-start">
+                                    <h5 class="harga-mobil text-success mb-3 text-center text-md-start" style="font-size: 1.5rem;">Rp <span class="harga">0</span>/hari</h5>
+                                    <div class="container">
+                                    <div class="row text-center text-md-start">
+                                        <!-- Spesifikasi (3 tampil di mobile) -->
+                                        <div class="col-4 col-md-4 mb-2"><i class="fas fa-car"></i> <span class="text-muted tipe-mobil d-block d-md-inline">Sedan</span></div>
+                                        <div class="col-4 col-md-4 mb-2"><i class="fas fa-palette"></i> <span class="text-muted warna d-block d-md-inline ms-1">Hitam</span></div>
+                                        <div class="col-4 col-md-4 mb-2"><i class="fas fa-gas-pump"></i> <span class="text-muted bahan-bakar d-block d-md-inline">Bensin</span></div>
+                                    </div>
+                                        
+                                    <!-- Spesifikasi tambahan (tersembunyi di mobile) -->
+                                    <div class="row text-center text-md-start d-none d-md-flex">
+                                        <div class="col-md-4 mb-2"><i class="fas fa-cogs"></i> <span class="text-muted transmisi">Manual</span></div>
+                                        <div class="col-md-4 mb-2"><i class="fas fa-chair"></i><span class="text-muted tempat-duduk ms-1">4</span></div>
+                                        <div class="col-md-4 mb-2"><i class="fas fa-calendar-alt"></i> <span class="text-muted tahun">2020</span></div>
+                                    </div>
+                                        
+                                    <!-- Info Garasi & Status (tersembunyi di mobile) -->
+                                    <div class="row text-center text-md-start d-none d-md-flex">
+                                        <div class="col-md-4 mb-2"><i class="fas fa-warehouse"></i> <span class="text-muted garasi">Garasi A</span></div>
+                                        <div class="col-md-6 mb-2"><i class="fas fa-check-circle text-success"></i> <span class="text-success status">Tersedia</span></div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
+                <div class="step" id="step1">
+                    <div class="mb-3">
+                        <label class="form-label">Pilihan Sewa</label>
+                        <select id="jenisSewa" class="form-control">
+                            <option value="lepasKunci" selected>Lepas Kunci</option>
+                            <option value="denganSupir">Dengan Supir</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary next-step">Lanjut</button>
+                </div>
+                <div class="step d-none" id="step2">
+                    <h5>Form Data Diri</h5>
+                    <form id="formDataDiri">
+                        <div class="mb-3">
+                            <label for="namaPenyewa" class="form-label">Nama Penyewa</label>
+                            <input type="text" class="form-control" id="namaPenyewa" required>
+                            <small class="form-text text-muted">Masukkan nama asli anda.</small>
+                        </div>
+                        <div class="mb-3">
+                            <label for="nomertelephone" class="form-label">Nomor Telepon</label>
+                            <input type="text" class="form-control" id="nomertelephone" placeholder="masukkan nomer telephone anda" required>
+                            <small class="form-text text-muted">Masukkan nomor telepon yang valid.</small>
+                            <script>
+                               document.getElementById('nomertelephone').addEventListener('input', function (e) {
+                                    // Hapus semua karakter non-angka
+                                    let value = e.target.value.replace(/\D/g, '');
+
+                                    // Batasi panjang input maksimal 12 angka
+                                    if (value.length > 12) {
+                                        value = value.substring(0, 12);
+                                    }
+
+                                    // Tambahkan spasi setiap 4 digit
+                                    value = value.replace(/(\d{4})(?=\d)/g, '$1 ');
+
+                                    // Update nilai input
+                                    e.target.value = value;
+
+                                    // Validasi panjang input (harus 12 digit)
+                                    if (value.replace(/\s/g, '').length < 12) {
+                                        e.target.setCustomValidity("Nomor telepon harus 12 digit.");
+                                    } else {
+                                        e.target.setCustomValidity(""); // Reset jika valid
+                                    }
+                                });
+
+                                // Tampilkan validasi saat form dikirim
+                                document.querySelector("form").addEventListener("submit", function (e) {
+                                    const phoneInput = document.getElementById('nomertelephone');
+                                    if (!phoneInput.checkValidity()) {
+                                        phoneInput.reportValidity(); // Menampilkan popup seperti required
+                                        e.preventDefault(); // Mencegah submit jika tidak valid
+                                    }
+                                });
+                            </script>
+                        </div>
+                        <!-- Form Tanggal Mulai Sewa -->
+                        <div class="mb-3">
+                            <label for="tanggalSewa" class="form-label">Tanggal Mulai Sewa</label>
+                            <input type="date" class="form-control" id="tanggalSewa" required>
+                            <small class="form-text text-muted">Pilih tanggal mulai penyewaan.</small>
+                        </div>
+
+                        <!-- Toast Modern dengan Ikon di Atas & Tombol Close di Pojok Kanan Atas -->
+                        <div class="toast-container position-fixed top-0 end-0 p-3">
+                            <div id="toastWarning" class="toast text-white shadow-sm rounded border-0 text-center position-relative" role="alert" aria-live="assertive" aria-atomic="true" style="background: #b3261e; min-width: 280px;">
+                                <button type="button" class="btn-close btn-close-white btn-close-sm position-absolute top-0 end-0 m-2" data-bs-dismiss="toast" aria-label="Close"></button>
+                                <div class="toast-body d-flex flex-column align-items-center p-3">
+                                    <i class="fas fa-exclamation-circle fa-2x mb-2"></i>
+                                    <span>Minimal durasi penyewaan adalah 3 hari dari tanggal pemesanan.</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tambahkan Bootstrap CSS & JS -->
+                        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+                        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+                        <script>
+                            document.addEventListener("DOMContentLoaded", function () {
+                                let tanggalInput = document.getElementById("tanggalSewa");
+                                let toastEl = document.getElementById("toastWarning");
+
+                                // Set tanggal minimal hari ini
+                                let today = new Date();
+                                let minDate = today.toISOString().split("T")[0];
+                                tanggalInput.setAttribute("min", minDate);
+
+                                // Set tanggal yang tidak valid menjadi warna merah
+                                let invalidDate = new Date();
+                                invalidDate.setDate(today.getDate() + 3); // Tanggal 3 hari dari sekarang
+
+                                tanggalInput.addEventListener("input", function () {
+                                    let selectedDate = new Date(tanggalInput.value);
+
+                                    if (selectedDate < invalidDate) {
+                                        tanggalInput.style.borderColor = "red";
+                                        tanggalInput.value = ""; // Reset input jika tidak valid
+
+                                        // Tampilkan toast Bootstrap
+                                        let toast = new bootstrap.Toast(toastEl);
+                                        toast.show();
+                                    } else {
+                                        tanggalInput.style.borderColor = ""; // Reset warna jika valid
+                                    }
+                                });
+                            });
+                        </script>
+
+                        <div id="lepasKunciFields" class="d-none">
+                            <div class="mb-3">
+                                <label for="fotoKTP" class="form-label">Foto Kartu KTP</label>
+                                <input type="file" class="form-control" id="fotoKTP" required>
+                                <small class="form-text text-muted">Masukkan foto kartu ktp asli anda.</small>
+                            </div>
+                            <div class="mb-3">
+                                <label for="fotoSIM" class="form-label">Foto Kartu SIM A</label>
+                                <input type="file" class="form-control" id="fotoSIM" required>
+                                <small class="form-text text-muted">Masukkan foto kartu sim asli anda.</small>
+                            </div>
+                            <div class="mb-3">
+                                <label for="fotoVerifikasi" class="form-label">Foto Verifikasi Penyewa</label>
+                                <input type="file" class="form-control" id="fotoVerifikasi" required>
+                                <small class="form-text text-muted">Masukkan foto muka anda bersama kartu ktp sebagai bukti keaslian.</small>
+                            </div>
+                            <div class="mb-3">
+                                <label for="alamatRumah" class="form-label">Alamat Rumah</label>
+                                <input type="text" class="form-control" id="alamatRumah" required>
+                                <small class="form-text text-muted">Masukkan alamar rumah asli anda.</small>
+                            </div>
+                        </div>
+                        <div id="denganSupirFields" class="d-none"> 
+                            <div class="mb-3">
+                                <label for="tujuanSewa" class="form-label">Tujuan menyewa</label>
+                                <select class="form-control" id="tujuanSewa" required>
+                                    <option value="" disabled selected>Pilih tujuan</option>
+                                    <option value="bisnis">Perjalanan Bisnis</option>
+                                    <option value="wisata">Wisata</option>
+                                    <option value="penjemputan">Penjemputan</option>
+                                    <option value="tujuan lainnnya">Tujuan lainnya</option>
+                                </select>
+                                <small class="form-text text-muted">Masukkan tujuan anda untuk menyewa.</small>
+                            </div>
+                            <div class="mb-3">
+                                <label for="lokasiPenjemputan" class="form-label">Lokasi Penjemputan</label>
+                                <input type="text" class="form-control" id="lokasiPenjemputan" required>
+                                <small class="form-text text-muted">Masukkan lokasi penjemputan yang valid.</small>
+                            </div>
+                            <div id="lokasiTujuanContainer">
+                                <label class="form-label">Lokasi Tujuan <small class="form-text text-muted" style="color: red !important;">* ini belum termasuk biaya masuk ataupun makan supir</small></label>
+                                <div class="input-group mb-2">
+                                    <input type="text" class="form-control" name="lokasiTujuan[]" placeholder="Tujuan 1" required>
+                                    <button class="btn btn-success" id="tambahTujuan">+</button>
+                                    
+                                </div>
+                                
+                            </div>
+                        </div>
+                        <button class="btn btn-primary next-step">Lanjut</button>
+                    </form>
+                </div>
+                
+                <div class="step d-none" id="step3">
+                    <h5>Form Pembayaran</h5>
+                    <!-- Rentang Hari dengan Custom Input -->
+                    <div class="durasi-wrapper">
+                        <label for="hariSewa" class="form-label durasi-label" style="font-weight: bold !important; margin-left:7px !important;">Durasi Sewa</label>
+                        <div class="d-flex align-items-center durasi-container">
+                            <input type="range" class="form-range flex-grow-1" id="hariSewaRange" min="1" max="100" value="1" aria-label="Jumlah Hari Sewa" style="margin-right: 0.5rem !important;">
+                            <div class="d-flex align-items-center">
+                                <input type="number" class="form-control text-center" id="hariSewa" value="1" min="1" max="100" aria-label="Jumlah Hari Sewa Custom" style="width: 70px;">
+                                <span class="ms-2">Hari</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Menyimpan Harga Per Hari (Hidden) -->
+                    <span id="hargaPerHari" data-harga="0" hidden></span>
+
+                    <!-- Tabel Pembayaran -->
+                    <table class="table">
+                        <tr>
+                            <th>Harga Sewa</th>
+                            <td>Rp <span id="hargaSewa">0</span></td>
+                        </tr>
+                        <tr>
+                            <th>DP (20%)</th>
+                            <td>Rp <span id="dp">0</span></td>
+                        </tr>
+                        <tr>
+                            <th>Status</th>
+                            <td><span id="status-pembayaran" class="bg-danger text-light" style="padding: 5px;">Belum Lunas</span></td>
+                        </tr>
+                    </table>
+
+                    <!-- Upload Bukti Pembayaran -->
+                    <div class="mb-3">
+                        <label for="buktiBayar" class="form-label">Upload Bukti Pembayaran</label>
+                        <input type="file" class="form-control" id="buktiBayar" required>
+                        <small class="form-text text-muted">
+                            Harap lakukan pengiriman ke nomor rekening <span style="color: red; font-weight: bold;">1234 5678 9012 3456</span> melalui transfer bank.
+                        </small>
+                    </div>
+
+                    <button class="btn btn-primary next-step">Lanjut</button>
+                </div>
+                <script>
+                    // Ambil elemen-elemen
+                    const hariSewaRange = document.getElementById('hariSewaRange');
+                    const hariSewaNumber = document.getElementById('hariSewa');
+                    const hargaSewaElement = document.getElementById('hargaSewa');
+                    const dpElement = document.getElementById('dp');
+                    const hargaPerHariElement = document.getElementById('hargaPerHari');
+
+                    // Harga per hari dari data atribut (backend bisa mengatur ini)
+                    let hargaPerHari = parseInt(hargaPerHariElement.dataset.harga, 10) || 0;
+
+                    // Saat range diubah, update input number
+                    hariSewaRange.addEventListener('input', function() {
+                        hariSewaNumber.value = hariSewaRange.value;
+                        updateHarga();
+                    });
+
+                    // Saat input number diubah, update range
+                    hariSewaNumber.addEventListener('input', function() {
+                        if (hariSewaNumber.value < 1) {
+                            hariSewaNumber.value = 1;
+                        } else if (hariSewaNumber.value > 100) {
+                            hariSewaNumber.value = 100;
+                        }
+                        hariSewaRange.value = hariSewaNumber.value;
+                        updateHarga();
+                    });
+
+                    // Fungsi untuk memperbarui harga sewa dan DP
+                    function updateHarga() {
+                        const hari = parseInt(hariSewaRange.value, 10);
+                        const totalHargaSewa = hari * hargaPerHari;
+                        const dp = totalHargaSewa * 0.2;
+
+                        hargaSewaElement.innerText = `${totalHargaSewa.toLocaleString('id-ID')}`;
+                        dpElement.innerText = `${dp.toLocaleString('id-ID')}`;
+                    }
+
+                    // Panggil updateHarga() saat harga per hari diperbarui dari backend
+                    function setHargaPerHari(harga) {
+                        hargaPerHari = parseInt(harga, 10) || 0;
+                        hargaPerHariElement.dataset.harga = hargaPerHari;
+                        updateHarga();
+                    }
+
+                    // Panggil fungsi updateHarga saat pertama kali load
+                    updateHarga();
+                </script>
+                <div class="step d-none" id="step4">
+                    <h5>Transaksi Sukses</h5>
+                    <p>Terima kasih telah menyewa mobil di layanan kami.</p>
+                    <button class="btn btn-success">Download PDF</button>
+                </div>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    let currentStep = 1;
+    const progressBar = document.getElementById("progressBar");
+    const steps = document.querySelectorAll(".step");
+    const jenisSewa = document.getElementById("jenisSewa");
+    const lepasKunciFields = document.getElementById("lepasKunciFields");
+    const denganSupirFields = document.getElementById("denganSupirFields");
+    const tujuanSewa = document.getElementById("tujuanSewa");
+    
+    // Membuat input tambahan untuk tujuan lainnya
+    const tujuanLainInput = document.createElement("input");
+    tujuanLainInput.type = "text";
+    tujuanLainInput.classList.add("form-control", "mt-2");
+    tujuanLainInput.id = "tujuanLainnya";
+    tujuanLainInput.placeholder = "Masukkan tujuan lainnya";
+    tujuanLainInput.style.display = "none";
+    tujuanSewa.parentNode.appendChild(tujuanLainInput);
+    
+    tujuanSewa.addEventListener("change", function() {
+        if (tujuanSewa.value === "tujuan lainnnya") {
+            tujuanLainInput.style.display = "block";
+            tujuanLainInput.setAttribute("required", "true"); // Aktifkan required
+        } else {
+            tujuanLainInput.style.display = "none";
+        }
+    });
+    
+    function updateFields() {
+        if (jenisSewa.value === "lepasKunci") {
+            lepasKunciFields.classList.remove("d-none");
+            denganSupirFields.classList.add("d-none");
+        } else {
+            lepasKunciFields.classList.add("d-none");
+            denganSupirFields.classList.remove("d-none");
+        }
+    }
+    
+    jenisSewa.value = "lepasKunci";
+    updateFields();
+    jenisSewa.addEventListener("change", updateFields);
+    
+     document.querySelectorAll(".next-step").forEach(button => {
+        button.addEventListener("click", function() {
+            const currentStepForm = steps[currentStep - 1].querySelectorAll("input[required], select[required], textarea[required]");
+            let isValid = true;
+
+            // Jika sedang di step ke-2, hanya validasi input yang aktif
+            if (currentStep === 2) {
+                let activeFields = jenisSewa.value === "lepasKunci" ? lepasKunciFields : denganSupirFields;
+                const requiredInputs = activeFields.querySelectorAll("input[required], select[required], textarea[required]");
+
+                requiredInputs.forEach(input => {
+                    if (!input.checkValidity()) {
+                        input.reportValidity();
+                        isValid = false;
+                    }
+                });
+            } else {
+                // Validasi normal untuk step lainnya
+                currentStepForm.forEach(input => {
+                    if (!input.checkValidity()) {
+                        input.reportValidity();
+                        isValid = false;
+                    }
+                });
+            }
+
+            if (isValid) {
+                // Pindah ke step berikutnya
+                steps[currentStep - 1].classList.add("d-none");
+                currentStep++;
+
+                if (currentStep <= steps.length) {
+                    steps[currentStep - 1].classList.remove("d-none");
+                    progressBar.style.width = (currentStep * 25) + "%";
+                    progressBar.innerText = currentStep + "/4";
+                }
+            }
+        });
+    });
+
+    
+    function updatePlaceholders() {
+        const inputs = document.querySelectorAll("#lokasiTujuanContainer input");
+        inputs.forEach((input, index) => {
+            input.placeholder = `Tujuan ${index + 1}`;
+            input.setAttribute("required", "true"); // Tambahkan required ke semua input
+        });
+    }
+
+    document.getElementById("tambahTujuan").addEventListener("click", function(event) {
+        event.preventDefault();
+        const inputGroup = document.createElement("div");
+        inputGroup.classList.add("input-group", "mb-2");
+
+        const inputField = document.createElement("input");
+        inputField.type = "text";
+        inputField.classList.add("form-control");
+        inputField.name = "lokasiTujuan[]";
+        inputField.setAttribute("required", "true"); // Tambahkan required saat input dibuat
+
+        const removeButton = document.createElement("button");
+        removeButton.type = "button";
+        removeButton.classList.add("btn", "btn-danger");
+        removeButton.innerHTML = " - ";
+
+        removeButton.addEventListener("click", function() {
+            inputGroup.remove();
+            updatePlaceholders();
+        });
+
+        const buttonWrapper = document.createElement("div");
+        buttonWrapper.classList.add("input-group-append");
+        buttonWrapper.appendChild(removeButton);
+
+        inputGroup.appendChild(inputField);
+        inputGroup.appendChild(buttonWrapper);
+
+        document.getElementById("lokasiTujuanContainer").appendChild(inputGroup);
+        updatePlaceholders();
+    });
+
+});
+</script>
+
 
 
 </html>

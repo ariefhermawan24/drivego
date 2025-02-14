@@ -360,6 +360,13 @@ button[type="submit"] {
         gap: 10px;
         /* Jarak antar tombol pada mobile */
     }
+
+    .foto-mobil {
+        border-radius: 10px;
+        object-fit: cover;
+        width: 100%;
+    }
+
 }
 
 .text-nav {
@@ -422,34 +429,6 @@ button[type="submit"] {
     border-radius: 10px;
     object-fit: cover;
     width: 100%;
-    transition: opacity 0.3s ease;
-}
-
-/* Efek Gelap Saat Hover */
-.foto-container:hover .foto-mobil {
-    opacity: 0.3;
-}
-
-/* Detail Mobil (Tersembunyi Secara Default) */
-.detail-mobil {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.7);
-    color: white;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.3s ease, visibility 0.3s ease;
-    padding: 20px;
-    border-radius: 10px;
-}
-
-/* Menampilkan Detail Mobil Saat Hover */
-.foto-container:hover .detail-mobil {
-    opacity: 1;
-    visibility: visible;
 }
 
 /* Modal Body */
@@ -482,4 +461,131 @@ button[type="submit"] {
 .form-control {
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.modal-content {
+    max-height: 90vh;
+    /* Batasi tinggi modal agar tidak melebihi layar */
+}
+
+.modal-body {
+    overflow-y: auto;
+    /* Tambahkan scroll pada modal jika kontennya panjang */
+}
+
+td {
+    text-align: end !important;
+}
+
+/* Hanya untuk bagian Durasi Sewa */
+.durasi-wrapper {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Untuk tampilan desktop (tetap dalam satu baris) */
+@media (min-width: 768px) {
+    .durasi-wrapper {
+        flex-direction: row;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .durasi-label {
+        min-width: 120px;
+        /* Agar sejajar */
+    }
+
+    .durasi-container {
+        flex-grow: 1;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+}
+
+/* Untuk tampilan mobile (label di atas, slider lebih panjang) */
+@media (max-width: 767px) {
+    .durasi-wrapper {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .durasi-container {
+        width: 100%;
+    }
+
+    .form-range {
+        width: 100%;
+    }
+}
+
+/* loading section */
+/* From Uiverse.io by TemRevil */
+/* Centering loading animation */
+.loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 200px;
+    /* Sesuaikan tinggi agar tetap proporsional */
+}
+
+/* Loading box tetap horizontal */
+.loading-box {
+    display: flex;
+    flex-direction: row;
+    /* Animasi tetap horizontal */
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Styling teks di bawah loading */
+.loading-text {
+    font-size: 16px;
+    color: #333;
+    margin-top: 10px;
+    font-weight: bold;
+    text-align: center;
+}
+
+
+.WH {
+    width: 20px;
+    height: 70px;
+}
+
+.color {
+    background-color: #ff5100;
+}
+
+.animation {
+    animation: Loading 1s infinite cubic-bezier(0.68, -0.55, 0.27, 1.55);
+}
+
+@keyframes Loading {
+    0% {
+        height: 0;
+    }
+
+    25% {
+        height: 70px;
+    }
+
+    50% {
+        height: 70px;
+        transform: rotate(10deg);
+    }
+
+    75% {
+        height: 70px;
+        transform: rotate(0deg);
+    }
+
+    100% {
+        height: 0;
+    }
 }

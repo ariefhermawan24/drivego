@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form dengan Maps</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
+        input { width: 80%; padding: 10px; margin: 10px 0; font-size: 16px; }
+        button { padding: 10px 15px; font-size: 16px; cursor: pointer; }
+
+        /* Modal */
+        #mapModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
+        #mapContainer { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80%; height: 75%; background: white; padding: 10px; border-radius: 8px; }
+        #map { width: 100%; height: 85%; border-radius: 5px; position: relative; }
+        .closeBtn { background: red; color: white; border: none; padding: 8px 15px; cursor: pointer; float: right; }
+
+        /* Kotak pencarian di dalam maps */
+        #searchBox {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 70%;
+            background: white;
+            padding: 8px;
+            border-radius: 5px;
+            box-shadow: 2px 2px 10px rgba(0,0,0,0.2);
+            font-size: 14px;
+            z-index: 1000;
+        }
+
+        /* Tampilan hasil alamat */
+        #alamatBox {
+            background: #fff;
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-top: 10px;
+            display: none;
+            width: 80%;
+            margin-left: auto;
+            margin-right: auto;
+            border-radius: 5px;
+            box-shadow: 2px 2px 10px rgba(0,0,0,0.2);
+            font-size: 16px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Formulir Lokasi</h2>
+    <input type="text" id="alamat" placeholder="Pilih lokasi di peta" readonly>
+    <button onclick="openMap()">Buka Maps</button>
+
+    <div id="alamatBox"></div>
+
+    <div id="mapModal">
+        <div id="mapContainer">
+            <button class="closeBtn" onclick="closeMap()">Tutup</button>
+            <div id="searchBox">
+                <input type="text" id="searchInput" placeholder="Cari lokasi..." onkeyup="searchLocation()">
+            </div>
+            <div id="map"></div>
+        </div>
+    </div>
+
+    <script>
+        let map, marker;
+
+        function openMap() {
+            document.getElementById("mapModal").style.display = "block";
+            
+            if (!map) {
+                map = L.map('map').setView([-7.797068, 110.370529], 13);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+                marker = L.marker([-7.797068, 110.370529], { draggable: true }).addTo(map);
+                
+                function updateAddress(lat, lng) {
+                    fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            document.getElementById("alamat").value = data.display_name;
+                            document.getElementById("alamatBox").innerText = "📍 " + data.display_name;
+                            document.getElementById("alamatBox").style.display = "block";
+                        });
+                }
+
+                map.on('click', function(e) {
+                    let lat = e.latlng.lat;
+                    let lng = e.latlng.lng;
+                    marker.setLatLng(e.latlng);
+                    updateAddress(lat, lng);
+                });
+            }
+        }
+
+        function closeMap() {
+            document.getElementById("mapModal").style.display = "none";
+        }
+
+        function searchLocation() {
+        let query = document.getElementById("searchInput").value;
+        if (query.length < 3) return;
+
+        fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${query}&countrycodes=ID`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.length > 0) {
+                    let lat = data[0].lat;
+                    let lon = data[0].lon;
+
+                    // Batas wilayah Indonesia (perkiraan kasar)
+                    let minLat = -11.0, maxLat = 6.2, minLon = 94.0, maxLon = 141.0;
+
+                    if (lat >= minLat && lat <= maxLat && lon >= minLon && lon <= maxLon) {
+                        map.setView([lat, lon], 15);
+                        marker.setLatLng([lat, lon]);
+                        document.getElementById("alamat").value = data[0].display_name;
+                        document.getElementById("alamatBox").innerText = "📍 " + data[0].display_name;
+                        document.getElementById("alamatBox").style.display = "block";
+                    } else {
+                        
+                    }
+                } else {
+                    
+                }
+            });
+    }
+    </script>
+
+</body>
+</html>

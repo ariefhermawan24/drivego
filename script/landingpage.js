@@ -32,6 +32,11 @@ const searchInput = document.getElementById('searchInput'); // Input pencarian
 
 // Fungsi untuk menampilkan data mobil
 function tampilkanMobil(dataMobil, dataGarasi) {
+    // Tampilkan loading sebelum data dimuat
+    document.querySelector('.loading-container').style.display = 'flex';
+    document.querySelector('.loading-box').style.display = 'flex';
+    document.querySelector('.loading-text').style.display = 'flex';
+
     carcontainer.innerHTML = ''; // Kosongkan elemen
     // Urutkan data mobil berdasarkan status
     const mobilList = Object.values(dataMobil || {}).sort((a, b) => {
@@ -42,12 +47,21 @@ function tampilkanMobil(dataMobil, dataGarasi) {
 
     // Cek apakah ada mobil yang ditemukan
     if (mobilList.length === 0) {
-        const noResultsMessage = `
-            <div class="col-12">
-                <p class="text-center text-danger">Mobil yang Anda cari tidak Tersedia.</p>
-            </div>
-        `;
-        carcontainer.insertAdjacentHTML('beforeend', noResultsMessage);
+        setTimeout(() => {
+            document.querySelector('.loading-container').style.display = 'none';
+            document.querySelector('.loading-box').style.display = 'none';
+            document.querySelector('.loading-text').style.display = 'none'; // Sembunyikan loading setelah selesai
+            
+            // Pastikan pesan tidak muncul lebih dari sekali
+            if (!document.querySelector('.no-results-message')) {
+                const noResultsMessage = `
+                    <div class="col-12 no-results-message">
+                        <p class="text-center text-danger">Mobil yang Anda cari tidak Tersedia.</p>
+                    </div>
+                `;
+                carcontainer.insertAdjacentHTML('beforeend', noResultsMessage);
+            }
+        }, 500); // Delay agar efek loading lebih terlihat
         return;
     }
 
@@ -97,7 +111,14 @@ function tampilkanMobil(dataMobil, dataGarasi) {
     `;
     carcontainer.insertAdjacentHTML('beforeend', card);
     });
-        document.querySelectorAll('.card[data-mobil]').forEach(card => {
+    // Sembunyikan loading setelah data selesai dimuat
+    setTimeout(() => {
+        document.querySelector('.loading-container').style.display = 'none';
+        document.querySelector('.loading-box').style.display = 'none';
+        document.querySelector('.loading-text').style.display = 'none';
+    });
+        
+    document.querySelectorAll('.card[data-mobil]').forEach(card => {
         card.addEventListener('click', (e) => {
             const dataset = card.dataset;
 
@@ -126,6 +147,16 @@ function tampilkanMobil(dataMobil, dataGarasi) {
             if (modalTahun) modalTahun.textContent = dataset.tahun || 'Tidak Diketahui';
             if (modalGarasi) modalGarasi.textContent = dataset.garasi || 'Garasi Tidak Diketahui';
             if (modalStatus) modalStatus.textContent = dataset.status || 'Tidak Diketahui';
+
+            // Ambil elemen-elemen di dalam step3
+            const hargaPerHariElement = document.querySelector('#step3 #hargaPerHari');
+
+            // Pastikan harga dari backend diset sebelum perhitungan dilakukan
+            if (hargaPerHariElement) {
+                const hargaDariBackend = dataset.harga || 0; // Ambil harga dari backend
+                hargaPerHariElement.dataset.harga = hargaDariBackend; // Simpan di atribut data
+                setHargaPerHari(hargaDariBackend); // Update harga per hari di frontend
+            }
         });
     });
 }
