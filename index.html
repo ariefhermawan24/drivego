@@ -12,6 +12,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="../drivego/source/css/landingpage.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <style>
     
     .bg-first {
@@ -56,6 +57,21 @@
         /* Menggabungkan warna latar dengan gambar */
     }
 
+.toggler-icon {
+    transition: transform 0.3s ease-in-out, opacity 0.2s ease-in-out, color 0.3s ease-in-out;
+    color: white !important;
+}
+
+.rotate-enter {
+    transform: rotate(90deg);
+    opacity: 1;
+}
+
+.rotate-exit {
+    transform: rotate(0deg); /* Ubah ke 0 agar kembali normal */
+    opacity: 1; /* Pastikan tetap terlihat */
+}
+
     </style>
 </head>
 <!-- Navbar -->
@@ -65,9 +81,11 @@
         <a class="navbar-brand me-auto" href="#">
             <img src="../drivego/source/image/navbar-logo.png" alt="Logo Rental Mobil" width="100" height="auto" class="d-inline-block align-text-top">
         </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-            <span class="navbar-toggler-icon bg-white"></span>
-        </button>
+        <span class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="fa-solid fa-bars fa-lg toggler-icon text-white"></i>
+        </span>
+
         <div class="collapse navbar-collapse" id="navbarNav">
             <!-- Menu navigasi -->
             <ul class="navbar-nav mx-auto text-center">
@@ -283,33 +301,65 @@
                             <input type="text" class="form-control" id="namaPenyewa" required>
                             <small class="form-text text-muted">Masukkan nama asli anda.</small>
                         </div>
+
+                        <script>
+                        document.getElementById('namaPenyewa').addEventListener('input', function (e) {
+                            let inputField = e.target;
+                            let value = inputField.value;
+
+                            // Hapus angka dari input
+                            let formattedValue = value.replace(/[0-9]/g, '');
+
+                            // Format agar huruf pertama dari setiap kata menjadi kapital
+                            formattedValue = formattedValue.replace(/\b\w/g, function (char) {
+                                return char.toUpperCase();
+                            });
+
+                            // Update nilai input tanpa angka
+                            inputField.value = formattedValue;
+
+                            // Validasi: jika ada angka, buat input jadi invalid secara langsung
+                            if (value.match(/[0-9]/)) {
+                                inputField.classList.add("input-invalid");
+                                inputField.setCustomValidity("Nama tidak boleh mengandung angka.");
+                            } else {
+                                inputField.classList.remove("input-invalid");
+                                inputField.setCustomValidity(""); // Reset error jika valid
+                            }
+
+                            // Tampilkan pesan error langsung tanpa perlu submit
+                            inputField.reportValidity();
+                        });
+                        </script>
                         <div class="mb-3">
                             <label for="nomertelephone" class="form-label">Nomor Telepon</label>
                             <input type="text" class="form-control" id="nomertelephone" placeholder="masukkan nomer telephone anda" required>
                             <small class="form-text text-muted">Masukkan nomor telepon yang valid.</small>
                             <script>
                                document.getElementById('nomertelephone').addEventListener('input', function (e) {
-                                    // Hapus semua karakter non-angka
-                                    let value = e.target.value.replace(/\D/g, '');
+                                let borderTelephone = e.target;
+                                let value = e.target.value.replace(/\D/g, ''); // Hanya angka
 
-                                    // Batasi panjang input maksimal 12 angka
-                                    if (value.length > 12) {
-                                        value = value.substring(0, 12);
-                                    }
+                                // Batasi panjang maksimal 12 angka
+                                if (value.length > 12) {
+                                    value = value.substring(0, 12);
+                                }
 
-                                    // Tambahkan spasi setiap 4 digit
-                                    value = value.replace(/(\d{4})(?=\d)/g, '$1 ');
+                                // Tambahkan spasi setiap 4 digit
+                                value = value.replace(/(\d{4})(?=\d)/g, '$1 ');
 
-                                    // Update nilai input
-                                    e.target.value = value;
+                                // Update nilai input
+                                e.target.value = value;
 
-                                    // Validasi panjang input (harus 12 digit)
-                                    if (value.replace(/\s/g, '').length < 12) {
-                                        e.target.setCustomValidity("Nomor telepon harus 12 digit.");
-                                    } else {
-                                        e.target.setCustomValidity(""); // Reset jika valid
-                                    }
-                                });
+                                // Validasi panjang input (harus 12 digit)
+                                if (value.replace(/\s/g, '').length < 12) {
+                                    borderTelephone.classList.add("input-invalid"); // Tambahkan class jika tidak valid
+                                    e.target.setCustomValidity("Nomor telepon harus 12 digit.");
+                                } else {
+                                    borderTelephone.classList.remove("input-invalid"); // Hapus class jika valid
+                                    e.target.setCustomValidity("");
+                                }
+                            });
 
                                 // Tampilkan validasi saat form dikirim
                                 document.querySelector("form").addEventListener("submit", function (e) {
@@ -338,10 +388,6 @@
                                 </div>
                             </div>
                         </div>
-
-                        <!-- Tambahkan Bootstrap CSS & JS -->
-                        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-                        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
                         <script>
                             document.addEventListener("DOMContentLoaded", function () {

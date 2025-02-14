@@ -2,7 +2,7 @@
 
 /* Navbar Sticky */
 .navbar {
-    position: sticky;
+    position: sticky !important;
     top: 0;
     z-index: 1020;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -588,4 +588,26 @@ td {
     100% {
         height: 0;
     }
+}
+
+/* Default border untuk input */
+#nomertelephone,
+#namaPenyewa {
+    border: 2px solid #ccc;
+    transition: border-color 0.3s ease-in-out;
+}
+
+/* Jika input tidak valid (salah format), border jadi merah */
+#nomertelephone.input-invalid,
+#namaPenyewa.input-invalid {
+    border: 2px solid red !important;
+}
+
+/* Efek ketika input dalam kondisi error dan di-hover atau fokus */
+#nomertelephone.input-invalid:focus,
+#nomertelephone.input-invalid:hover,
+#namaPenyewa.input-invalid:focus,
+#namaPenyewa.input-invalid:hover {
+    border: 2px solid red !important;
+    box-shadow: 0 0 5px rgba(255, 0, 0, 0.5);
 }

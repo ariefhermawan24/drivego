@@ -266,4 +266,30 @@ updateActiveNav();
 // Tambahkan event listener pada scroll
 window.addEventListener('scroll', updateActiveNav);
 
+document.addEventListener("DOMContentLoaded", function () {
+    const toggler = document.querySelector(".navbar-toggler");
+    const icon = toggler.querySelector("i");
+    const navbar = document.getElementById("navbarNav");
+
+    toggler.addEventListener("click", function () {
+        if (navbar.classList.contains("show")) {
+            icon.classList.remove("fa-xmark", "rotate-enter");
+            icon.classList.add("fa-bars", "rotate-exit");
+        } else {
+            icon.classList.remove("fa-bars", "rotate-exit");
+            icon.classList.add("fa-xmark", "rotate-enter");
+        }
+    });
+
+    // Pastikan ikon kembali ke hamburger setelah navbar ditutup
+    navbar.addEventListener("hidden.bs.collapse", function () {
+        icon.classList.remove("fa-xmark", "rotate-enter");
+        icon.classList.add("fa-bars", "rotate-exit");
+    });
+
+    navbar.addEventListener("shown.bs.collapse", function () {
+        icon.classList.remove("fa-bars", "rotate-exit");
+        icon.classList.add("fa-xmark", "rotate-enter");
+    });
+});
 
