@@ -57,20 +57,20 @@
         /* Menggabungkan warna latar dengan gambar */
     }
 
-.toggler-icon {
-    transition: transform 0.3s ease-in-out, opacity 0.2s ease-in-out, color 0.3s ease-in-out;
-    color: white !important;
-}
+    .toggler-icon {
+        transition: transform 0.3s ease-in-out, opacity 0.2s ease-in-out, color 0.3s ease-in-out;
+        color: white !important;
+    }
 
-.rotate-enter {
-    transform: rotate(90deg);
-    opacity: 1;
-}
+    .rotate-enter {
+        transform: rotate(90deg);
+        opacity: 1;
+    }
 
-.rotate-exit {
-    transform: rotate(0deg); /* Ubah ke 0 agar kembali normal */
-    opacity: 1; /* Pastikan tetap terlihat */
-}
+    .rotate-exit {
+        transform: rotate(0deg); /* Ubah ke 0 agar kembali normal */
+        opacity: 1; /* Pastikan tetap terlihat */
+    }
 
     </style>
 </head>
@@ -234,10 +234,22 @@
 <div id="transaksiModal" class="modal fade" tabindex="-1" aria-labelledby="transaksiModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content position-relative">
-            <!-- Progress Bar -->
-            <div class="progress bg-white position-absolute w-100 z-1" style="top: 0; left: 0; margin-top:60px !important;">
-                <div class="progress-bar" id="progressBar" role="progressbar" style="width: 25%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">1/4</div>
-            </div>
+            <!-- progress bar -->
+            <div class="progress-container position-absolute w-100 z-1 bg-white"
+                style="top: 0; left: 0; padding: 0 20px; margin-top: 60px;">
+                <div class="d-flex justify-content-between mb-1">
+                    <small id="labelStep1" class="step-label active">Mode</small>
+                    <small id="labelStep2" class="step-label">Identitas</small>
+                    <small id="labelStep3" class="step-label">Bayar</small>
+                    <small id="labelStep4" class="step-label">Validasi</small>
+                </div>
+                <div class="progress" style="height: 8px; border-radius: 10px;">
+                    <div class="progress-bar bg-primary" id="progressBar" role="progressbar"
+                        style="width: 25%; border-radius: 10px;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">
+                        1/4
+                    </div>
+                </div>
+            </div>  
             <div class="modal-header bg-dark">
                 <h5 class="modal-title nama-mobil" id="transaksiModalLabel">Nama Mobil</h5>
                 <button type="button" class="btn-close bg-white" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -259,24 +271,25 @@
                                 <div class="detail-mobil text-center text-md-start">
                                     <h5 class="harga-mobil text-success mb-3 text-center text-md-start" style="font-size: 1.5rem;">Rp <span class="harga">0</span>/hari</h5>
                                     <div class="container">
-                                    <div class="row text-center text-md-start">
-                                        <!-- Spesifikasi (3 tampil di mobile) -->
-                                        <div class="col-4 col-md-4 mb-2"><i class="fas fa-car"></i> <span class="text-muted tipe-mobil d-block d-md-inline">Sedan</span></div>
-                                        <div class="col-4 col-md-4 mb-2"><i class="fas fa-palette"></i> <span class="text-muted warna d-block d-md-inline ms-1">Hitam</span></div>
-                                        <div class="col-4 col-md-4 mb-2"><i class="fas fa-gas-pump"></i> <span class="text-muted bahan-bakar d-block d-md-inline">Bensin</span></div>
-                                    </div>
-                                        
-                                    <!-- Spesifikasi tambahan (tersembunyi di mobile) -->
-                                    <div class="row text-center text-md-start d-none d-md-flex">
-                                        <div class="col-md-4 mb-2"><i class="fas fa-cogs"></i> <span class="text-muted transmisi">Manual</span></div>
-                                        <div class="col-md-4 mb-2"><i class="fas fa-chair"></i><span class="text-muted tempat-duduk ms-1">4</span></div>
-                                        <div class="col-md-4 mb-2"><i class="fas fa-calendar-alt"></i> <span class="text-muted tahun">2020</span></div>
-                                    </div>
-                                        
-                                    <!-- Info Garasi & Status (tersembunyi di mobile) -->
-                                    <div class="row text-center text-md-start d-none d-md-flex">
-                                        <div class="col-md-4 mb-2"><i class="fas fa-warehouse"></i> <span class="text-muted garasi">Garasi A</span></div>
-                                        <div class="col-md-6 mb-2"><i class="fas fa-check-circle text-success"></i> <span class="text-success status">Tersedia</span></div>
+                                        <div class="row text-center text-md-start">
+                                            <!-- Spesifikasi (3 tampil di mobile) -->
+                                            <div class="col-4 col-md-4 mb-2"><i class="fas fa-car"></i> <span class="text-muted tipe-mobil d-block d-md-inline">Sedan</span></div>
+                                            <div class="col-4 col-md-4 mb-2"><i class="fas fa-palette"></i> <span class="text-muted warna d-block d-md-inline ms-1">Hitam</span></div>
+                                            <div class="col-4 col-md-4 mb-2"><i class="fas fa-gas-pump"></i> <span class="text-muted bahan-bakar d-block d-md-inline">Bensin</span></div>
+                                        </div>
+                                            
+                                        <!-- Spesifikasi tambahan (tersembunyi di mobile) -->
+                                        <div class="row text-center text-md-start d-none d-md-flex">
+                                            <div class="col-md-4 mb-2"><i class="fas fa-cogs"></i> <span class="text-muted transmisi">Manual</span></div>
+                                            <div class="col-md-4 mb-2"><i class="fas fa-chair"></i><span class="text-muted tempat-duduk ms-1">4</span></div>
+                                            <div class="col-md-4 mb-2"><i class="fas fa-calendar-alt"></i> <span class="text-muted tahun">2020</span></div>
+                                        </div>
+                                            
+                                        <!-- Info Garasi & Status (tersembunyi di mobile) -->
+                                        <div class="row text-center text-md-start d-none d-md-flex">
+                                            <div class="col-md-4 mb-2"><i class="fas fa-warehouse"></i> <span class="text-muted garasi">Garasi A</span></div>
+                                            <div class="col-md-6 mb-2"><i class="fas fa-check-circle text-success"></i> <span class="text-success status">Tersedia</span></div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -382,42 +395,33 @@
                         <div class="toast-container position-fixed top-0 end-0 p-3">
                             <div id="toastWarning" class="toast text-white shadow-sm rounded border-0 text-center position-relative" role="alert" aria-live="assertive" aria-atomic="true" style="background: #b3261e; min-width: 280px;">
                                 <button type="button" class="btn-close btn-close-white btn-close-sm position-absolute top-0 end-0 m-2" data-bs-dismiss="toast" aria-label="Close"></button>
-                                <div class="toast-body d-flex flex-column align-items-center p-3">
-                                    <i class="fas fa-exclamation-circle fa-2x mb-2"></i>
-                                    <span>Minimal durasi penyewaan adalah 3 hari dari tanggal pemesanan.</span>
-                                </div>
                             </div>
                         </div>
 
                         <script>
                             document.addEventListener("DOMContentLoaded", function () {
-                                let tanggalInput = document.getElementById("tanggalSewa");
-                                let toastEl = document.getElementById("toastWarning");
+                            let tanggalInput = document.getElementById("tanggalSewa");
 
-                                // Set tanggal minimal hari ini
-                                let today = new Date();
-                                let minDate = today.toISOString().split("T")[0];
-                                tanggalInput.setAttribute("min", minDate);
+                            // Set tanggal minimal hari ini + 3 hari
+                            let today = new Date();
+                            let minValidDate = new Date();
+                            minValidDate.setDate(today.getDate() +  3);
 
-                                // Set tanggal yang tidak valid menjadi warna merah
-                                let invalidDate = new Date();
-                                invalidDate.setDate(today.getDate() + 3); // Tanggal 3 hari dari sekarang
+                            let minDate = minValidDate.toISOString().split("T")[0];
+                            tanggalInput.setAttribute("min", minDate); // Mencegah pemilihan tanggal sebelum minimal
 
-                                tanggalInput.addEventListener("input", function () {
-                                    let selectedDate = new Date(tanggalInput.value);
+                            // Validasi input saat tanggal dipilih
+                            tanggalInput.addEventListener("input", function () {
+                                let selectedDate = new Date(tanggalInput.value);
 
-                                    if (selectedDate < invalidDate) {
-                                        tanggalInput.style.borderColor = "red";
-                                        tanggalInput.value = ""; // Reset input jika tidak valid
-
-                                        // Tampilkan toast Bootstrap
-                                        let toast = new bootstrap.Toast(toastEl);
-                                        toast.show();
-                                    } else {
-                                        tanggalInput.style.borderColor = ""; // Reset warna jika valid
-                                    }
-                                });
+                                if (selectedDate < minValidDate) {
+                                    tanggalInput.value = ""; // Reset input jika tidak valid
+                                    tanggalInput.classList.add("is-invalid"); // Tambahkan efek invalid
+                                } else {
+                                    tanggalInput.classList.remove("is-invalid"); // Hapus efek invalid jika valid
+                                }
                             });
+                        });
                         </script>
 
                         <div id="lepasKunciFields" class="d-none">
@@ -566,9 +570,51 @@
                     updateHarga();
                 </script>
                 <div class="step d-none" id="step4">
-                    <h5>Transaksi Sukses</h5>
-                    <p>Terima kasih telah menyewa mobil di layanan kami.</p>
-                    <button class="btn btn-success">Download PDF</button>
+                    <!-- Bagian Menunggu Persetujuan -->
+                    <div class="waiting-approval" id="waitingApproval">
+                        <div class="loader"></div>
+                        <h5>Menunggu Persetujuan Admin</h5>
+                        <p>Pesanan Anda sedang diproses. Mohon tunggu beberapa saat.</p>
+                        <button class="btn btn-primary" onclick="checkApproval()">Cek Status</button>
+                    </div>
+
+                    <!-- Bagian Transaksi Sukses (Tampil setelah disetujui admin) -->
+                    <div class="order-summary animate d-none" id="approvedSection">
+                        <div class="checkmark-container">
+                            <div class="checkmark">✔</div>
+                        </div>
+                        <h5>Transaksi Disetujui!</h5>
+                        <p>Terima kasih telah menyewa mobil di layanan kami.</p>
+
+                        <div class="order-details">
+                            <h6>Rincian Pesanan</h6>
+                            <ul>
+                                <li><strong>Nama Penyewa:</strong> Muhammad Arief</li>
+                                <li><strong>Mobil:</strong> Toyota Avanza 2023</li>
+                                <li><strong>Tanggal Sewa:</strong> 20 Februari 2025 - 22 Februari 2025</li>
+                                <li><strong>Total Biaya:</strong> Rp 1.500.000</li>
+                            </ul>
+                        </div>
+                        <button class="btn btn-success animate-btn">Download PDF</button>
+                    </div>
+                    <script>
+                    /* Fungsi simulasi cek persetujuan admin */
+                    function checkApproval() {
+                        const waitingSection = document.getElementById("waitingApproval");
+                        const approvedSection = document.getElementById("approvedSection");
+                        const checkButton = waitingSection.querySelector('.btn-primary');
+
+                        checkButton.innerText = "Memeriksa...";
+                        checkButton.disabled = true;
+
+                        // Simulasi penundaan persetujuan admin (misal 3 detik)
+                        setTimeout(() => {
+                            waitingSection.classList.add('d-none');
+                            approvedSection.classList.remove('d-none');
+                            approvedSection.classList.add('animate');
+                        }, 3000); // Ganti waktu jika butuh lebih lama
+                    }
+                    </script>
                 </div>
             </div>
         </div>
@@ -576,129 +622,7 @@
 </div>
 
 <script>
-document.addEventListener("DOMContentLoaded", function() {
-    let currentStep = 1;
-    const progressBar = document.getElementById("progressBar");
-    const steps = document.querySelectorAll(".step");
-    const jenisSewa = document.getElementById("jenisSewa");
-    const lepasKunciFields = document.getElementById("lepasKunciFields");
-    const denganSupirFields = document.getElementById("denganSupirFields");
-    const tujuanSewa = document.getElementById("tujuanSewa");
-    
-    // Membuat input tambahan untuk tujuan lainnya
-    const tujuanLainInput = document.createElement("input");
-    tujuanLainInput.type = "text";
-    tujuanLainInput.classList.add("form-control", "mt-2");
-    tujuanLainInput.id = "tujuanLainnya";
-    tujuanLainInput.placeholder = "Masukkan tujuan lainnya";
-    tujuanLainInput.style.display = "none";
-    tujuanSewa.parentNode.appendChild(tujuanLainInput);
-    
-    tujuanSewa.addEventListener("change", function() {
-        if (tujuanSewa.value === "tujuan lainnnya") {
-            tujuanLainInput.style.display = "block";
-            tujuanLainInput.setAttribute("required", "true"); // Aktifkan required
-        } else {
-            tujuanLainInput.style.display = "none";
-        }
-    });
-    
-    function updateFields() {
-        if (jenisSewa.value === "lepasKunci") {
-            lepasKunciFields.classList.remove("d-none");
-            denganSupirFields.classList.add("d-none");
-        } else {
-            lepasKunciFields.classList.add("d-none");
-            denganSupirFields.classList.remove("d-none");
-        }
-    }
-    
-    jenisSewa.value = "lepasKunci";
-    updateFields();
-    jenisSewa.addEventListener("change", updateFields);
-    
-     document.querySelectorAll(".next-step").forEach(button => {
-        button.addEventListener("click", function() {
-            const currentStepForm = steps[currentStep - 1].querySelectorAll("input[required], select[required], textarea[required]");
-            let isValid = true;
 
-            // Jika sedang di step ke-2, hanya validasi input yang aktif
-            if (currentStep === 2) {
-                let activeFields = jenisSewa.value === "lepasKunci" ? lepasKunciFields : denganSupirFields;
-                const requiredInputs = activeFields.querySelectorAll("input[required], select[required], textarea[required]");
-
-                requiredInputs.forEach(input => {
-                    if (!input.checkValidity()) {
-                        input.reportValidity();
-                        isValid = false;
-                    }
-                });
-            } else {
-                // Validasi normal untuk step lainnya
-                currentStepForm.forEach(input => {
-                    if (!input.checkValidity()) {
-                        input.reportValidity();
-                        isValid = false;
-                    }
-                });
-            }
-
-            if (isValid) {
-                // Pindah ke step berikutnya
-                steps[currentStep - 1].classList.add("d-none");
-                currentStep++;
-
-                if (currentStep <= steps.length) {
-                    steps[currentStep - 1].classList.remove("d-none");
-                    progressBar.style.width = (currentStep * 25) + "%";
-                    progressBar.innerText = currentStep + "/4";
-                }
-            }
-        });
-    });
-
-    
-    function updatePlaceholders() {
-        const inputs = document.querySelectorAll("#lokasiTujuanContainer input");
-        inputs.forEach((input, index) => {
-            input.placeholder = `Tujuan ${index + 1}`;
-            input.setAttribute("required", "true"); // Tambahkan required ke semua input
-        });
-    }
-
-    document.getElementById("tambahTujuan").addEventListener("click", function(event) {
-        event.preventDefault();
-        const inputGroup = document.createElement("div");
-        inputGroup.classList.add("input-group", "mb-2");
-
-        const inputField = document.createElement("input");
-        inputField.type = "text";
-        inputField.classList.add("form-control");
-        inputField.name = "lokasiTujuan[]";
-        inputField.setAttribute("required", "true"); // Tambahkan required saat input dibuat
-
-        const removeButton = document.createElement("button");
-        removeButton.type = "button";
-        removeButton.classList.add("btn", "btn-danger");
-        removeButton.innerHTML = " - ";
-
-        removeButton.addEventListener("click", function() {
-            inputGroup.remove();
-            updatePlaceholders();
-        });
-
-        const buttonWrapper = document.createElement("div");
-        buttonWrapper.classList.add("input-group-append");
-        buttonWrapper.appendChild(removeButton);
-
-        inputGroup.appendChild(inputField);
-        inputGroup.appendChild(buttonWrapper);
-
-        document.getElementById("lokasiTujuanContainer").appendChild(inputGroup);
-        updatePlaceholders();
-    });
-
-});
 </script>
 
 

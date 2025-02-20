@@ -161,6 +161,153 @@ function tampilkanMobil(dataMobil, dataGarasi) {
     });
 }
 
+document.addEventListener("DOMContentLoaded", function() {
+    let currentStep = 1;
+    const progressBar = document.getElementById("progressBar");
+    const steps = document.querySelectorAll(".step");
+    const jenisSewa = document.getElementById("jenisSewa");
+    const lepasKunciFields = document.getElementById("lepasKunciFields");
+    const denganSupirFields = document.getElementById("denganSupirFields");
+    const tujuanSewa = document.getElementById("tujuanSewa");
+    const detailMobil = document.getElementById("detail-mobil"); // Elemen detail mobil
+
+    // ✅ Fungsi untuk mengatur visibilitas detail mobil pada step 1 & 3 saja
+    function toggleDetailMobil() {
+        if (currentStep === 1 || currentStep === 3) {
+            detailMobil.classList.remove("d-none");
+        } else {
+            detailMobil.classList.add("d-none");
+        }
+    }
+
+    // Membuat input tambahan untuk tujuan lainnya
+    const tujuanLainInput = document.createElement("input");
+    tujuanLainInput.type = "text";
+    tujuanLainInput.classList.add("form-control", "mt-2");
+    tujuanLainInput.id = "tujuanLainnya";
+    tujuanLainInput.placeholder = "Masukkan tujuan lainnya";
+    tujuanLainInput.style.display = "none";
+    tujuanSewa.parentNode.appendChild(tujuanLainInput);
+
+    tujuanSewa.addEventListener("change", function() {
+        if (tujuanSewa.value === "tujuan lainnnya") {
+            tujuanLainInput.style.display = "block";
+            tujuanLainInput.setAttribute("required", "true");
+        } else {
+            tujuanLainInput.style.display = "none";
+        }
+    });
+
+    function updateFields() {
+        if (jenisSewa.value === "lepasKunci") {
+            lepasKunciFields.classList.remove("d-none");
+            denganSupirFields.classList.add("d-none");
+        } else {
+            lepasKunciFields.classList.add("d-none");
+            denganSupirFields.classList.remove("d-none");
+        }
+    }
+
+    jenisSewa.value = "lepasKunci";
+    updateFields();
+    jenisSewa.addEventListener("change", updateFields);
+
+    // Fungsi untuk memperbarui keterangan step yang aktif
+    function updateStepLabels() {
+        document.querySelectorAll(".step-label").forEach((label, index) => {
+            if (index + 1 === currentStep) {
+                label.classList.add("active");
+            } else {
+                label.classList.remove("active");
+            }
+        });
+    }
+
+    // Perbarui bagian event listener ".next-step"
+    document.querySelectorAll(".next-step").forEach(button => {
+        button.addEventListener("click", function() {
+            const currentStepForm = steps[currentStep - 1].querySelectorAll("input[required], select[required], textarea[required]");
+            let isValid = true;
+
+            if (currentStep === 2) {
+                let activeFields = jenisSewa.value === "lepasKunci" ? lepasKunciFields : denganSupirFields;
+                const requiredInputs = activeFields.querySelectorAll("input[required], select[required], textarea[required]");
+
+                requiredInputs.forEach(input => {
+                    if (!input.checkValidity()) {
+                        input.reportValidity();
+                        isValid = false;
+                    }
+                });
+            } else {
+                currentStepForm.forEach(input => {
+                    if (!input.checkValidity()) {
+                        input.reportValidity();
+                        isValid = false;
+                    }
+                });
+            }
+
+            if (isValid) {
+                steps[currentStep - 1].classList.add("d-none");
+                currentStep++;
+
+                if (currentStep <= steps.length) {
+                    steps[currentStep - 1].classList.remove("d-none");
+                    progressBar.style.width = (currentStep * 25) + "%";
+                    progressBar.innerText = currentStep + "/4";
+                    updateStepLabels(); // 🔥 Update label aktif
+                    toggleDetailMobil(); // 🔥 Perbarui visibilitas detail mobil
+                }
+            }
+        });
+    });
+    
+    function updatePlaceholders() {
+        const inputs = document.querySelectorAll("#lokasiTujuanContainer input");
+        inputs.forEach((input, index) => {
+            input.placeholder = `Tujuan ${index + 1}`;
+            input.setAttribute("required", "true");
+        });
+    }
+
+    document.getElementById("tambahTujuan").addEventListener("click", function(event) {
+        event.preventDefault();
+        const inputGroup = document.createElement("div");
+        inputGroup.classList.add("input-group", "mb-2");
+
+        const inputField = document.createElement("input");
+        inputField.type = "text";
+        inputField.classList.add("form-control");
+        inputField.name = "lokasiTujuan[]";
+        inputField.setAttribute("required", "true");
+
+        const removeButton = document.createElement("button");
+        removeButton.type = "button";
+        removeButton.classList.add("btn", "btn-danger");
+        removeButton.innerHTML = " - ";
+
+        removeButton.addEventListener("click", function() {
+            inputGroup.remove();
+            updatePlaceholders();
+        });
+
+        const buttonWrapper = document.createElement("div");
+        buttonWrapper.classList.add("input-group-append");
+        buttonWrapper.appendChild(removeButton);
+
+        inputGroup.appendChild(inputField);
+        inputGroup.appendChild(buttonWrapper);
+
+        document.getElementById("lokasiTujuanContainer").appendChild(inputGroup);
+        updatePlaceholders();
+    });
+    
+    updateStepLabels(); // Inisialisasi label saat pertama kali halaman dimuat
+    toggleDetailMobil(); // ✅ Panggil saat halaman dimuat
+});
+
+
 // Fungsi untuk mencari mobil berdasarkan input
 function cariMobil() {
     const query = searchInput.value.toLowerCase(); // Ambil nilai input pencarian dan ubah ke huruf kecil

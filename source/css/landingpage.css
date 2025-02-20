@@ -611,3 +611,194 @@ td {
     border: 2px solid red !important;
     box-shadow: 0 0 5px rgba(255, 0, 0, 0.5);
 }
+
+/* Loader (Animasi Loading) */
+.loader {
+    border: 6px solid #f3f3f3;
+    border-top: 6px solid #007bff;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 20px auto;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.waiting-approval {
+    text-align: center;
+    padding: 30px;
+    border-radius: 20px;
+    background-color: #fff;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.waiting-approval h5 {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+}
+
+.btn-primary {
+    padding: 10px 30px;
+    border-radius: 50px;
+    font-weight: bold;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.btn-primary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 123, 255, 0.4);
+}
+
+/* Transaksi Sukses (Seperti sebelumnya) */
+@keyframes fadeSlideUp {
+    0% {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.order-summary {
+    background: #fff;
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    animation: fadeSlideUp 0.8s ease-out forwards;
+    opacity: 0;
+}
+
+.order-summary.animate {
+    opacity: 1;
+}
+
+.order-summary h5 {
+    font-size: 1.8rem;
+    color: #28a745;
+    margin-bottom: 15px;
+}
+
+.order-details {
+    text-align: left;
+    margin-top: 20px;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 15px;
+    animation: fadeSlideUp 1s ease-out 0.5s forwards;
+    opacity: 0;
+}
+
+.checkmark-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.checkmark {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background-color: #28a745;
+    color: rgb(255, 255, 255) !important;
+    font-size: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: popCheck 0.5s ease-out forwards;
+}
+
+@keyframes popCheck {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+    }
+
+    80% {
+        transform: scale(1.1);
+        opacity: 1;
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+.step-label {
+    color: gray;
+    font-weight: 500;
+    transition: color 0.3s ease;
+    cursor: not-allowed !important;
+}
+
+.step-label.active {
+    color: rgba(var(--bs-primary-rgb), var(--bs-bg-opacity)) !important;
+    /* Warna biru tosca untuk step aktif */
+    font-weight: bold;
+    cursor: pointer !important;
+}
+
+/* Default (Desktop) */
+.progress-container {
+    width: calc(100% - 40px);
+    padding: 0 20px;
+    margin-top: 50px;
+}
+
+.progress {
+    height: 8px;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    font-size: 0.75rem;
+    line-height: 8px;
+    border-radius: 10px;
+}
+
+/* 🌟 Mobile (Responsif) */
+@media (max-width: 576px) {
+    .progress-container {
+        width: calc(100% - 20px);
+        /* Mengurangi padding untuk mobile */
+        padding: 0 10px;
+        margin-top: 40px;
+    }
+
+    .progress {
+        height: 6px;
+        /* Lebih tipis di mobile */
+    }
+
+    .progress-bar {
+        font-size: 0.65rem;
+        /* Ukuran teks progress diperkecil */
+        line-height: 6px;
+    }
+
+    .step-label {
+        font-size: 0.7rem;
+        /* Label lebih kecil tapi tetap terbaca */
+        text-align: center;
+    }
+}
+
+.btn-primary:disabled {
+    pointer-events: all !important;
+    cursor: not-allowed !important;
+    opacity: 0.65;
+    /* Opsional: untuk efek disabled */
+}
