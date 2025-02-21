@@ -314,75 +314,10 @@
                             <input type="text" class="form-control" id="namaPenyewa" required>
                             <small class="form-text text-muted">Masukkan nama asli anda.</small>
                         </div>
-
-                        <script>
-                        document.getElementById('namaPenyewa').addEventListener('input', function (e) {
-                            let inputField = e.target;
-                            let value = inputField.value;
-
-                            // Hapus angka dari input
-                            let formattedValue = value.replace(/[0-9]/g, '');
-
-                            // Format agar huruf pertama dari setiap kata menjadi kapital
-                            formattedValue = formattedValue.replace(/\b\w/g, function (char) {
-                                return char.toUpperCase();
-                            });
-
-                            // Update nilai input tanpa angka
-                            inputField.value = formattedValue;
-
-                            // Validasi: jika ada angka, buat input jadi invalid secara langsung
-                            if (value.match(/[0-9]/)) {
-                                inputField.classList.add("input-invalid");
-                                inputField.setCustomValidity("Nama tidak boleh mengandung angka.");
-                            } else {
-                                inputField.classList.remove("input-invalid");
-                                inputField.setCustomValidity(""); // Reset error jika valid
-                            }
-
-                            // Tampilkan pesan error langsung tanpa perlu submit
-                            inputField.reportValidity();
-                        });
-                        </script>
                         <div class="mb-3">
                             <label for="nomertelephone" class="form-label">Nomor Telepon</label>
                             <input type="text" class="form-control" id="nomertelephone" placeholder="masukkan nomer telephone anda" required>
                             <small class="form-text text-muted">Masukkan nomor telepon yang valid.</small>
-                            <script>
-                               document.getElementById('nomertelephone').addEventListener('input', function (e) {
-                                let borderTelephone = e.target;
-                                let value = e.target.value.replace(/\D/g, ''); // Hanya angka
-
-                                // Batasi panjang maksimal 12 angka
-                                if (value.length > 12) {
-                                    value = value.substring(0, 12);
-                                }
-
-                                // Tambahkan spasi setiap 4 digit
-                                value = value.replace(/(\d{4})(?=\d)/g, '$1 ');
-
-                                // Update nilai input
-                                e.target.value = value;
-
-                                // Validasi panjang input (harus 12 digit)
-                                if (value.replace(/\s/g, '').length < 12) {
-                                    borderTelephone.classList.add("input-invalid"); // Tambahkan class jika tidak valid
-                                    e.target.setCustomValidity("Nomor telepon harus 12 digit.");
-                                } else {
-                                    borderTelephone.classList.remove("input-invalid"); // Hapus class jika valid
-                                    e.target.setCustomValidity("");
-                                }
-                            });
-
-                                // Tampilkan validasi saat form dikirim
-                                document.querySelector("form").addEventListener("submit", function (e) {
-                                    const phoneInput = document.getElementById('nomertelephone');
-                                    if (!phoneInput.checkValidity()) {
-                                        phoneInput.reportValidity(); // Menampilkan popup seperti required
-                                        e.preventDefault(); // Mencegah submit jika tidak valid
-                                    }
-                                });
-                            </script>
                         </div>
                         <!-- Form Tanggal Mulai Sewa -->
                         <div class="mb-3">
@@ -390,40 +325,12 @@
                             <input type="date" class="form-control" id="tanggalSewa" required>
                             <small class="form-text text-muted">Pilih tanggal mulai penyewaan.</small>
                         </div>
-
                         <!-- Toast Modern dengan Ikon di Atas & Tombol Close di Pojok Kanan Atas -->
                         <div class="toast-container position-fixed top-0 end-0 p-3">
                             <div id="toastWarning" class="toast text-white shadow-sm rounded border-0 text-center position-relative" role="alert" aria-live="assertive" aria-atomic="true" style="background: #b3261e; min-width: 280px;">
                                 <button type="button" class="btn-close btn-close-white btn-close-sm position-absolute top-0 end-0 m-2" data-bs-dismiss="toast" aria-label="Close"></button>
                             </div>
                         </div>
-
-                        <script>
-                            document.addEventListener("DOMContentLoaded", function () {
-                            let tanggalInput = document.getElementById("tanggalSewa");
-
-                            // Set tanggal minimal hari ini + 3 hari
-                            let today = new Date();
-                            let minValidDate = new Date();
-                            minValidDate.setDate(today.getDate() +  3);
-
-                            let minDate = minValidDate.toISOString().split("T")[0];
-                            tanggalInput.setAttribute("min", minDate); // Mencegah pemilihan tanggal sebelum minimal
-
-                            // Validasi input saat tanggal dipilih
-                            tanggalInput.addEventListener("input", function () {
-                                let selectedDate = new Date(tanggalInput.value);
-
-                                if (selectedDate < minValidDate) {
-                                    tanggalInput.value = ""; // Reset input jika tidak valid
-                                    tanggalInput.classList.add("is-invalid"); // Tambahkan efek invalid
-                                } else {
-                                    tanggalInput.classList.remove("is-invalid"); // Hapus efek invalid jika valid
-                                }
-                            });
-                        });
-                        </script>
-
                         <div id="lepasKunciFields" class="d-none">
                             <div class="mb-3">
                                 <label for="fotoKTP" class="form-label">Foto Kartu KTP</label>
@@ -470,7 +377,6 @@
                                     <button class="btn btn-success" id="tambahTujuan">+</button>
                                     
                                 </div>
-                                
                             </div>
                         </div>
                         <button class="btn btn-primary next-step">Lanjut</button>
@@ -521,54 +427,6 @@
 
                     <button class="btn btn-primary next-step">Lanjut</button>
                 </div>
-                <script>
-                    // Ambil elemen-elemen
-                    const hariSewaRange = document.getElementById('hariSewaRange');
-                    const hariSewaNumber = document.getElementById('hariSewa');
-                    const hargaSewaElement = document.getElementById('hargaSewa');
-                    const dpElement = document.getElementById('dp');
-                    const hargaPerHariElement = document.getElementById('hargaPerHari');
-
-                    // Harga per hari dari data atribut (backend bisa mengatur ini)
-                    let hargaPerHari = parseInt(hargaPerHariElement.dataset.harga, 10) || 0;
-
-                    // Saat range diubah, update input number
-                    hariSewaRange.addEventListener('input', function() {
-                        hariSewaNumber.value = hariSewaRange.value;
-                        updateHarga();
-                    });
-
-                    // Saat input number diubah, update range
-                    hariSewaNumber.addEventListener('input', function() {
-                        if (hariSewaNumber.value < 1) {
-                            hariSewaNumber.value = 1;
-                        } else if (hariSewaNumber.value > 100) {
-                            hariSewaNumber.value = 100;
-                        }
-                        hariSewaRange.value = hariSewaNumber.value;
-                        updateHarga();
-                    });
-
-                    // Fungsi untuk memperbarui harga sewa dan DP
-                    function updateHarga() {
-                        const hari = parseInt(hariSewaRange.value, 10);
-                        const totalHargaSewa = hari * hargaPerHari;
-                        const dp = totalHargaSewa * 0.2;
-
-                        hargaSewaElement.innerText = `${totalHargaSewa.toLocaleString('id-ID')}`;
-                        dpElement.innerText = `${dp.toLocaleString('id-ID')}`;
-                    }
-
-                    // Panggil updateHarga() saat harga per hari diperbarui dari backend
-                    function setHargaPerHari(harga) {
-                        hargaPerHari = parseInt(harga, 10) || 0;
-                        hargaPerHariElement.dataset.harga = hargaPerHari;
-                        updateHarga();
-                    }
-
-                    // Panggil fungsi updateHarga saat pertama kali load
-                    updateHarga();
-                </script>
                 <div class="step d-none" id="step4">
                     <!-- Bagian Menunggu Persetujuan -->
                     <div class="waiting-approval" id="waitingApproval">

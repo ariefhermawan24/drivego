@@ -160,7 +160,7 @@ function tampilkanMobil(dataMobil, dataGarasi) {
         });
     });
 }
-
+// modal script
 document.addEventListener("DOMContentLoaded", function() {
     let currentStep = 1;
     const progressBar = document.getElementById("progressBar");
@@ -195,6 +195,8 @@ document.addEventListener("DOMContentLoaded", function() {
             tujuanLainInput.setAttribute("required", "true");
         } else {
             tujuanLainInput.style.display = "none";
+            tujuanLainInput.removeAttribute("required"); // Menghapus atribut required
+            tujuanLainInput.value = ""; // Mengosongkan input saat disembunyikan
         }
     });
 
@@ -264,7 +266,7 @@ document.addEventListener("DOMContentLoaded", function() {
     });
     
     function updatePlaceholders() {
-        const inputs = document.querySelectorAll("#lokasiTujuanContainer input");
+        const inputs = lokasiTujuanContainer.querySelectorAll("input");
         inputs.forEach((input, index) => {
             input.placeholder = `Tujuan ${index + 1}`;
             input.setAttribute("required", "true");
@@ -307,6 +309,132 @@ document.addEventListener("DOMContentLoaded", function() {
     toggleDetailMobil(); // ✅ Panggil saat halaman dimuat
 });
 
+// ============================
+// 📌 Form Nama Penyewa (Modal)
+// ============================
+document.getElementById('namaPenyewa').addEventListener('input', function (e) {
+    const inputField = e.target;
+    let value = inputField.value;
+
+    // 🔤 Hapus angka dari input
+    let formattedValue = value.replace(/[0-9]/g, '');
+
+    // 🔠 Kapitalisasi huruf pertama setiap kata
+    formattedValue = formattedValue.replace(/\b\w/g, char => char.toUpperCase());
+
+    // 📝 Perbarui nilai input
+    inputField.value = formattedValue;
+
+    // ⚠️ Validasi: Nama tidak boleh mengandung angka
+    if (value.match(/[0-9]/)) {
+        inputField.classList.add("input-invalid");
+        inputField.setCustomValidity("Nama tidak boleh mengandung angka.");
+    } else {
+        inputField.classList.remove("input-invalid");
+        inputField.setCustomValidity("");
+    }
+
+    // 🚨 Tampilkan pesan error langsung
+    inputField.reportValidity();
+});
+
+// ===============================
+// ☎️ Form Nomor Telepon (Modal)
+// ===============================
+document.getElementById('nomertelephone').addEventListener('input', function (e) {
+    const borderTelephone = e.target;
+    let value = e.target.value.replace(/\D/g, ''); // 🔢 Hanya angka
+
+    // 🏷️ Batasi panjang maksimal 12 angka
+    if (value.length > 12) value = value.substring(0, 12);
+
+    // 🔗 Tambahkan spasi setiap 4 digit
+    value = value.replace(/(\d{4})(?=\d)/g, '$1 ');
+
+    // 🔄 Perbarui nilai input
+    e.target.value = value;
+
+    // ⚠️ Validasi panjang input (harus 12 digit)
+    if (value.replace(/\s/g, '').length < 12) {
+        borderTelephone.classList.add("input-invalid");
+        e.target.setCustomValidity("Nomor telepon harus 12 digit.");
+    } else {
+        borderTelephone.classList.remove("input-invalid");
+        e.target.setCustomValidity("");
+    }
+});
+
+// 🎯 Validasi saat form dikirim
+document.querySelector("form").addEventListener("submit", function (e) {
+    const phoneInput = document.getElementById('nomertelephone');
+    if (!phoneInput.checkValidity()) {
+        phoneInput.reportValidity();
+        e.preventDefault(); // ⛔ Mencegah submit jika tidak valid
+    }
+});
+
+// ==============================
+// 🗓️ Form Tanggal Sewa (Modal)
+// ==============================
+document.addEventListener("DOMContentLoaded", function () {
+    const tanggalInput = document.getElementById("tanggalSewa");
+
+    // 🕒 Set tanggal minimal hari ini + 3 hari
+    const today = new Date();
+    const minValidDate = new Date(today.setDate(today.getDate() + 3));
+
+    const minDate = minValidDate.toISOString().split("T")[0];
+    tanggalInput.setAttribute("min", minDate); // 🛡️ Mencegah pemilihan tanggal sebelum minimal
+});
+
+// ===================================
+// 💰 Form DP & Harga Sewa (Modal)
+// ===================================
+
+// 🏷️ Ambil elemen-elemen
+const hariSewaRange = document.getElementById('hariSewaRange');
+const hariSewaNumber = document.getElementById('hariSewa');
+const hargaSewaElement = document.getElementById('hargaSewa');
+const dpElement = document.getElementById('dp');
+const hargaPerHariElement = document.getElementById('hargaPerHari');
+
+// 💸 Harga per hari dari data atribut (backend bisa mengatur ini)
+let hargaPerHari = parseInt(hargaPerHariElement.dataset.harga, 10) || 0;
+
+// 🔄 Saat range diubah, update input number & harga
+hariSewaRange.addEventListener('input', function () {
+    hariSewaNumber.value = hariSewaRange.value;
+    updateHarga();
+});
+
+// 🔄 Saat input number diubah, update range & harga
+hariSewaNumber.addEventListener('input', function () {
+    if (hariSewaNumber.value < 1) hariSewaNumber.value = 1;
+    else if (hariSewaNumber.value > 100) hariSewaNumber.value = 100;
+
+    hariSewaRange.value = hariSewaNumber.value;
+    updateHarga();
+});
+
+// 💡 Fungsi untuk memperbarui harga sewa dan DP
+function updateHarga() {
+    const hari = parseInt(hariSewaRange.value, 10);
+    const totalHargaSewa = hari * hargaPerHari;
+    const dp = totalHargaSewa * 0.2;
+
+    hargaSewaElement.innerText = totalHargaSewa.toLocaleString('id-ID');
+    dpElement.innerText = dp.toLocaleString('id-ID');
+}
+
+// ⚙️ Fungsi untuk memperbarui harga per hari (jika dari backend)
+function setHargaPerHari(harga) {
+    hargaPerHari = parseInt(harga, 10) || 0;
+    hargaPerHariElement.dataset.harga = hargaPerHari;
+    updateHarga();
+}
+
+// 🔥 Panggil fungsi updateHarga saat pertama kali load
+updateHarga();
 
 // Fungsi untuk mencari mobil berdasarkan input
 function cariMobil() {
