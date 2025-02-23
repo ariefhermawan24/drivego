@@ -821,6 +821,7 @@ td {
     cursor: pointer;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     transition: background-color 0.3s;
+    overflow: hidden;
     z-index: 1000;
 }
 
@@ -828,7 +829,18 @@ td {
     background-color: darkorange;
 }
 
-/* Popup Mini */
+/* Animasi untuk ikon di tombol */
+.btn-icon {
+    display: inline-block;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.btn-icon.change {
+    transform: rotate(180deg);
+    opacity: 0;
+}
+
+/* Popup dengan animasi */
 .popup-info {
     position: fixed;
     bottom: 80px;
@@ -840,12 +852,17 @@ td {
     font-size: 14px;
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-    display: none;
     z-index: 999;
+    display: none !important;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
-.icon-alert {
-    font-size: 20px;
+.popup-show {
+    display: block !important;
+    opacity: 1;
+    transform: translateY(0);
 }
 
 /* Responsif */

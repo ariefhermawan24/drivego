@@ -568,41 +568,76 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
-// floating button
+// pop up info
 const infoBtn = document.getElementById('infoBtn');
-    const popupInfo = document.getElementById('popupInfo');
-    let popupVisible = false;
+const popupInfo = document.getElementById('popupInfo');
+const btnIcon = document.querySelector('.btn-icon');
+const footer = document.getElementById('footer');
+let popupVisible = false;
+
+// Fungsi untuk menampilkan popup dan ubah ikon
+const showPopup = () => {
+        popupInfo.style.setProperty('display', 'block', 'important');
+        setTimeout(() => popupInfo.classList.add('popup-show'), 10);
+
+        // Animasi ikon ke 'X'
+        btnIcon.classList.add('change');
+        setTimeout(() => {
+            btnIcon.textContent = 'X';
+            btnIcon.classList.remove('change');
+        }, 300);
+    };
+
+    // Fungsi untuk menyembunyikan popup dan reset ikon
+    const hidePopup = () => {
+        popupInfo.classList.remove('popup-show');
+        setTimeout(() => popupInfo.style.setProperty('display', 'none', 'important'), 300);
+
+        // Animasi ikon kembali ke '?'
+        btnIcon.classList.add('change');
+        setTimeout(() => {
+            btnIcon.textContent = '?';
+            btnIcon.classList.remove('change');
+        }, 300);
+    };
 
     // Toggle popup saat tombol diklik
     infoBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         popupVisible = !popupVisible;
-        popupInfo.style.setProperty('display', popupVisible ? 'block' : 'none', 'important');
+        popupVisible ? showPopup() : hidePopup();
     });
 
-    // Sembunyikan popup saat klik di luar area
+    // Hover tambahan
+    infoBtn.addEventListener('mouseenter', () => {
+        if (!popupVisible) showPopup();
+    });
+
+    infoBtn.addEventListener('mouseleave', () => {
+        if (!popupVisible) hidePopup();
+    });
+
+    popupInfo.addEventListener('mouseleave', () => {
+        if (!popupVisible) hidePopup();
+    });
+
+    // Klik di luar popup untuk menyembunyikan
     document.addEventListener('click', (e) => {
         if (popupVisible && !popupInfo.contains(e.target) && e.target !== infoBtn) {
-            popupInfo.style.setProperty('display', 'none', 'important');
+            hidePopup();
             popupVisible = false;
         }
     });
 
-    // Hover tambahan (opsional)
-    infoBtn.addEventListener('mouseenter', () => {
-        if (!popupVisible) popupInfo.style.setProperty('display', 'block', 'important');
-    });
+    // 🔥 Fungsi untuk mengatur batas floating button di atas footer
+    window.addEventListener('scroll', () => {
+        const footerRect = footer.getBoundingClientRect();
+        const windowHeight = window.innerHeight;
+        const overlap = windowHeight - footerRect.top - 5; // di atas footer
 
-    infoBtn.addEventListener('mouseleave', () => {
-        if (!popupVisible) {
-            setTimeout(() => {
-                if (!popupInfo.matches(':hover')) {
-                    popupInfo.style.setProperty('display', 'none', 'important');
-                }
-            }, 300);
+        if (overlap > 0) {
+            infoBtn.style.transform = `translateY(-${overlap}px)`;
+        } else {
+            infoBtn.style.transform = `translateY(0)`;
         }
-    });
-
-    popupInfo.addEventListener('mouseleave', () => {
-        if (!popupVisible) popupInfo.style.setProperty('display', 'none', 'important');
     });
