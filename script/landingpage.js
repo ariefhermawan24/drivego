@@ -568,3 +568,41 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
+// floating button
+const infoBtn = document.getElementById('infoBtn');
+    const popupInfo = document.getElementById('popupInfo');
+    let popupVisible = false;
+
+    // Toggle popup saat tombol diklik
+    infoBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        popupVisible = !popupVisible;
+        popupInfo.style.setProperty('display', popupVisible ? 'block' : 'none', 'important');
+    });
+
+    // Sembunyikan popup saat klik di luar area
+    document.addEventListener('click', (e) => {
+        if (popupVisible && !popupInfo.contains(e.target) && e.target !== infoBtn) {
+            popupInfo.style.setProperty('display', 'none', 'important');
+            popupVisible = false;
+        }
+    });
+
+    // Hover tambahan (opsional)
+    infoBtn.addEventListener('mouseenter', () => {
+        if (!popupVisible) popupInfo.style.setProperty('display', 'block', 'important');
+    });
+
+    infoBtn.addEventListener('mouseleave', () => {
+        if (!popupVisible) {
+            setTimeout(() => {
+                if (!popupInfo.matches(':hover')) {
+                    popupInfo.style.setProperty('display', 'none', 'important');
+                }
+            }, 300);
+        }
+    });
+
+    popupInfo.addEventListener('mouseleave', () => {
+        if (!popupVisible) popupInfo.style.setProperty('display', 'none', 'important');
+    });

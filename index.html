@@ -223,6 +223,22 @@
     </div>
 </section>
 
+<!-- Popup Mini -->
+<div class="popup-info bg-dark text-light d-flex align-items-center text-center" id="popupInfo">
+    <div class="icon-alert me-2">⚠️</div>
+    <p class="mb-0">Website ini hanya untuk tujuan edukasi.</p>
+</div>
+
+<!-- Floating Button -->
+<div class="floating-btn" id="infoBtn">
+    <span>?</span>
+</div>
+
+<!-- Footer -->
+<footer class="text-light text-center py-3" style="background-color: black;">
+    <p class="mb-0">© 2025 DriveGo | All Rights Reserved</p>
+</footer>
+
 <!-- Tambahkan Firebase SDK -->
 <script src="../drivego/script/landingpage.js" type="module"></script>
 
@@ -250,8 +266,8 @@
                     </div>
                 </div>
             </div>  
-            <div class="modal-header bg-dark">
-                <h5 class="modal-title nama-mobil" id="transaksiModalLabel">Nama Mobil</h5>
+            <div class="modal-header bg-dark" style="margin-top: -20px;">
+                <h5 class="modal-title modal-bold" style="font-size: 25px;">Drive <h5 style="color: orange; margin-top:10px; margin-left:5px; font-size:25px;">Go</h5></h5>
                 <button type="button" class="btn-close bg-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -269,8 +285,15 @@
                             <!-- Detail di kanan (desktop) / bawah (mobile) -->
                             <div class="col-md-8">
                                 <div class="detail-mobil text-center text-md-start">
-                                    <h5 class="harga-mobil text-success mb-3 text-center text-md-start" style="font-size: 1.5rem;">Rp <span class="harga">0</span>/hari</h5>
-                                    <div class="container">
+                                    <div class="d-flex flex-column align-items-center align-items-md-start mb-3">
+                                        <h5 class="nama-mobil text-center text-md-start modal-bold" id="transaksiModalLabel" style="font-size: 1.75rem;">
+                                            Nama Mobil
+                                        </h5>
+                                        <h6 class="harga-mobil text-center text-md-start modal-bold" style="font-size: 1.25rem; color: orange; margin-top:-10px">
+                                            Rp <span class="harga">0</span>/hari
+                                        </h6>
+                                    </div>
+                                    <div class="container" style="margin-top: -18px;">
                                         <div class="row text-center text-md-start">
                                             <!-- Spesifikasi (3 tampil di mobile) -->
                                             <div class="col-4 col-md-4 mb-2"><i class="fas fa-car"></i> <span class="text-muted tipe-mobil d-block d-md-inline">Sedan</span></div>
@@ -327,7 +350,7 @@
                         </div>
                         <!-- Toast Modern dengan Ikon di Atas & Tombol Close di Pojok Kanan Atas -->
                         <div class="toast-container position-fixed top-0 end-0 p-3">
-                            <div id="toastWarning" class="toast text-white shadow-sm rounded border-0 text-center position-relative" role="alert" aria-live="assertive" aria-atomic="true" style="background: #b3261e; min-width: 280px;">
+                            <div id="toastWarning" class="toast text-white shadow-sm ronded border-0 text-center position-relative" role="alert" aria-live="assertive" aria-atomic="true" style="background: #b3261e; min-width: 280px;">
                                 <button type="button" class="btn-close btn-close-white btn-close-sm position-absolute top-0 end-0 m-2" data-bs-dismiss="toast" aria-label="Close"></button>
                             </div>
                         </div>
@@ -431,8 +454,8 @@
                     <!-- Bagian Menunggu Persetujuan -->
                     <div class="waiting-approval" id="waitingApproval">
                         <div class="loader"></div>
-                        <h5>Menunggu Persetujuan Admin</h5>
-                        <p>Pesanan Anda sedang diproses. Mohon tunggu beberapa saat.</p>
+                        <h5>Peninjauan Berkas Anda</h5>
+                        <p>Berkas Anda sedang dalam proses validasi. Kami akan segera menginformasikan status terbaru.</p>
                         <button class="btn btn-primary" onclick="checkApproval()">Cek Status</button>
                     </div>
 

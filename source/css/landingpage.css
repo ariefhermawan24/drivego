@@ -415,8 +415,8 @@ button[type="submit"] {
     border-top-right-radius: 10px;
 }
 
-.modal-title {
-    font-weight: bold;
+.modal-bold {
+    font-weight: bold !important;
 }
 
 /* Foto Mobil */
@@ -740,14 +740,14 @@ td {
     color: gray;
     font-weight: 500;
     transition: color 0.3s ease;
-    cursor: not-allowed !important;
+    cursor: not-allowed;
 }
 
 .step-label.active {
     color: rgba(var(--bs-primary-rgb), var(--bs-bg-opacity)) !important;
     /* Warna biru tosca untuk step aktif */
     font-weight: bold;
-    cursor: pointer !important;
+    cursor: pointer;
 }
 
 /* Default (Desktop) */
@@ -801,4 +801,65 @@ td {
     cursor: not-allowed !important;
     opacity: 0.65;
     /* Opsional: untuk efek disabled */
+}
+
+/* Floating Button */
+.floating-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 50px;
+    height: 50px;
+    background-color: orange;
+    color: white;
+    font-size: 24px;
+    font-weight: bold;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    transition: background-color 0.3s;
+    z-index: 1000;
+}
+
+.floating-btn:hover {
+    background-color: darkorange;
+}
+
+/* Popup Mini */
+.popup-info {
+    position: fixed;
+    bottom: 80px;
+    right: 20px;
+    width: 280px;
+    padding: 12px 16px;
+    background-color: #222;
+    color: #fff;
+    font-size: 14px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    display: none;
+    z-index: 999;
+}
+
+.icon-alert {
+    font-size: 20px;
+}
+
+/* Responsif */
+@media (max-width: 576px) {
+    .popup-info {
+        width: 90%;
+        right: 5%;
+        font-size: 13px;
+        padding: 10px;
+    }
+
+    .floating-btn {
+        width: 45px;
+        height: 45px;
+        font-size: 20px;
+    }
 }
