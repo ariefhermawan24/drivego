@@ -29,6 +29,90 @@ const garasiRef = ref(database, 'garasi');
 const carcontainer = document.querySelector('.daftar-mobil .row')
 const container = document.querySelector('.daftar-garasi .row');
 const searchInput = document.getElementById('searchInput'); // Input pencarian
+ 
+const filterGarasi = document.getElementById("filterGarasi");
+const filterTipe = document.getElementById("filterTipe");
+const filterKursi = document.getElementById("filterKursi");
+
+// Fungsi untuk mengisi dropdown filter
+function populateDropdown(ref, dropdown, keyName, property) {
+    onValue(ref, (snapshot) => {
+        dropdown.innerHTML = `<option selected>Pilih ${keyName}</option>`;
+        const values = new Set();
+
+        Object.values(snapshot.val() || {}).forEach((item) => {
+            if (item && item[property]) {
+                values.add(item[property]); // Tambahkan ke dalam Set untuk menghindari duplikasi
+            }
+        });
+
+        values.forEach((value) => {
+            const option = document.createElement("option");
+            option.value = value;
+            option.textContent = property === "jumlah_tempat_duduk" ? `${value} Kursi` : value;
+            dropdown.appendChild(option);
+        });
+    });
+}
+
+// Mengisi dropdown berdasarkan data dari Firebase
+populateDropdown(garasiRef, filterGarasi, "Garasi", "nama_tempat");
+populateDropdown(mobilRef, filterTipe, "Tipe", "tipe_mobil");
+populateDropdown(mobilRef, filterKursi, "Kursi", "jumlah_tempat_duduk");
+
+// Fungsi untuk mencari dan memfilter mobil
+function cariMobil() {
+    const query = searchInput.value.toLowerCase();
+    const selectedGarasi = filterGarasi.value.toLowerCase();
+    const selectedTipe = filterTipe.value.toLowerCase();
+    const selectedKursi = filterKursi.value;
+
+    onValue(mobilRef, (snapshotMobil) => {
+        onValue(garasiRef, (snapshotGarasi) => {
+            const dataMobil = snapshotMobil.val();
+            const dataGarasi = snapshotGarasi.val();
+
+            const filteredMobil = Object.values(dataMobil || {}).filter((mobil) => {
+                const namaMobil = mobil.nama_mobil ? mobil.nama_mobil.toLowerCase() : "";
+                const tipeMobil = mobil.tipe_mobil ? mobil.tipe_mobil.toLowerCase() : "";
+                const jumlahKursi = mobil.jumlah_tempat_duduk ? String(mobil.jumlah_tempat_duduk) : "";
+                
+                // Temukan nama garasi berdasarkan ID garasi mobil
+                const namaGarasi = dataGarasi && dataGarasi[mobil.id_tempat] ? dataGarasi[mobil.id_tempat].nama_tempat.toLowerCase() : "";
+
+                const cocokNama = query === "" || namaMobil.includes(query);
+                const cocokGarasi = selectedGarasi === "pilih garasi" || namaGarasi === selectedGarasi;
+                const cocokTipe = selectedTipe === "pilih tipe" || tipeMobil === selectedTipe;
+                const cocokKursi = selectedKursi === "Pilih Kursi" || jumlahKursi === selectedKursi;
+
+                return cocokNama && cocokGarasi && cocokTipe && cocokKursi;
+            });
+
+            // Tampilkan mobil yang sesuai filter
+            tampilkanMobil(filteredMobil, dataGarasi);
+        });
+    });
+}
+
+// Event listener untuk pencarian dan filter
+searchInput.addEventListener('input', cariMobil);
+filterGarasi.addEventListener('change', cariMobil);
+filterTipe.addEventListener('change', cariMobil);
+filterKursi.addEventListener('change', cariMobil);
+
+// reset filter
+document.getElementById("resetFilters").addEventListener("click", function () {
+    // Reset input pencarian
+    document.getElementById("searchInput").value = "";
+
+    // Reset dropdown filter ke pilihan pertama
+    filterGarasi.selectedIndex = 0;
+    filterTipe.selectedIndex = 0;
+    filterKursi.selectedIndex = 0;
+
+    // Panggil fungsi untuk menampilkan semua mobil kembali
+    cariMobil();
+});
 
 // Fungsi untuk menampilkan data mobil
 function tampilkanMobil(dataMobil, dataGarasi) {
@@ -38,12 +122,8 @@ function tampilkanMobil(dataMobil, dataGarasi) {
     document.querySelector('.loading-text').style.display = 'flex';
 
     carcontainer.innerHTML = ''; // Kosongkan elemen
-    // Urutkan data mobil berdasarkan status
-    const mobilList = Object.values(dataMobil || {}).sort((a, b) => {
-        const statusA = a.status || 'undefined';
-        const statusB = b.status || 'undefined';
-        return statusA === 'tersedia' ? -1 : 1;
-    });
+    // Filter hanya mobil yang tersedia
+    const mobilList = Object.values(dataMobil || {}).filter(mobil => mobil.status === 'tersedia');
 
     // Cek apakah ada mobil yang ditemukan
     if (mobilList.length === 0) {
@@ -210,6 +290,26 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }
 
+    function updateOrderDetails() {
+        if (jenisSewa.value === "lepasKunci") {
+            detailLepasKunci.classList.remove("d-none");
+            detailDenganSupir.classList.add("d-none");
+        } else {
+            detailLepasKunci.classList.add("d-none");
+            detailDenganSupir.classList.remove("d-none");
+        }
+    }
+
+    function updateLabel() {
+    if (jenisSewa.value === "lepasKunci") {
+        document.getElementById("label-jam").textContent = "Jam Pengambilan";
+        document.getElementById("penjelasan-jam").textContent = "Pilih jam untuk pengambilan mobil di garasi kami.";
+    } else {
+        document.getElementById("label-jam").textContent = "Jam Penjemputan";
+        document.getElementById("penjelasan-jam").textContent = "Pilih jam penjemputan yang diinginkan.";
+    }
+}
+
     jenisSewa.value = "lepasKunci";
     updateFields();
     jenisSewa.addEventListener("change", updateFields);
@@ -260,6 +360,8 @@ document.addEventListener("DOMContentLoaded", function() {
                     progressBar.innerText = currentStep + "/4";
                     updateStepLabels(); // 🔥 Update label aktif
                     toggleDetailMobil(); // 🔥 Perbarui visibilitas detail mobil
+                    updateOrderDetails()
+                    updateLabel()
                 }
             }
         });
@@ -387,6 +489,34 @@ document.addEventListener("DOMContentLoaded", function () {
     tanggalInput.setAttribute("min", minDate); // 🛡️ Mencegah pemilihan tanggal sebelum minimal
 });
 
+// ==============================
+// 🗓️ Form Jam (Modal)
+// ==============================
+
+document.addEventListener("DOMContentLoaded", function () {
+    const jamPenjemputan = document.getElementById("jamPenjemputan");
+    const toastEl = document.getElementById("jamToast");
+    const toastBootstrap = new bootstrap.Toast(toastEl, { delay: 3000 }); // Otomatis hilang setelah 1 detik
+    const minTime = "04:00";
+    const maxTime = "23:59"; // 24:00 tidak valid di HTML
+
+    function validateTime() {
+        let selectedTime = jamPenjemputan.value;
+
+        if (selectedTime < minTime || selectedTime > maxTime) {
+            jamPenjemputan.value = minTime; // Ubah otomatis ke jam minimum
+            toastBootstrap.show(); // Tampilkan notifikasi
+        }
+    }
+
+    // Set min dan max pada input
+    jamPenjemputan.setAttribute("min", minTime);
+    jamPenjemputan.setAttribute("max", maxTime);
+
+    // Event listener untuk validasi input
+    jamPenjemputan.addEventListener("change", validateTime);
+});
+
 // ===================================
 // 💰 Form DP & Harga Sewa (Modal)
 // ===================================
@@ -435,31 +565,6 @@ function setHargaPerHari(harga) {
 
 // 🔥 Panggil fungsi updateHarga saat pertama kali load
 updateHarga();
-
-// Fungsi untuk mencari mobil berdasarkan input
-function cariMobil() {
-    const query = searchInput.value.toLowerCase(); // Ambil nilai input pencarian dan ubah ke huruf kecil
-
-    // Ambil data mobil dan garasi dari Firebase
-    onValue(mobilRef, (snapshotMobil) => {
-        onValue(garasiRef, (snapshotGarasi) => {
-            const dataMobil = snapshotMobil.val();
-            const dataGarasi = snapshotGarasi.val();
-
-            // Filter mobil berdasarkan pencarian
-            const filteredMobil = Object.values(dataMobil || {}).filter((mobil) =>
-                mobil.nama_mobil.toLowerCase().includes(
-                    query) // Cek apakah nama mobil sesuai dengan pencarian
-            );
-
-            // Tampilkan mobil yang sudah difilter
-            tampilkanMobil(filteredMobil, dataGarasi);
-        });
-    });
-}
-
-// Tambahkan event listener pada kolom pencarian
-searchInput.addEventListener('input', cariMobil);
 
 // Pantau perubahan data di Firebase (untuk pertama kali load)
 onValue(mobilRef, (snapshotMobil) => {

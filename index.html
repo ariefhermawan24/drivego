@@ -184,34 +184,48 @@
 
 <!-- Garasi Section -->
 <section id="garasi" class="py-5">
-    <div class="container daftar-mobil" >
+    <div class="container daftar-mobil">
         <h2 class="text-center" style="margin-bottom: 20px; margin-top: 20px">Daftar Mobil</h2>
+        
         <!-- Search Bar -->
-        <div class="search-bar" style="margin-bottom: 20px">
+        <div class="search-bar d-flex align-items-center" style="margin-bottom: 10px">
             <div class="input-group">
-                <!-- Tambahkan ikon di sini -->
                 <span class="input-group-text" id="searchIcon"><i class="fas fa-search"></i></span>
-                <input type="text" class="form-control" id="searchInput" placeholder="Cari Mobil..."
-                    aria-label="Cari Mobil" aria-describedby="searchIcon">
+                <input type="text" class="form-control" id="searchInput" placeholder="Cari Mobil..." aria-label="Cari Mobil" aria-describedby="searchIcon">
             </div>
+            <button id="resetFilters" class="btn btn-outline-secondary ms-2" title="mereset seluruh filter">
+                <i class="fas fa-sync-alt"></i>
+            </button>
         </div>
-
+        
+        <!-- Dropdown Filters -->
+        <div class="filter-container" style="display: flex; gap: 10px; margin-bottom: 10px;">
+            <select class="form-select" id="filterGarasi" style="flex: 1;">
+                <option selected>Pilih Garasi</option>
+            </select>
+            <select class="form-select" id="filterTipe" style="flex: 1;">
+                <option selected>Pilih Tipe</option>
+            </select>
+            <select class="form-select" id="filterKursi" style="flex: 1;">
+                <option selected>Pilih Kursi</option>
+            </select>
+        </div>
+        
         <!-- Loading Container -->
         <div class="loading-container">
-            <!-- Loading Animation (Horizontal) -->
             <div class="loading-box">
                 <div class="WH animation color"></div>
                 <div class="WH animation color"></div>
                 <div class="WH animation color"></div>
             </div>
-            <!-- Loading Text -->
-            <p class="loading-text">Rendering Car , Wait For A Moment...</p>
+            <p class="loading-text">Rendering Car, Wait For A Moment...</p>
         </div>
-
-        <div class="row">
+        
+        <div class="row" id="carContainer">
         </div>
     </div>
 </section>
+
 
 <!-- contact section -->
 <section id="contact" class="py-5 bg-dark">
@@ -348,10 +362,20 @@
                             <input type="date" class="form-control" id="tanggalSewa" required>
                             <small class="form-text text-muted">Pilih tanggal mulai penyewaan.</small>
                         </div>
-                        <!-- Toast Modern dengan Ikon di Atas & Tombol Close di Pojok Kanan Atas -->
-                        <div class="toast-container position-fixed top-0 end-0 p-3">
-                            <div id="toastWarning" class="toast text-white shadow-sm ronded border-0 text-center position-relative" role="alert" aria-live="assertive" aria-atomic="true" style="background: #b3261e; min-width: 280px;">
-                                <button type="button" class="btn-close btn-close-white btn-close-sm position-absolute top-0 end-0 m-2" data-bs-dismiss="toast" aria-label="Close"></button>
+                        <!-- Form Jam Penjemputan -->
+                        <div class="mb-3">
+                            <label for="jamPenjemputan" class="form-label" id="label-jam">Jam Penjemputan</label>
+                            <input type="time" class="form-control" id="jamPenjemputan" required>
+                            <small class="form-text text-muted" id="penjelasan-jam">Pilih jam penjemputan yang diinginkan.</small>
+                        </div>
+                        <!-- Toast Notifikasi -->
+                        <div class="toast-container position-fixed bottom-0 end-0 p-3">
+                            <div id="jamToast" class="toast align-items-center text-white bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="1000">
+                                <div class="d-flex">
+                                    <div class="toast-body">
+                                        Jam kerja kami dari 04:00 hingga 24:00.
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div id="lepasKunciFields" class="d-none">
@@ -450,62 +474,43 @@
 
                     <button class="btn btn-primary next-step">Lanjut</button>
                 </div>
-                <div class="step d-none" id="step4">
-                    <!-- Bagian Menunggu Persetujuan -->
-                    <div class="waiting-approval" id="waitingApproval">
+                <div id="step4" class="step d-none">
+                    <!-- Bagian Status Persetujuan -->
+                    <div class="waiting-approval" id="statusApproval">
                         <div class="loader"></div>
                         <h5>Peninjauan Berkas Anda</h5>
-                        <p>Berkas Anda sedang dalam proses validasi. Kami akan segera menginformasikan status terbaru.</p>
-                        <button class="btn btn-primary" onclick="checkApproval()">Cek Status</button>
-                    </div>
+                        <p>Berkas Anda sedang dalam proses validasi. Mohon tunggu...</p>  
+                    
 
-                    <!-- Bagian Transaksi Sukses (Tampil setelah disetujui admin) -->
-                    <div class="order-summary animate d-none" id="approvedSection">
-                        <div class="checkmark-container">
-                            <div class="checkmark">✔</div>
+                        <!-- Detail untuk Lepas Kunci -->
+                        <div id="detailLepasKunci" class="order-details d-none">
+                            <table class="table">
+                                <tr><th>Nama Penyewa</th><td>Muhammad Arief</td></tr>
+                                <tr><th>Tanggal Sewa</th><td>20 Februari 2025 - 22 Februari 2025</td></tr>
+                                <tr><th>Total Biaya</th><td>Rp 1.500.000</td></tr>
+                                <tr><th>Jenis Sewa</th><td>Lepas Kunci</td></tr>
+                                <tr><th>Alamat Penyewa</th><td>Jalan ABC No. 123</td></tr>
+                                <tr><th>Dokumen</th><td>KTP, SIM, Verifikasi Foto</td></tr>
+                            </table>
                         </div>
-                        <h5>Transaksi Disetujui!</h5>
-                        <p>Terima kasih telah menyewa mobil di layanan kami.</p>
 
-                        <div class="order-details">
-                            <h6>Rincian Pesanan</h6>
-                            <ul>
-                                <li><strong>Nama Penyewa:</strong> Muhammad Arief</li>
-                                <li><strong>Mobil:</strong> Toyota Avanza 2023</li>
-                                <li><strong>Tanggal Sewa:</strong> 20 Februari 2025 - 22 Februari 2025</li>
-                                <li><strong>Total Biaya:</strong> Rp 1.500.000</li>
-                            </ul>
+                        <!-- Detail untuk Dengan Supir -->
+                        <div id="detailDenganSupir" class="order-details d-none">
+                            <table class="table table-bordered">
+                                <tr><th>Nama Penyewa</th><td>Muhammad Arief</td></tr>
+                                <tr><th>Tanggal Sewa</th><td>20 Februari 2025 - 22 Februari 2025</td></tr>
+                                <tr><th>Total Biaya</th><td>Rp 1.500.000</td></tr>
+                                <tr><th>Jenis Sewa</th><td>Dengan Supir</td></tr>
+                                <tr><th>Tujuan Sewa</th><td>Wisata</td></tr>
+                                <tr><th>Lokasi Penjemputan</th><td>Stasiun Solo Balapan</td></tr>
+                            </table>
                         </div>
-                        <button class="btn btn-success animate-btn">Download PDF</button>
                     </div>
-                    <script>
-                    /* Fungsi simulasi cek persetujuan admin */
-                    function checkApproval() {
-                        const waitingSection = document.getElementById("waitingApproval");
-                        const approvedSection = document.getElementById("approvedSection");
-                        const checkButton = waitingSection.querySelector('.btn-primary');
-
-                        checkButton.innerText = "Memeriksa...";
-                        checkButton.disabled = true;
-
-                        // Simulasi penundaan persetujuan admin (misal 3 detik)
-                        setTimeout(() => {
-                            waitingSection.classList.add('d-none');
-                            approvedSection.classList.remove('d-none');
-                            approvedSection.classList.add('animate');
-                        }, 3000); // Ganti waktu jika butuh lebih lama
-                    }
-                    </script>
                 </div>
             </div>
         </div>
     </div>
 </div>
-
-<script>
-
-</script>
-
 
 
 </html>

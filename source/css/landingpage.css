@@ -149,11 +149,7 @@ button[type="submit"] {
         /* Padding untuk ukuran tombol */
     }
 
-    .garasi .col-md-4 {
-        flex: 1 1 45%;
-        /* 2 kolom pada tablet */
-        max-width: 45%;
-    }
+    
 
     .mobile-login {
         width: 100%;
