@@ -446,27 +446,46 @@ document.getElementById('namaPenyewa').addEventListener('input', function (e) {
 document.getElementById('nomertelephone').addEventListener('input', function (e) {
     const borderTelephone = e.target;
     let value = e.target.value.replace(/\D/g, ''); // 🔢 Hanya angka
+    let formattedValue = value;
+    let maxLength = 12; // Default max untuk nomor Indonesia
+    let errorMessage = ""; // Pesan error default kosong
 
-    // 🏷️ Batasi panjang maksimal 12 angka
-    if (value.length > 12) value = value.substring(0, 12);
+    // 🚫 Deteksi Nomor Luar Negeri (tidak diawali 0)
+    if (!value.startsWith("0")) {
+        maxLength = 15; // Maksimal 15 digit
+        if (value.length > maxLength) value = value.substring(0, maxLength);
+        formattedValue = value.replace(/(\d{4})(?=\d)/g, '$1 ');
+        errorMessage = "Hanya nomor Indonesia yang diperbolehkan.";
 
-    // 🔗 Tambahkan spasi setiap 4 digit
-    value = value.replace(/(\d{4})(?=\d)/g, '$1 ');
+    // 📱 Mobile Number (08xxx - max 12 digit)
+    } else if (value.startsWith("08")) {
+        if (value.length > maxLength) value = value.substring(0, maxLength);
+        formattedValue = value.replace(/(\d{4})(?=\d)/g, '$1 ');
+        if (value.length < 12) errorMessage = "Nomor HP harus 12 digit.";
+
+    // ☎️ Landline Number (02xxx - 09xxx - max 12 digit)
+    } else if (/^(02|03|04|05|06|07|09)/.test(value)) {
+        if (value.length > maxLength) value = value.substring(0, maxLength);
+        formattedValue = value.replace(/^(\d{3})(\d{4})(\d{0,5})$/, "$1-$2-$3").replace(/-$/, "");
+        if (value.length < 10) errorMessage = "Nomor telepon rumah minimal 10 digit.";
+
+    // ❌ Format Tidak Dikenal
+    } else {
+        if (value.length > maxLength) value = value.substring(0, maxLength);
+        formattedValue = value.replace(/(\d{4})(?=\d)/g, '$1 ');
+        errorMessage = "Format nomor tidak valid di Indonesia.";
+    }
 
     // 🔄 Perbarui nilai input
-    e.target.value = value;
+    e.target.value = formattedValue;
 
-    // ⚠️ Validasi panjang input (harus 12 digit)
-    if (value.replace(/\s/g, '').length < 12) {
-        borderTelephone.classList.add("input-invalid");
-        e.target.setCustomValidity("Nomor telepon harus 12 digit.");
-    } else {
-        borderTelephone.classList.remove("input-invalid");
-        e.target.setCustomValidity("");
-    }
+    // ⚠️ Jika ada error, langsung tampilkan validasi
+    e.target.setCustomValidity(errorMessage);
+    e.target.reportValidity(); // Memunculkan pesan validasi langsung
+    borderTelephone.classList.toggle("input-invalid", !!errorMessage);
 });
 
-// 🎯 Validasi saat form dikirim
+// 🎯 Validasi tetap berjalan saat submit
 document.querySelector("form").addEventListener("submit", function (e) {
     const phoneInput = document.getElementById('nomertelephone');
     if (!phoneInput.checkValidity()) {
@@ -682,67 +701,62 @@ let popupVisible = false;
 
 // Fungsi untuk menampilkan popup dan ubah ikon
 const showPopup = () => {
-        popupInfo.style.setProperty('display', 'block', 'important');
-        setTimeout(() => popupInfo.classList.add('popup-show'), 10);
+    popupInfo.style.setProperty('display', 'block', 'important');
+    setTimeout(() => popupInfo.classList.add('popup-show'), 10);
 
-        // Animasi ikon ke 'X'
-        btnIcon.classList.add('change');
-        setTimeout(() => {
-            btnIcon.textContent = 'X';
-            btnIcon.classList.remove('change');
-        }, 300);
-    };
+    // Animasi ikon ke 'X'
+    btnIcon.classList.add('change');
+    setTimeout(() => {
+        btnIcon.textContent = 'X';
+        btnIcon.classList.remove('change');
+    }, 300);
+};
 
-    // Fungsi untuk menyembunyikan popup dan reset ikon
-    const hidePopup = () => {
-        popupInfo.classList.remove('popup-show');
-        setTimeout(() => popupInfo.style.setProperty('display', 'none', 'important'), 300);
+const hidePopup = () => {
+    popupInfo.classList.remove('popup-show');
+    setTimeout(() => popupInfo.style.setProperty('display', 'none', 'important'), 300);
 
-        // Animasi ikon kembali ke '?'
-        btnIcon.classList.add('change');
-        setTimeout(() => {
-            btnIcon.textContent = '?';
-            btnIcon.classList.remove('change');
-        }, 300);
-    };
+    // Animasi ikon kembali ke '?'
+    btnIcon.classList.add('change');
+    setTimeout(() => {
+        btnIcon.textContent = '?';
+        btnIcon.classList.remove('change');
+    }, 300);
+};
 
-    // Toggle popup saat tombol diklik
-    infoBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        popupVisible = !popupVisible;
-        popupVisible ? showPopup() : hidePopup();
-    });
+// Toggle popup saat tombol diklik
+infoBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    popupVisible = !popupVisible;
+    popupVisible ? showPopup() : hidePopup();
+});
 
-    // Hover tambahan
-    infoBtn.addEventListener('mouseenter', () => {
-        if (!popupVisible) showPopup();
-    });
+// Hover tambahan
+infoBtn.addEventListener('mouseenter', () => {
+    if (!popupVisible) showPopup();
+});
 
-    infoBtn.addEventListener('mouseleave', () => {
-        if (!popupVisible) hidePopup();
-    });
+infoBtn.addEventListener('mouseleave', () => {
+    if (!popupVisible) hidePopup();
+});
 
-    popupInfo.addEventListener('mouseleave', () => {
-        if (!popupVisible) hidePopup();
-    });
+popupInfo.addEventListener('mouseleave', () => {
+    if (!popupVisible) hidePopup();
+});
 
-    // Klik di luar popup untuk menyembunyikan
-    document.addEventListener('click', (e) => {
-        if (popupVisible && !popupInfo.contains(e.target) && e.target !== infoBtn) {
-            hidePopup();
-            popupVisible = false;
-        }
-    });
+// Klik di luar popup untuk menyembunyikan
+document.addEventListener('click', (e) => {
+    if (popupVisible && !popupInfo.contains(e.target) && e.target !== infoBtn) {
+        hidePopup();
+        popupVisible = false;
+    }
+});
 
-    // 🔥 Fungsi untuk mengatur batas floating button di atas footer
-    window.addEventListener('scroll', () => {
-        const footerRect = footer.getBoundingClientRect();
-        const windowHeight = window.innerHeight;
-        const overlap = windowHeight - footerRect.top - 5; // di atas footer
+// 🔥 Mengatur batas floating button di atas footer
+window.addEventListener('scroll', () => {
+    const footerRect = footer.getBoundingClientRect();
+    const windowHeight = window.innerHeight;
+    const overlap = windowHeight - footerRect.top - 5; // di atas footer
 
-        if (overlap > 0) {
-            infoBtn.style.transform = `translateY(-${overlap}px)`;
-        } else {
-            infoBtn.style.transform = `translateY(0)`;
-        }
-    });
+    infoBtn.style.transform = overlap > 0 ? `translateY(-${overlap}px)` : `translateY(0)`;
+});

@@ -149,7 +149,7 @@ button[type="submit"] {
         /* Padding untuk ukuran tombol */
     }
 
-    
+
 
     .mobile-login {
         width: 100%;
@@ -875,4 +875,51 @@ td {
         height: 45px;
         font-size: 20px;
     }
+}
+
+.info-icon {
+    cursor: pointer !important;
+    white-space: nowrap !important;
+}
+
+.popover {
+    max-width: none !important;
+    /* Hilangkan batas lebar popover */
+    white-space: nowrap;
+    /* Pastikan teks dalam satu baris */
+}
+
+.popover-body {
+    white-space: nowrap;
+    /* Hindari teks turun ke bawah */
+}
+
+@keyframes dotAnimation {
+    0% {
+        content: "";
+    }
+
+    25% {
+        content: ".";
+    }
+
+    50% {
+        content: "..";
+    }
+
+    75% {
+        content: "...";
+    }
+
+    100% {
+        content: "";
+    }
+
+    /* Ulang dari awal */
+}
+
+.wait-dots::after {
+    content: "";
+    display: inline-block;
+    animation: dotAnimation 1.5s infinite steps(1);
 }
