@@ -443,6 +443,7 @@ document.getElementById('namaPenyewa').addEventListener('input', function (e) {
 // ===============================
 // ☎️ Form Nomor Telepon (Modal)
 // ===============================
+//
 document.getElementById('nomertelephone').addEventListener('input', function (e) {
     const borderTelephone = e.target;
     let value = e.target.value.replace(/\D/g, ''); // 🔢 Hanya angka
