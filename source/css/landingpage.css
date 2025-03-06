@@ -879,20 +879,22 @@ td {
 
 .info-icon {
     cursor: pointer !important;
-    white-space: nowrap !important;
 }
 
-.popover {
-    max-width: none !important;
-    /* Hilangkan batas lebar popover */
-    white-space: nowrap;
-    /* Pastikan teks dalam satu baris */
+@media (min-width: 1024px) {
+    .popover {
+        max-width: none !important;
+        /* Hilangkan batas lebar popover */
+        white-space: nowrap;
+        /* Pastikan teks dalam satu baris */
+    }
+
+    .popover-body {
+        white-space: nowrap;
+        /* Hindari teks turun ke bawah */
+    }
 }
 
-.popover-body {
-    white-space: nowrap;
-    /* Hindari teks turun ke bawah */
-}
 
 @keyframes dotAnimation {
     0% {
@@ -922,4 +924,19 @@ td {
     content: "";
     display: inline-block;
     animation: dotAnimation 1.5s infinite steps(1);
+}
+
+.order-details {
+    display: flex;
+    justify-content: center;
+    /* Memusatkan tabel secara horizontal */
+    align-items: center;
+    /* Memusatkan tabel secara vertikal */
+}
+
+.order-details table {
+    width: 90%;
+    /* Pastikan tabel tidak terlalu lebar */
+    max-width: 600px;
+    /* Batasi lebar maksimal */
 }
