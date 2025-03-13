@@ -940,3 +940,13 @@ td {
     max-width: 600px;
     /* Batasi lebar maksimal */
 }
+
+.sticky-filters {
+    position: sticky;
+    top: 58px !important;
+    /* Sesuaikan dengan tinggi navbar */
+    background: white;
+    z-index: 1000;
+    padding: 10px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}

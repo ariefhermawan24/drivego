@@ -187,28 +187,31 @@
     <div class="container daftar-mobil">
         <h2 class="text-center" style="margin-bottom: 20px; margin-top: 20px">Daftar Mobil</h2>
         
-        <!-- Search Bar -->
-        <div class="search-bar d-flex align-items-center" style="margin-bottom: 10px">
-            <div class="input-group">
-                <span class="input-group-text" id="searchIcon"><i class="fas fa-search"></i></span>
-                <input type="text" class="form-control" id="searchInput" placeholder="Cari Mobil..." aria-label="Cari Mobil" aria-describedby="searchIcon">
+        <!-- Sticky Filter Container -->
+        <div class="sticky-filters">
+            <!-- Search Bar -->
+            <div class="search-bar d-flex align-items-center" style="margin-bottom: 10px">
+                <div class="input-group">
+                    <span class="input-group-text" id="searchIcon"><i class="fas fa-search"></i></span>
+                    <input type="text" class="form-control" id="searchInput" placeholder="Cari Mobil..." aria-label="Cari Mobil" aria-describedby="searchIcon">
+                </div>
+                <button id="resetFilters" class="btn btn-outline-secondary ms-2" title="mereset seluruh filter">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
             </div>
-            <button id="resetFilters" class="btn btn-outline-secondary ms-2" title="mereset seluruh filter">
-                <i class="fas fa-sync-alt"></i>
-            </button>
-        </div>
-        
-        <!-- Dropdown Filters -->
-        <div class="filter-container" style="display: flex; gap: 10px; margin-bottom: 10px;">
-            <select class="form-select" id="filterGarasi" style="flex: 1;">
-                <option selected>Pilih Garasi</option>
-            </select>
-            <select class="form-select" id="filterTipe" style="flex: 1;">
-                <option selected>Pilih Tipe</option>
-            </select>
-            <select class="form-select" id="filterKursi" style="flex: 1;">
-                <option selected>Pilih Kursi</option>
-            </select>
+
+            <!-- Dropdown Filters -->
+            <div class="filter-container d-flex gap-2">
+                <select class="form-select" id="filterGarasi">
+                    <option selected>Pilih Garasi</option>
+                </select>
+                <select class="form-select" id="filterTipe">
+                    <option selected>Pilih Tipe</option>
+                </select>
+                <select class="form-select" id="filterKursi">
+                    <option selected>Pilih Kursi</option>
+                </select>
+            </div>
         </div>
         
         <!-- Loading Container -->
@@ -269,7 +272,7 @@
                 style="top: 0; left: 0; padding: 0 20px; margin-top: 60px;">
                 <div class="d-flex justify-content-between mb-1">
                     <small id="labelStep1" class="step-label active">Mode</small>
-                    <small id="labelStep2" class="step-label">Identitas</small>
+                    <small id="labelStep2" class="step-label">Identitas</small> 
                     <small id="labelStep3" class="step-label">Bayar</small>
                     <small id="labelStep4" class="step-label">Validasi</small>
                 </div>
