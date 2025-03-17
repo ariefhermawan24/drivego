@@ -250,34 +250,193 @@ document.addEventListener("DOMContentLoaded", function() {
     const denganSupirFields = document.getElementById("denganSupirFields");
     const tujuanSewa = document.getElementById("tujuanSewa");
     const detailMobil = document.getElementById("detail-mobil"); // Elemen detail mobil
+    const lokasiTujuanContainer = document.getElementById("lokasiTujuanContainer");
 
-    // ✅ Fungsi untuk mengatur visibilitas detail mobil pada step 1 & 3 saja
     function toggleDetailMobil() {
-        if (currentStep === 1 || currentStep === 3) {
-            detailMobil.classList.remove("d-none");
+        detailMobil.classList.toggle("d-none", !(currentStep === 1 || currentStep === 3));
+    }
+
+    // 🔥 Simpan data ke localStorage setiap perubahan
+    function saveProgress() {
+        let formData = {};
+        document.querySelectorAll("input, select, textarea").forEach(input => {
+            formData[input.id] = input.value;
+        });
+
+        // ✅ Simpan "Tujuan lainnya" jika dipilih
+        if (tujuanSewa.value === "lainnya") {
+            formData.tujuanLainnya = tujuanLainInput.value;
         } else {
-            detailMobil.classList.add("d-none");
+            formData.tujuanLainnya = "";
+        }
+
+        // ✅ Simpan semua tujuan sebagai array dalam localStorage
+        let tujuanValues = [];
+        document.querySelectorAll("input[name='lokasiTujuan[]']").forEach(input => {
+            tujuanValues.push(input.value);
+        });
+        formData.lokasiTujuan = tujuanValues;
+        formData.currentStep = currentStep; // Simpan step terakhir
+        localStorage.setItem("formProgress", JSON.stringify(formData));
+    }
+
+    // 🔥 Load data dari localStorage saat halaman/modal dibuka
+    function loadProgress() {
+        const savedData = JSON.parse(localStorage.getItem("formProgress"));
+        console.log("🔍 Data di localStorage saat ini:", savedData); // Debugging
+        if (savedData) {
+            Object.keys(savedData).forEach(key => {
+                const element = document.getElementById(key);
+                if (element) {
+                    element.value = savedData[key];
+
+                    // ✅ Tampilkan kembali input "Tujuan lainnya" jika sebelumnya dipilih
+                    if (key === "tujuanSewa" && savedData[key] === "lainnya") {
+                    tujuanLainContainer.style.display = "block";
+                    }
+                }
+
+                if (document.getElementById(key)) {
+                document.getElementById(key).value = savedData[key];
+                }
+            });
+
+            // ✅ Muat kembali input "Tujuan lainnya" jika ada nilai tersimpan
+            if (savedData.tujuanLainnya && savedData.tujuanLainnya.trim() !== "") {
+                tujuanLainContainer.style.display = "block";
+                tujuanLainInput.value = savedData.tujuanLainnya;
+            }
+
+            if (savedData.lokasiTujuan && savedData.lokasiTujuan.length > 0) {
+                // ✅ Isi tujuan pertama langsung ke input HTML yang sudah ada
+                const firstTujuanInput = document.getElementById("tujuan-1");
+                if (firstTujuanInput) {
+                    firstTujuanInput.value = savedData.lokasiTujuan[0];
+                }
+
+                // ✅ Tambahkan tujuan lainnya (mulai dari tujuan-2)
+                for (let i = 1; i < savedData.lokasiTujuan.length; i++) {
+                    addTujuanInput(savedData.lokasiTujuan[i], i + 1); // 🟢 ID dimulai dari tujuan-2
+                }
+            }
+
+            // 🔥 Cek apakah currentStep tersimpan dan valid
+            if (savedData.currentStep && savedData.currentStep <= steps.length) {
+                currentStep = savedData.currentStep;
+            } else {
+                currentStep = 1; // Default ke step 1 jika data invalid
+            }
+
+            console.log("🔄 Data dimuat, Current Step:", currentStep);
+
+            updateProgress();
+            showStep(currentStep);
         }
     }
 
-    // Membuat input tambahan untuk tujuan lainnya
+    document.querySelectorAll("input, select, textarea").forEach(input => {
+        input.addEventListener("input", saveProgress);
+    });
+
+    function showStep(step) {
+        steps.forEach((s, index) => {
+            s.classList.toggle("d-none", index + 1 !== step);
+        });
+
+        updateProgress();
+        toggleDetailMobil();
+        updateFields();
+        updateLabel();
+    }
+
+    // 🔥 Membuat container pembungkus untuk input "Tujuan lainnya"
+    const tujuanLainContainer = document.createElement("div");
+    tujuanLainContainer.style.display = "none"; // Default disembunyikan
+    tujuanLainContainer.classList.add("mt-2");
+
+    // 🔥 Membuat input tambahan untuk "Tujuan lainnya"
     const tujuanLainInput = document.createElement("input");
     tujuanLainInput.type = "text";
-    tujuanLainInput.classList.add("form-control", "mt-2");
+    tujuanLainInput.classList.add("form-control");
     tujuanLainInput.id = "tujuanLainnya";
     tujuanLainInput.placeholder = "Masukkan tujuan lainnya";
-    tujuanLainInput.style.display = "none";
-    tujuanSewa.parentNode.appendChild(tujuanLainInput);
 
-    tujuanSewa.addEventListener("change", function() {
-        if (tujuanSewa.value === "tujuan lainnnya") {
-            tujuanLainInput.style.display = "block";
+    tujuanLainContainer.appendChild(tujuanLainInput);
+    tujuanSewa.parentNode.appendChild(tujuanLainContainer);
+
+    // 🔥 Event listener untuk menampilkan input "Tujuan lainnya" saat opsi dipilih
+    tujuanSewa.addEventListener("change", function () {
+        if (tujuanSewa.value === "lainnya") {
+            tujuanLainContainer.style.display = "block";
             tujuanLainInput.setAttribute("required", "true");
         } else {
-            tujuanLainInput.style.display = "none";
-            tujuanLainInput.removeAttribute("required"); // Menghapus atribut required
-            tujuanLainInput.value = ""; // Mengosongkan input saat disembunyikan
+            tujuanLainContainer.style.display = "none";
+            tujuanLainInput.removeAttribute("required");
+            tujuanLainInput.value = ""; // Kosongkan input saat disembunyikan
         }
+        saveProgress(); // Simpan perubahan ke localStorage
+    });
+
+    // 🔥 Simpan perubahan pada input "Tujuan lainnya" secara real-time
+    tujuanLainInput.addEventListener("input", saveProgress);
+    
+    function updatePlaceholders() {
+        const inputs = document.querySelectorAll("input[name='lokasiTujuan[]']");
+        inputs.forEach((input, index) => {
+            const newId = `tujuan-${index + 1}`;
+            input.placeholder = `Tujuan ${index + 1}`;
+            input.id = newId; // Pastikan ID sesuai dengan indeks terbaru
+        });
+    }
+
+    function addTujuanInput(value = "", index = 2) {
+        console.log("📌 addTujuanInput() dipanggil dengan:", value, index);
+
+        const lokasiTujuanContainer = document.getElementById("lokasiTujuanContainer");
+        if (!lokasiTujuanContainer) return;
+
+        const inputGroup = document.createElement("div");
+        inputGroup.classList.add("input-group", "mb-2");
+
+        const newId = `tujuan-${index}`; // 🟢 Pastikan ID mulai dari tujuan-2
+
+        const inputField = document.createElement("input");
+        inputField.type = "text";
+        inputField.classList.add("form-control");
+        inputField.name = "lokasiTujuan[]";
+        inputField.placeholder = `Tujuan ${index}`;
+        inputField.required = true;
+        inputField.value = value;
+        inputField.id = newId; // 🟢 ID dimulai dari tujuan-2
+
+        inputField.addEventListener("input", saveProgress);
+
+        console.log(`✅ Input ${newId} dibuat dengan nilai:`, value);
+
+        const removeButton = document.createElement("button");
+        removeButton.type = "button";
+        removeButton.classList.add("btn", "btn-danger");
+        removeButton.innerHTML = " - ";
+
+        removeButton.addEventListener("click", function () {
+            inputGroup.remove();
+            saveProgress();
+            updatePlaceholders();
+        });
+
+        const buttonWrapper = document.createElement("div");
+        buttonWrapper.classList.add("input-group-append");
+        buttonWrapper.appendChild(removeButton);
+
+        inputGroup.appendChild(inputField);
+        inputGroup.appendChild(buttonWrapper);
+        lokasiTujuanContainer.appendChild(inputGroup);
+    }
+
+    // Event listener tombol tambah tujuan
+    document.getElementById("tambahTujuan").addEventListener("click", function (event) {
+        event.preventDefault();
+        addTujuanInput();
     });
 
     function updateFields() {
@@ -287,16 +446,6 @@ document.addEventListener("DOMContentLoaded", function() {
         } else {
             lepasKunciFields.classList.add("d-none");
             denganSupirFields.classList.remove("d-none");
-        }
-    }
-
-    function updateOrderDetails() {
-        if (jenisSewa.value === "lepasKunci") {
-            detailLepasKunci.classList.remove("d-none");
-            detailDenganSupir.classList.add("d-none");
-        } else {
-            detailLepasKunci.classList.add("d-none");
-            detailDenganSupir.classList.remove("d-none");
         }
     }
 
@@ -314,18 +463,19 @@ document.addEventListener("DOMContentLoaded", function() {
     updateFields();
     jenisSewa.addEventListener("change", updateFields);
 
-    // Fungsi untuk memperbarui keterangan step yang aktif
+    // 🔥 Update progress bar & step label
+    function updateProgress() {
+        progressBar.style.width = (currentStep * 25) + "%";
+        progressBar.innerText = currentStep + "/4";
+        updateStepLabels();
+    }
+
     function updateStepLabels() {
         document.querySelectorAll(".step-label").forEach((label, index) => {
-            if (index + 1 === currentStep) {
-                label.classList.add("active");
-            } else {
-                label.classList.remove("active");
-            }
+            label.classList.toggle("active", index + 1 === currentStep);
         });
     }
 
-    // Perbarui bagian event listener ".next-step"
     document.querySelectorAll(".next-step").forEach(button => {
         button.addEventListener("click", function() {
             const currentStepForm = steps[currentStep - 1].querySelectorAll("input[required], select[required], textarea[required]");
@@ -334,7 +484,6 @@ document.addEventListener("DOMContentLoaded", function() {
             if (currentStep === 2) {
                 let activeFields = jenisSewa.value === "lepasKunci" ? lepasKunciFields : denganSupirFields;
                 const requiredInputs = activeFields.querySelectorAll("input[required], select[required], textarea[required]");
-
                 requiredInputs.forEach(input => {
                     if (!input.checkValidity()) {
                         input.reportValidity();
@@ -356,15 +505,26 @@ document.addEventListener("DOMContentLoaded", function() {
 
                 if (currentStep <= steps.length) {
                     steps[currentStep - 1].classList.remove("d-none");
-                    progressBar.style.width = (currentStep * 25) + "%";
-                    progressBar.innerText = currentStep + "/4";
                     updateStepLabels(); // 🔥 Update label aktif
-                    toggleDetailMobil(); // 🔥 Perbarui visibilitas detail mobil
-                    updateOrderDetails()
-                    updateLabel()
+                    updateProgress();
+                    toggleDetailMobil();
+                    updateFields();
+                    updateLabel();
+                    saveProgress();
+                }
+
+                // 🔥 Simpan & kirim data saat Step 3 Next ditekan
+                if (currentStep === 4) {
+                    console.log("✅ Data Tersimpan:", JSON.parse(localStorage.getItem("formProgress")));
                 }
             }
         });
+    });
+
+    document.getElementById("jenisSewa").addEventListener("change", function() {
+        updateFields();
+        updateLabel();
+        saveProgress();
     });
     
     function updatePlaceholders() {
@@ -375,40 +535,11 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
-    document.getElementById("tambahTujuan").addEventListener("click", function(event) {
-        event.preventDefault();
-        const inputGroup = document.createElement("div");
-        inputGroup.classList.add("input-group", "mb-2");
-
-        const inputField = document.createElement("input");
-        inputField.type = "text";
-        inputField.classList.add("form-control");
-        inputField.name = "lokasiTujuan[]";
-        inputField.setAttribute("required", "true");
-
-        const removeButton = document.createElement("button");
-        removeButton.type = "button";
-        removeButton.classList.add("btn", "btn-danger");
-        removeButton.innerHTML = " - ";
-
-        removeButton.addEventListener("click", function() {
-            inputGroup.remove();
-            updatePlaceholders();
-        });
-
-        const buttonWrapper = document.createElement("div");
-        buttonWrapper.classList.add("input-group-append");
-        buttonWrapper.appendChild(removeButton);
-
-        inputGroup.appendChild(inputField);
-        inputGroup.appendChild(buttonWrapper);
-
-        document.getElementById("lokasiTujuanContainer").appendChild(inputGroup);
-        updatePlaceholders();
-    });
-    
-    updateStepLabels(); // Inisialisasi label saat pertama kali halaman dimuat
+    // 🔥 Load data saat modal dibuka atau halaman di-refresh
+    loadProgress();
+    updateFields();
     toggleDetailMobil(); // ✅ Panggil saat halaman dimuat
+    updateStepLabels(); // Inisialisasi label saat pertama kali halaman dimuat
 });
 
 // ============================
