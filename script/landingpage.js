@@ -259,13 +259,18 @@ document.addEventListener("DOMContentLoaded", function() {
     // 🔥 Simpan data ke localStorage setiap perubahan
     function saveProgress() {
         let formData = {};
+        const excludedFields = ["filterGarasi", "filterKursi", "filterTipe", "searchInput"]; // 🛑 Hindari penyimpanan field ini
+
         document.querySelectorAll("input, select, textarea").forEach(input => {
-            formData[input.id] = input.value;
+            // 🛑 Hindari input file dan field yang harus diabaikan
+            if (input.type !== "file" && !excludedFields.includes(input.id)) {
+                formData[input.id] = input.value;
+            }
         });
 
         // ✅ Simpan "Tujuan lainnya" jika dipilih
-        if (tujuanSewa.value === "lainnya") {
-            formData.tujuanLainnya = tujuanLainInput.value;
+        if (document.getElementById("tujuanSewa")?.value === "lainnya") {
+            formData.tujuanLainnya = document.getElementById("tujuanLainInput")?.value || "";
         } else {
             formData.tujuanLainnya = "";
         }
@@ -276,64 +281,64 @@ document.addEventListener("DOMContentLoaded", function() {
             tujuanValues.push(input.value);
         });
         formData.lokasiTujuan = tujuanValues;
-        formData.currentStep = currentStep; // Simpan step terakhir
+
+        // ✅ Simpan step terakhir
+        formData.currentStep = typeof currentStep !== "undefined" ? currentStep : 1;
+
         localStorage.setItem("formProgress", JSON.stringify(formData));
     }
+
+    // 🔄 Tambahkan event listener untuk memantau perubahan
+    document.querySelectorAll("input, select, textarea").forEach(input => {
+        input.addEventListener("input", saveProgress);
+    });
 
     // 🔥 Load data dari localStorage saat halaman/modal dibuka
     function loadProgress() {
         const savedData = JSON.parse(localStorage.getItem("formProgress"));
         console.log("🔍 Data di localStorage saat ini:", savedData); // Debugging
+
         if (savedData) {
             Object.keys(savedData).forEach(key => {
                 const element = document.getElementById(key);
+
                 if (element) {
+                    // 🛑 Lewati input file agar tidak menyebabkan error
+                if (element.type !== "file") {
                     element.value = savedData[key];
-
-                    // ✅ Tampilkan kembali input "Tujuan lainnya" jika sebelumnya dipilih
-                    if (key === "tujuanSewa" && savedData[key] === "lainnya") {
-                    tujuanLainContainer.style.display = "block";
-                    }
-                }
-
-                if (document.getElementById(key)) {
-                document.getElementById(key).value = savedData[key];
-                }
-            });
-
-            // ✅ Muat kembali input "Tujuan lainnya" jika ada nilai tersimpan
-            if (savedData.tujuanLainnya && savedData.tujuanLainnya.trim() !== "") {
-                tujuanLainContainer.style.display = "block";
-                tujuanLainInput.value = savedData.tujuanLainnya;
-            }
-
-            if (savedData.lokasiTujuan && savedData.lokasiTujuan.length > 0) {
-                // ✅ Isi tujuan pertama langsung ke input HTML yang sudah ada
-                const firstTujuanInput = document.getElementById("tujuan-1");
-                if (firstTujuanInput) {
-                    firstTujuanInput.value = savedData.lokasiTujuan[0];
-                }
-
-                // ✅ Tambahkan tujuan lainnya (mulai dari tujuan-2)
-                for (let i = 1; i < savedData.lokasiTujuan.length; i++) {
-                    addTujuanInput(savedData.lokasiTujuan[i], i + 1); // 🟢 ID dimulai dari tujuan-2
                 }
             }
+        });
 
-            // 🔥 Cek apakah currentStep tersimpan dan valid
-            if (savedData.currentStep && savedData.currentStep <= steps.length) {
-                currentStep = savedData.currentStep;
-            } else {
-                currentStep = 1; // Default ke step 1 jika data invalid
-            }
-
-            console.log("🔄 Data dimuat, Current Step:", currentStep);
-
-            updateProgress();
-            showStep(currentStep);
+        // ✅ Muat kembali input "Tujuan lainnya" jika ada nilai tersimpan
+        if (savedData.tujuanSewa === "lainnya") {
+            tujuanLainContainer.style.display = "block";
+            tujuanLainInput.value = savedData.tujuanLainnya || "";
         }
-    }
 
+        // ✅ Load input lokasi tujuan
+        if (savedData.lokasiTujuan && savedData.lokasiTujuan.length > 0) {
+            const firstTujuanInput = document.getElementById("tujuan-1");
+            if (firstTujuanInput) {
+                firstTujuanInput.value = savedData.lokasiTujuan[0];
+            }
+
+            for (let i = 1; i < savedData.lokasiTujuan.length; i++) {
+                addTujuanInput(savedData.lokasiTujuan[i], i + 1);
+            }
+        }
+
+        // 🔥 Load step terakhir
+        currentStep = savedData.currentStep && savedData.currentStep <= steps.length ? savedData.currentStep : 1;
+
+        console.log("🔄 Data dimuat, Current Step:", currentStep);
+
+        updateProgress();
+        showStep(currentStep);
+    }
+}
+
+    // ✅ Simpan data setiap input berubah
     document.querySelectorAll("input, select, textarea").forEach(input => {
         input.addEventListener("input", saveProgress);
     });
@@ -515,7 +520,79 @@ document.addEventListener("DOMContentLoaded", function() {
 
                 // 🔥 Simpan & kirim data saat Step 3 Next ditekan
                 if (currentStep === 4) {
-                    console.log("✅ Data Tersimpan:", JSON.parse(localStorage.getItem("formProgress")));
+                    // Generate ID Pesanan
+                    const orderId = "ORD-" + Math.floor(100000 + Math.random() * 900000); // Contoh: ORD-123456
+                    
+                    // Ambil data dari localStorage
+                    let formData = JSON.parse(localStorage.getItem("formProgress")) || {};
+
+                    // Data details mobil
+                    const NamaMobil = document.querySelector('#transaksiModal .nama-mobil');
+                    const garasi = document.querySelector('#transaksiModal .garasi');
+                    const harga = document.querySelector('#transaksiModal .harga-mobil');
+
+                    // Simpan data mobil dan garasi
+                    if (NamaMobil) {
+                        formData.namaMobil = NamaMobil.textContent.trim();
+                    }
+
+                    if (garasi) {
+                        formData.garasi = garasi.textContent.trim();
+                    }
+
+                    if (harga) {
+                        let hargaSewa = parseInt(harga.textContent.replace(/\D/g, ''), 10); // Ambil angka dari teks harga
+
+                        // Ambil hari sewa dari localStorage
+                        let hariSewa = parseInt(localStorage.getItem("hariSewa"), 10) || 1;
+
+                        // Perhitungan harga
+                        let totalHarga = hargaSewa * hariSewa;
+                        let pembayaranDP = totalHarga * 0.2; // DP 20%
+                        let pembayaranDiTempat = totalHarga - pembayaranDP; // Sisa pembayaran
+
+                        // ✅ Ambil tanggal langsung dari input form
+                        let tanggalSewaInput = document.querySelector("#tanggalSewa").value;
+
+                        // ✅ Pastikan tanggal tidak berubah karena zona waktu
+                        let [tahun, bulan, tanggal] = tanggalSewaInput.split('-').map(Number);
+                        let tanggalSewa = new Date(tahun, bulan - 1, tanggal); // Buat tanggal dengan zona waktu yang benar
+
+                        // Hitung tanggal akhir sewa
+                        let tanggalAkhirSewa = new Date(tahun, bulan - 1, tanggal);
+                        tanggalAkhirSewa.setDate(tanggalAkhirSewa.getDate() + hariSewa);
+
+                        // Fungsi untuk format tanggal ke "19 Maret 2025"
+                        const formatTanggal = (tanggal) => {
+                            const bulan = [
+                                "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+                                "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+                            ];
+                            return `${tanggal.getDate()} ${bulan[tanggal.getMonth()]} ${tanggal.getFullYear()}`;
+                        };
+
+                        // Format tanggal tanpa mengubah nilai aslinya
+                        let tanggalSewaFormatted = formatTanggal(tanggalSewa);
+                        let tanggalAkhirSewaFormatted = formatTanggal(tanggalAkhirSewa);
+
+                        // Simpan hasil perhitungan ke formData
+                        formData.hargaSewa = hargaSewa;
+                        formData.hariSewa = hariSewa;
+                        formData.totalHarga = totalHarga;
+                        formData.pembayaranDP = pembayaranDP;
+                        formData.pembayaranDiTempat = pembayaranDiTempat;
+                        formData.tanggalSewa = tanggalSewaFormatted;
+                        formData.tanggalAkhirSewa = tanggalAkhirSewaFormatted;
+                        formData.rangeSewa = `${tanggalSewaFormatted} - ${tanggalAkhirSewaFormatted}`; // Rentang sewa dengan ikon "-"
+                    }
+
+                    // Tambahkan ID Pesanan
+                    formData.orderId = orderId;
+
+                    // Simpan kembali ke localStorage
+                    localStorage.setItem("formProgress", JSON.stringify(formData));
+
+                    console.log("✅ Data Tersimpan:", formData);
                 }
             }
         });
@@ -891,4 +968,16 @@ window.addEventListener('scroll', () => {
     const overlap = windowHeight - footerRect.top - 5; // di atas footer
 
     infoBtn.style.transform = overlap > 0 ? `translateY(-${overlap}px)` : `translateY(0)`;
+});
+// file max 1mb
+document.querySelectorAll('input[type="file"]').forEach(input => {
+    input.addEventListener('change', function () {
+        const file = this.files[0];
+        if (file && file.size > 1048576) { // 1MB = 1048576 bytes
+            const toastEl = document.getElementById('toastFileError');
+            const toast = new bootstrap.Toast(toastEl);
+            toast.show();
+            this.value = ""; // Reset input
+        }
+    });
 });
