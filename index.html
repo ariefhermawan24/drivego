@@ -489,15 +489,21 @@
         </div>
     </div>
     <!-- Toast Notification -->
-    <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+    <div class="position-fixed p-3 toast-container" style="z-index: 11">
         <div id="toastFileError" class="toast align-items-center text-bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="2000">
-            <div class="d-flex">
-                <div class="toast-body">
+            <div class="d-flex justify-content-center">
+                <div class="toast-body text-center">
                     Ukuran file tidak boleh lebih dari 1MB!
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+    setTimeout(function() {
+        window.location.href = "../drivego/underdevelop"; // Ganti dengan nama file halaman Anda
+    }, 2000); // 5000 milidetik = 5 detik (ubah sesuai kebutuhan)
+</script>
 
 </html>

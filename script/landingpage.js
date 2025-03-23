@@ -5,7 +5,11 @@ import {
 import {
     getDatabase,
     ref,
-    onValue
+    set,
+    onValue,
+    get, // 🔥 Tambahkan ini
+    child, // 🔥 Tambahkan ini
+    update // 🔥 Tambahkan ini untuk memperbarui status mobil
 } from 'https://www.gstatic.com/firebasejs/9.17.1/firebase-database.js';
 
 const firebaseConfig = {
@@ -270,7 +274,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
         // ✅ Simpan "Tujuan lainnya" jika dipilih
         if (document.getElementById("tujuanSewa")?.value === "lainnya") {
-            formData.tujuanLainnya = document.getElementById("tujuanLainInput")?.value || "";
+            formData.tujuanLainnya = document.getElementById("tujuanLainnya")?.value || "";
         } else {
             formData.tujuanLainnya = "";
         }
@@ -520,79 +524,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
                 // 🔥 Simpan & kirim data saat Step 3 Next ditekan
                 if (currentStep === 4) {
-                    // Generate ID Pesanan
-                    const orderId = "ORD-" + Math.floor(100000 + Math.random() * 900000); // Contoh: ORD-123456
-                    
-                    // Ambil data dari localStorage
-                    let formData = JSON.parse(localStorage.getItem("formProgress")) || {};
-
-                    // Data details mobil
-                    const NamaMobil = document.querySelector('#transaksiModal .nama-mobil');
-                    const garasi = document.querySelector('#transaksiModal .garasi');
-                    const harga = document.querySelector('#transaksiModal .harga-mobil');
-
-                    // Simpan data mobil dan garasi
-                    if (NamaMobil) {
-                        formData.namaMobil = NamaMobil.textContent.trim();
-                    }
-
-                    if (garasi) {
-                        formData.garasi = garasi.textContent.trim();
-                    }
-
-                    if (harga) {
-                        let hargaSewa = parseInt(harga.textContent.replace(/\D/g, ''), 10); // Ambil angka dari teks harga
-
-                        // Ambil hari sewa dari localStorage
-                        let hariSewa = parseInt(localStorage.getItem("hariSewa"), 10) || 1;
-
-                        // Perhitungan harga
-                        let totalHarga = hargaSewa * hariSewa;
-                        let pembayaranDP = totalHarga * 0.2; // DP 20%
-                        let pembayaranDiTempat = totalHarga - pembayaranDP; // Sisa pembayaran
-
-                        // ✅ Ambil tanggal langsung dari input form
-                        let tanggalSewaInput = document.querySelector("#tanggalSewa").value;
-
-                        // ✅ Pastikan tanggal tidak berubah karena zona waktu
-                        let [tahun, bulan, tanggal] = tanggalSewaInput.split('-').map(Number);
-                        let tanggalSewa = new Date(tahun, bulan - 1, tanggal); // Buat tanggal dengan zona waktu yang benar
-
-                        // Hitung tanggal akhir sewa
-                        let tanggalAkhirSewa = new Date(tahun, bulan - 1, tanggal);
-                        tanggalAkhirSewa.setDate(tanggalAkhirSewa.getDate() + hariSewa);
-
-                        // Fungsi untuk format tanggal ke "19 Maret 2025"
-                        const formatTanggal = (tanggal) => {
-                            const bulan = [
-                                "Januari", "Februari", "Maret", "April", "Mei", "Juni",
-                                "Juli", "Agustus", "September", "Oktober", "November", "Desember"
-                            ];
-                            return `${tanggal.getDate()} ${bulan[tanggal.getMonth()]} ${tanggal.getFullYear()}`;
-                        };
-
-                        // Format tanggal tanpa mengubah nilai aslinya
-                        let tanggalSewaFormatted = formatTanggal(tanggalSewa);
-                        let tanggalAkhirSewaFormatted = formatTanggal(tanggalAkhirSewa);
-
-                        // Simpan hasil perhitungan ke formData
-                        formData.hargaSewa = hargaSewa;
-                        formData.hariSewa = hariSewa;
-                        formData.totalHarga = totalHarga;
-                        formData.pembayaranDP = pembayaranDP;
-                        formData.pembayaranDiTempat = pembayaranDiTempat;
-                        formData.tanggalSewa = tanggalSewaFormatted;
-                        formData.tanggalAkhirSewa = tanggalAkhirSewaFormatted;
-                        formData.rangeSewa = `${tanggalSewaFormatted} - ${tanggalAkhirSewaFormatted}`; // Rentang sewa dengan ikon "-"
-                    }
-
-                    // Tambahkan ID Pesanan
-                    formData.orderId = orderId;
-
-                    // Simpan kembali ke localStorage
-                    localStorage.setItem("formProgress", JSON.stringify(formData));
-
-                    console.log("✅ Data Tersimpan:", formData);
+                    simpanKeFirebase();
                 }
             }
         });
@@ -618,6 +550,190 @@ document.addEventListener("DOMContentLoaded", function() {
     toggleDetailMobil(); // ✅ Panggil saat halaman dimuat
     updateStepLabels(); // Inisialisasi label saat pertama kali halaman dimuat
 });
+
+// 🔥 Fungsi untuk Generate ID Pesanan Unik
+async function generateUniqueOrderId() {
+    let orderId;
+    let exists = true;
+
+    while (exists) {
+        // 🔥 Buat ID Pesanan Baru
+        orderId = "ORD-" + Math.floor(100000 + Math.random() * 900000);
+
+        // 🔥 Cek ke Firebase apakah ID sudah ada
+        const orderRef = ref(database, "transaksi/" + orderId);
+        const snapshot = await get(orderRef);
+
+        // 🔥 Jika ID belum ada, lanjutkan
+        if (!snapshot.exists()) {
+            exists = false;
+        }
+    }
+
+    return orderId;
+}
+
+// 🔥 Fungsi untuk Menyimpan Data ke Firebase
+async function simpanKeFirebase() {
+    // 🔥 Generate ID Pesanan yang Unik
+    const orderId = await generateUniqueOrderId();
+    
+    // 🔥 Ambil Data dari LocalStorage
+    let formData = JSON.parse(localStorage.getItem("formProgress")) || {};
+
+    // 🔥 Ambil namaPenyewa dari LocalStorage
+    const username = formData.namaPenyewa || "UnknownUser"; 
+
+    // 🔥 Ambil Data Detail Mobil
+    const NamaMobil = document.querySelector('#transaksiModal .nama-mobil');
+    const garasi = document.querySelector('#transaksiModal .garasi');
+    const harga = document.querySelector('#transaksiModal .harga-mobil');
+
+    if (NamaMobil) formData.namaMobil = NamaMobil.textContent.trim();
+    if (garasi) formData.garasi = garasi.textContent.trim();
+    if (harga) {
+        let hargaSewa = parseInt(harga.textContent.replace(/\D/g, ''), 10);
+        let hariSewa = parseInt(localStorage.getItem("hariSewa"), 10) || 1;
+        let totalHarga = hargaSewa * hariSewa;
+        let pembayaranDP = totalHarga * 0.2;
+        let pembayaranDiTempat = totalHarga - pembayaranDP;
+
+        let tanggalSewaInput = document.querySelector("#tanggalSewa").value;
+        let [tahun, bulan, tanggal] = tanggalSewaInput.split('-').map(Number);
+        let tanggalSewa = new Date(tahun, bulan - 1, tanggal);
+        let tanggalAkhirSewa = new Date(tahun, bulan - 1, tanggal);
+        tanggalAkhirSewa.setDate(tanggalAkhirSewa.getDate() + hariSewa);
+
+        const formatTanggal = (tanggal) => {
+            const bulan = [
+                "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+                "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+            ];
+            return `${tanggal.getDate()} ${bulan[tanggal.getMonth()]} ${tanggal.getFullYear()}`;
+        };
+
+        formData.hargaSewa = hargaSewa;
+        formData.hariSewa = hariSewa;
+        formData.totalHarga = totalHarga;
+        formData.pembayaranDP = pembayaranDP;
+        formData.pembayaranDiTempat = pembayaranDiTempat;
+        formData.tanggalSewa = formatTanggal(tanggalSewa);
+        formData.tanggalAkhirSewa = formatTanggal(tanggalAkhirSewa);
+        formData.rangeSewa = `${formatTanggal(tanggalSewa)} - ${formatTanggal(tanggalAkhirSewa)}`;
+    }
+
+    // 🔥 Fungsi untuk Upload Gambar ke Cloudinary
+    async function uploadToCloudinary(file, orderId, username, kategori) {
+        const cloudName = "dcvcatmaw"; // Ganti dengan Cloud Name dari Cloudinary
+        const uploadPreset = "user_uploads"; // Ganti dengan Upload Preset yang sudah dibuat
+
+        // 🔥 Format nama penyewa agar tidak ada spasi (gunakan _ atau -)
+        const formattedUsername = username.replace(/\s+/g, "-");
+
+        // 🔥 Tentukan path folder
+        const folderPath = `${orderId}/${formattedUsername}/${kategori}`;
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("upload_preset", uploadPreset);
+        formData.append("folder", folderPath);
+
+        try {
+            const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+                method: "POST",
+                body: formData,
+            });
+
+            if (!response.ok) throw new Error("Gagal mengunggah ke Cloudinary");
+
+            const data = await response.json();
+            console.log("✅ Upload berhasil:", data);
+            return file.name; // 🔥 Simpan nama file saja, bukan URL
+        } catch (error) {
+            console.error("❌ Error saat upload ke Cloudinary:", error);
+            return null;
+        }
+    }
+
+    // 🔥 Upload & Simpan Nama File ke LocalStorage & Firebase
+    async function saveFileName(inputId, keyName, kategori) {
+        const fileInput = document.getElementById(inputId);
+        if (fileInput && fileInput.files.length > 0) {
+            const file = fileInput.files[0];
+            const allowedTypes = ['image/jpeg', 'image/png'];
+
+            if (file) {
+                if (file.size > 1048576) {
+                    showToast("❌ Ukuran file tidak boleh lebih dari 1MB!");
+                    fileInput.value = "";
+                } else if (!allowedTypes.includes(file.type)) {
+                    showToast("❌ Hanya boleh mengunggah file gambar dengan format JPG atau PNG!");
+                    fileInput.value = "";
+                } else {
+                    const fileName = await uploadToCloudinary(file, orderId, username, kategori);
+                    if (fileName) formData[keyName] = fileName;
+                }
+            }
+        }
+    }
+
+    await saveFileName("fotoKTP", "fotoKTP", "fotobukti");
+    await saveFileName("fotoSIM", "fotoSIM", "fotobukti");
+    await saveFileName("fotoVerifikasi", "fotoVerifikasi", "fotobukti");
+    await saveFileName("buktiBayar", "buktiBayar", "pembayaran");
+
+    // 🔥 Tambahkan ID Pesanan
+    formData.orderId = orderId;
+
+    // 🔥 Simpan ke LocalStorage
+    localStorage.setItem("formProgress", JSON.stringify(formData));
+
+    console.log("✅ Data Tersimpan di LocalStorage:", formData);
+
+    // 🔥 Buat Salinan Data Tanpa `currentStep`
+    let firebaseData = { ...formData }; 
+    delete firebaseData.currentStep; // 🔥 Hapus currentStep sebelum dikirim ke Firebase
+    
+    // 🔥 Simpan Data ke Firebase Realtime Database
+    set(ref(database, "transaksi/" + orderId), firebaseData)
+    .then(() => {
+        console.log("✅ Data berhasil disimpan ke Firebase!");
+
+        // 🔥 Update Status Mobil ke "pending"
+        updateMobilStatus(firebaseData.namaMobil);
+    })
+    .catch((error) => {
+        console.error("❌ Gagal menyimpan ke Firebase:", error);
+    });
+}
+
+function updateMobilStatus(namaMobil) {
+    const mobilRef = ref(database, "mobil");
+
+    get(mobilRef)
+        .then((snapshot) => {
+            if (snapshot.exists()) {
+                let mobilData = snapshot.val();
+
+                Object.keys(mobilData).forEach((key) => {
+                    if (mobilData[key] && mobilData[key].nama_mobil === namaMobil) {
+                        // 🔥 Update status mobil menjadi "pending"
+                        update(ref(database, `mobil/${key}`), { status: "pending" })
+                            .then(() => {
+                                console.log(`✅ Status mobil "${namaMobil}" berhasil diubah menjadi 'pending'`);
+                            })
+                            .catch((error) => {
+                                console.error(`❌ Gagal mengupdate status mobil "${namaMobil}":`, error);
+                            });
+                    }
+                });
+            } else {
+                console.warn("⚠️ Data mobil tidak ditemukan.");
+            }
+        })
+        .catch((error) => {
+            console.error("❌ Gagal mengambil data mobil:", error);
+        });
+}
 
 // ============================
 // 📌 Form Nama Penyewa (Modal)
@@ -973,11 +1089,29 @@ window.addEventListener('scroll', () => {
 document.querySelectorAll('input[type="file"]').forEach(input => {
     input.addEventListener('change', function () {
         const file = this.files[0];
-        if (file && file.size > 1048576) { // 1MB = 1048576 bytes
-            const toastEl = document.getElementById('toastFileError');
-            const toast = new bootstrap.Toast(toastEl);
-            toast.show();
-            this.value = ""; // Reset input
+        if (file) {
+            const allowedTypes = ['image/jpeg', 'image/png'];
+
+            // Cek ukuran file
+            if (file.size > 1048576) { // 1MB = 1048576 bytes
+                showToast("Ukuran file tidak boleh lebih dari 1MB!");
+                this.value = ""; // Reset input
+                return;
+            }
+
+            // Cek tipe file
+            if (!allowedTypes.includes(file.type)) {
+                showToast("Hanya boleh mengunggah file gambar dengan format JPG atau PNG!");
+                this.value = ""; // Reset input
+            }
         }
     });
 });
+
+// Fungsi untuk menampilkan toast
+function showToast(message) {
+    const toastEl = document.getElementById('toastFileError');
+    toastEl.querySelector('.toast-body').textContent = message;
+    const toast = new bootstrap.Toast(toastEl);
+    toast.show();
+}

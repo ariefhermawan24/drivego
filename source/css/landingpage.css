@@ -950,3 +950,22 @@ td {
     padding: 10px;
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
 }
+
+@media (max-width: 768px) {
+
+    /* Toast di tengah bawah layar untuk mobile */
+    .toast-container {
+        bottom: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+}
+
+@media (min-width: 769px) {
+
+    /* Toast tetap di pojok kanan bawah pada desktop */
+    .toast-container {
+        bottom: 10px;
+        right: 10px;
+    }
+}
