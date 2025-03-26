@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DriveGO - Login</title>
+  <link rel="shortcut icon" type="image/png" href="../drivego/source/image/tittle-logo.png" />
+  <link rel="stylesheet" href="../drivego/assets/css/styles.min.css" />
+  <link rel="stylesheet" href="../drivego/source/css/login.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+</head>
+
+<body>
+  <div class="card">
+    <div class="logo-img">
+      <img src="../drivego/source/image/login-logo.png" alt="DriveGO Logo">
+    </div>
+    <p class="text-center">Drivers Panel Login</p>
+    <form>
+      <div class="form-group">
+        <input type="email" class="form-control" id="email" placeholder="Enter your email" required>
+        <label for="email" class="form-label">Email</label>
+      </div>
+      <div class="form-group">
+        <input type="password" class="form-control" id="password" placeholder="Enter your password" required>
+        <label for="password" class="form-label">Password</label>
+      </div>
+
+      <!-- Baris baru untuk "Lupa Password" & Show Password -->
+      <div class="form-options">
+        <a href="#" id="forgotPassword" class="forgot-password">Lupa Password?</a>
+        <label class="show-password">
+          <input type="checkbox" id="togglePassword"> Show Password
+        </label>
+      </div>
+      <button type="submit" class="btn btn-primary w-100">Sign In</button>
+    </form>
+  </div>
+
+  <!-- Animasi loading sukses -->
+  <div id="success-animation" class="success-overlay hidden">
+      <div class="success-message">
+          <svg class="checkmark" viewBox="0 0 52 52">
+              <circle class="checkmark-circle" cx="26" cy="26" r="25" fill="none"/>
+              <path class="checkmark-check" fill="none" d="M14 27l7 7 16-16"/>
+          </svg>
+          <div id="user-info">
+              <p id="user-name"></p>
+              <p id="user-role"></p>
+          </div>
+      </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast">
+      <i id="toast-icon" class="toast-icon fa-solid fa-circle-check"></i>
+      <span id="toast-message">Login Berhasil!</span>
+  </div>
+
+  <!-- Toast Container -->
+<div class="toast-container">
+  <div id="toast-verifikasi" class="toast">
+    <div class="toast-content">
+      <i class="toast-icon fas fa-key"></i>
+      <p id="toast-text">Memuat pertanyaan...</p>
+
+      <!-- Input dalam format Bootstrap -->
+      <div class="form-group">
+        <input type="text" class="form-control" id="toast-input" placeholder="Jawaban Anda" required>
+        <label for="toast-input" class="form-label">Jawaban</label>
+      </div>
+
+      <!-- Tombol Show Password (hanya muncul saat reset password) -->
+      <button id="showPassword" class="btn btn-secondary w-100 text-white" style="display: none; background-color: #3b3c3d; margin-bottom: 10px !important; margin-top: -14px !important;">
+        <i class="fas fa-eye"></i> Show Password
+      </button>
+
+      <!-- Tombol dalam format Bootstrap -->
+      <button id="toast-button" class="btn btn-primary w-100">Verifikasi</button>
+    </div>
+  </div>
+</div>
+
+
+</body>
+
+<!-- Tambahkan Firebase SDK -->
+<script src="../drivego/script/login.js" type="module"></script>
+
+</html>

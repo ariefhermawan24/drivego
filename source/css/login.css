@@ -121,6 +121,257 @@ body {
     text-decoration: underline;
 }
 
+.form-options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+.forgot-password {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.forgot-password:hover {
+    text-decoration: underline;
+}
+
+.show-password {
+    display: flex;
+    align-items: center;
+}
+
+.show-password input {
+    margin-right: 5px;
+}
+
+.is-invalid {
+    border: 2px solid red;
+    background-color: #1e1e1e;
+}
+
+.is-invalid-label {
+    color: red !important;
+    font-weight: bold !important;
+}
+
+/* Styling untuk pesan error */
+.error-message {
+    color: red !important;
+    font-size: 12px;
+    margin-top: 5px;
+    display: block;
+    opacity: 1;
+    animation: fadeIn 0.3s forwards;
+    -webkit-animation: fadeIn 0.3s forward;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+/* ✅ Fix Overlay Menghalangi Input */
+.success-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: none;
+    /* ⬅️ Mencegah menghalangi input */
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+/* Saat Animasi Ditampilkan */
+.success-overlay.show {
+    display: flex;
+    opacity: 1;
+}
+
+.success-message {
+    background: #1e1e1e;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+    color: #ffffff;
+}
+
+/* Checkmark Animation */
+.checkmark {
+    width: 60px;
+    height: 60px;
+    stroke: #00bcd4;
+    stroke-width: 5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    fill: none;
+    animation: draw 0.5s ease-in-out forwards;
+    -webkit-animation: draw 0.5s ease-in-out forwards;
+}
+
+.checkmark-circle {
+    stroke: #00bcd4;
+    stroke-width: 5;
+    stroke-dasharray: 157;
+    stroke-dashoffset: 157;
+    animation: circle 0.6s ease-in-out forwards;
+}
+
+.checkmark-check {
+    stroke-dasharray: 36;
+    stroke-dashoffset: 36;
+    animation: check 0.3s ease-in-out 0.6s forwards;
+}
+
+/* Keyframes */
+@keyframes circle {
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+
+@keyframes check {
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+
+/* ✅ Animasi Text (Muncul Bersamaan dengan Checkmark) */
+#user-info {
+    margin-top: 10px;
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: opacity 0.6s ease, transform 0.3s ease;
+}
+
+/* Saat Animasi Ditampilkan */
+.success-overlay.show #user-info {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* ✅ Ukuran Font */
+#user-name {
+    font-size: 22px;
+    color: #00bcd4;
+}
+
+#user-role {
+    font-size: 18px;
+    color: #ffffff;
+    opacity: 0.8;
+}
+
+/* Toast Container */
+.toast {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: #333;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 500;
+    opacity: 0;
+    transform: translateX(-50%) translateY(20px);
+    transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+
+    /* Posisi tetap di tengah bawah layar */
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    z-index: 1000;
+}
+
+/* Animasi muncul */
+.toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+/* Ikon dalam Toast */
+.toast-icon {
+    font-size: 20px;
+    animation: bounce 0.5s infinite;
+    -webkit-animation: bounce 0.5s infinite;
+}
+
+/* Animasi Teks di dalam Toast */
+.toast-text {
+    opacity: 0;
+    transform: translateY(10px);
+    animation: fadeInUp 0.5s ease-in-out 0.2s forwards;
+}
+
+button.btn-primary:disabled {
+    cursor: not-allowed !important;
+    pointer-events: auto !important;
+    /* Aktifkan kembali pointer events */
+}
+
+
+/* Keyframes untuk efek fade-in dan slide-up */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Animasi Ikon */
+@keyframes bounce {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-5px);
+    }
+}
+
+/* Posisi toast */
+.toast-container {
+    position: fixed;
+    width: auto;
+    bottom: 20px;
+    right: 20px;
+    /* Posisi default untuk desktop */
+    z-index: 1050;
+}
+
+/* Toast di tengah bawah khusus untuk ponsel */
+@media (max-width: 768px) {
+    .toast-container {
+        left: 50%;
+        transform: translateX(-50%);
+        right: auto;
+    }
+}
+
+
 /* Media Queries untuk Responsif */
 @media (max-width: 576px) {
     body {

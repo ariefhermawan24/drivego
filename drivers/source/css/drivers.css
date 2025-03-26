@@ -1,0 +1,638 @@
+body {
+    display: flex;
+    margin: 0;
+}
+
+.sidebar {
+    width: 250px;
+    height: 100vh;
+    background: #343a40;
+    color: white;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    transition: width 0.3s ease-in-out;
+}
+
+.sidebar.minimized {
+    width: 80px;
+    align-items: center !important;
+}
+
+.sidebar .logo {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px;
+    font-size: 18px;
+    /* Diperkecil */
+    font-weight: bold;
+    width: 100%;
+    position: relative;
+}
+
+.sidebar .logo i {
+    font-size: 20px;
+    /* Diperkecil */
+}
+
+/* Saat sidebar diminimized */
+.sidebar.minimized .logo {
+    justify-content: center;
+}
+
+.sidebar.minimized .logo i {
+    margin: 0 auto;
+}
+
+.toggle-btn {
+    background: transparent;
+    color: white;
+    border: none;
+    cursor: pointer;
+    width: 40px;
+    /* Diperkecil */
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    /* Diperkecil */
+    transition: color 0.3s;
+}
+
+.sidebar.minimized .toggle-btn {
+    position: absolute;
+    bottom: 15px;
+    right: 50%;
+    transform: translateX(50%);
+    background: #343a40 !important;
+    color: white;
+    border-radius: 5px;
+    padding: 8px;
+    width: 50px;
+    height: 45px;
+    font-size: 18px !important;
+}
+
+.sidebar ul {
+    padding: 0;
+    list-style: none;
+    width: 100%;
+    overflow-y: auto;
+}
+
+.sidebar ul li {
+    padding: 12px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    background: #3d434a;
+    margin: 5px;
+    border-radius: 5px;
+}
+
+.menu-induk {
+    justify-content: space-between;
+    padding-right: 10px;
+}
+
+.menu-induk .arrow {
+    transition: transform 0.3s ease;
+}
+
+.sidebar ul li i {
+    width: 20px;
+    text-align: center !important;
+    font-size: 16px !important;
+    /* Diperkecil */
+}
+
+.sidebar ul li span {
+    margin-left: 10px;
+    font-size: 14px;
+    /* Diperkecil */
+}
+
+.sidebar ul .submenu {
+    display: none;
+    padding-left: 10px;
+    padding-right: 6px;
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out;
+}
+
+.sidebar ul .submenu li {
+    background: #495057;
+    margin: 3px 0;
+    padding: 8px;
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.sidebar ul .submenu li:hover {
+    color: #74c0fc;
+    background: #6c757d;
+    transform: translateX(5px);
+}
+
+.sidebar ul li.active+.submenu {
+    display: block;
+    opacity: 1;
+    max-height: 500px;
+}
+
+.sidebar.minimized .submenu {
+    display: none !important;
+}
+
+.sidebar.minimized ul li span {
+    display: none;
+}
+
+.sidebar.minimized .logo span {
+    display: none;
+}
+
+.sidebar .logo i.icon img {
+    width: 34px;
+    height: 34px;
+}
+
+.sidebar.minimized .arrow {
+    display: none;
+}
+
+.sidebar ul li:hover {
+    color: #74c0fc;
+    background: #495057;
+    transition: background 0.2s ease-in-out;
+}
+
+.toggle-btn-bottom {
+    display: none;
+    position: absolute;
+    bottom: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #343a40;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 8px;
+    width: 50px;
+    height: 45px;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+.sidebar.minimized .toggle-btn-bottom {
+    display: block;
+}
+
+.sidebar .toggle-btn:hover,
+.toggle-btn-bottom:hover {
+    color: #adb5bd;
+}
+
+.sidebar.minimized ul li {
+    justify-content: center;
+}
+
+.sidebar.minimized ul li i {
+    margin: 0;
+}
+
+.white {
+    color: white;
+}
+
+.orange {
+    color: #db974b;
+}
+
+/* Wrapper utama agar layout menjadi atas-bawah */
+.main-container {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    height: 100vh;
+}
+
+/* NAVBAR */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #3d434a;
+    color: white;
+    padding: 15px 20px;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+/* Navbar Center (Administrator Panel) */
+.navbar-center {
+    display: flex;
+    align-items: center;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.navbar-center i {
+    margin-right: 10px;
+}
+
+/* Account Dropdown */
+.account-dropdown {
+    position: relative;
+    cursor: pointer;
+}
+
+.account-icon {
+    font-size: 24px;
+}
+
+/* Hover efek untuk ikon user-circle */
+.account-icon {
+    font-size: 28px;
+    color: white;
+    cursor: pointer;
+    transition: transform 0.3s ease, color 0.3s ease;
+}
+
+.account-icon:hover {
+    color: #db974b;
+    transform: scale(1.1);
+}
+
+/* DROPDOWN */
+.dropdown-content {
+    position: absolute;
+    right: 0;
+    top: 50px;
+    /* Tetap di bawah ikon */
+    background: #2e3237;
+    color: white;
+    min-width: 180px;
+    border-radius: 12px;
+    box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.2);
+    padding: 10px 0;
+    overflow: hidden;
+
+    /* Awal dalam keadaan tersembunyi */
+    opacity: 0;
+    transform: translateY(-10px);
+    visibility: hidden;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+/* Animasi muncul */
+.dropdown-content.show {
+    opacity: 1;
+    transform: translateY(0);
+    visibility: visible;
+}
+
+/* Animasi menghilang */
+.dropdown-content.hide {
+    opacity: 0;
+    transform: translateY(-10px);
+    visibility: hidden;
+}
+
+/* Item dropdown */
+.dropdown-content a {
+    display: flex;
+    align-items: center;
+    padding: 12px 15px;
+    text-decoration: none;
+    color: white;
+    font-size: 14px;
+    transition: background 0.2s ease-in-out, padding-left 0.2s;
+}
+
+.dropdown-content a i {
+    margin-right: 10px;
+}
+
+/* Hover pada semua item dropdown */
+.dropdown-content a:hover {
+    color: #74c0fc;
+    background: rgba(255, 255, 255, 0.1);
+    padding-left: 20px;
+    border-radius: 5px;
+    transition: all 0.3s ease-in-out;
+}
+
+
+
+.dropdown-content a.logout:hover {
+    color: #ff4d4d !important;
+    /* Warna latar merah */
+    background: rgba(255, 255, 255, 0.1);
+    padding-left: 20px;
+    border-radius: 5px;
+    transition: all 0.3s ease-in-out;
+}
+
+
+
+/* Content Styling */
+.content {
+    flex-grow: 1;
+    padding: 20px;
+    background: #f4f4f4;
+}
+
+/* FOOTER */
+.footer {
+    background: #2e3237;
+    color: white;
+    text-align: center;
+    justify-content: center;
+    margin: 0;
+    padding: 10px;
+    font-size: 14px;
+}
+
+/* Untuk Chrome, Safari */
+::-webkit-scrollbar {
+    display: none;
+}
+
+/* Untuk Firefox */
+* {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+/* RESPONSIVE DESIGN */
+@media screen and (max-width: 1024px) {
+    .sidebar {
+        width: 200px;
+    }
+
+    .sidebar.minimized {
+        width: 70px;
+    }
+
+    .sidebar .logo {
+        padding: 15px;
+        font-size: 18px;
+    }
+
+    .sidebar .logo i.icon img {
+        width: 32px;
+        height: 32px;
+    }
+
+    .sidebar ul li {
+        padding: 10px;
+    }
+
+    .sidebar ul li i {
+        font-size: 16px;
+    }
+
+    .sidebar ul li span {
+        font-size: 12px;
+    }
+
+    .navbar {
+        padding: 12px 15px;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .navbar-center {
+        font-size: 16px;
+    }
+
+    .account-icon {
+        font-size: 22px;
+    }
+
+    .toggle-btn-bottom {
+        margin-bottom: 50px !important;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .sidebar {
+        width: 180px;
+    }
+
+    .sidebar.minimized {
+        width: 65px;
+    }
+
+    .sidebar .logo {
+        padding: 12px;
+        font-size: 16px;
+    }
+
+    .sidebar .logo i.icon img {
+        width: 30px;
+        height: 30px;
+    }
+
+    .toggle-btn {
+        width: 40px;
+        height: 40px;
+        font-size: 18px;
+    }
+
+    .sidebar ul li {
+        padding: 8px;
+    }
+
+    .sidebar ul li i {
+        font-size: 14px;
+    }
+
+    .sidebar ul li span {
+        font-size: 10px;
+    }
+
+    .navbar {
+        padding: 10px 15px;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .navbar-center {
+        font-size: 14px;
+    }
+
+    .account-icon {
+        font-size: 20px;
+    }
+
+    .footer {
+        font-size: 12px;
+        padding: 12px;
+    }
+
+    .toggle-btn-bottom {
+        margin-bottom: 50px !important;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .sidebar {
+        width: 160px;
+    }
+
+    .sidebar.minimized {
+        width: 60px;
+    }
+
+    .sidebar .logo {
+        padding: 10px;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .sidebar .logo i.icon img {
+        width: 25px;
+        height: 25px;
+        margin-top: -5px;
+    }
+
+    .sidebar .logo span {
+        font-size: 12px;
+    }
+
+    .toggle-btn {
+        width: 35px;
+        height: 35px;
+        font-size: 16px;
+    }
+
+    .sidebar ul li {
+        padding: 6px;
+    }
+
+    .sidebar ul li i {
+        font-size: 12px;
+    }
+
+    .sidebar ul li span {
+        font-size: 9px;
+    }
+
+    .navbar {
+        padding: 10px 12px;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .navbar-center {
+        font-size: 13px;
+    }
+
+    .account-icon {
+        font-size: 18px;
+    }
+
+    .dropdown-content {
+        min-width: 160px;
+    }
+
+    .dropdown-content a {
+        font-size: 12px;
+        padding: 8px 12px;
+    }
+
+    .footer {
+        font-size: 11px;
+        padding: 10px;
+    }
+
+    .toggle-btn-bottom {
+        margin-bottom: 50px !important;
+    }
+}
+
+@media screen and (max-width: 320px) {
+    .sidebar {
+        width: 140px;
+    }
+
+    .sidebar.minimized {
+        width: 55px;
+    }
+
+    .sidebar .logo {
+        padding: 8px;
+        font-size: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .sidebar .logo i.icon img {
+        width: 20px;
+        height: 20px;
+        margin-top: -10px !important;
+    }
+
+    .sidebar .logo span {
+        font-size: 10px;
+    }
+
+    .toggle-btn {
+        width: 30px;
+        height: 30px;
+        font-size: 14px;
+    }
+
+    .sidebar ul li {
+        padding: 5px;
+    }
+
+    .sidebar ul li i {
+        font-size: 10px;
+    }
+
+    .sidebar ul li span {
+        font-size: 8px;
+    }
+
+    .navbar {
+        padding: 8px 10px;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .navbar-center {
+        font-size: 12px;
+    }
+
+    .account-icon {
+        font-size: 16px;
+    }
+
+    .dropdown-content {
+        min-width: 140px;
+    }
+
+    .dropdown-content a {
+        font-size: 11px;
+        padding: 6px 10px;
+    }
+
+    .footer {
+        font-size: 10px;
+        padding: 8px;
+    }
+
+    .toggle-btn-bottom {
+        margin-bottom: 50px !important;
+    }
+}
