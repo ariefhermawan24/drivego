@@ -85,6 +85,145 @@
 
     
     <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            let username = sessionStorage.getItem("username");
+            let role = sessionStorage.getItem("role");
+
+            function getQueryParam(param) {
+                let urlParams = new URLSearchParams(window.location.search);
+                return urlParams.get(param);
+            }
+
+            function showToast(message, callback) {
+                let overlay = document.createElement("div");
+                overlay.style.position = "fixed";
+                overlay.style.top = "0";
+                overlay.style.left = "0";
+                overlay.style.width = "100%";
+                overlay.style.height = "100%";
+                overlay.style.backdropFilter = "blur(10px)";
+                overlay.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
+                overlay.style.zIndex = "1000";
+                document.body.appendChild(overlay);
+
+                let toast = document.createElement("div");
+                toast.innerText = message;
+                toast.style.position = "fixed";
+                toast.style.top = "50%";
+                toast.style.left = "50%";
+                toast.style.transform = "translate(-50%, -50%)";
+                toast.style.backgroundColor = "#333";
+                toast.style.color = "#fff";
+                toast.style.padding = "12px 20px";
+                toast.style.borderRadius = "8px";
+                toast.style.fontSize = "16px";
+                toast.style.zIndex = "1100";
+                toast.style.display = "flex";
+                toast.style.justifyContent = "center";
+                toast.style.alignItems = "center";
+                toast.style.textAlign = "center";
+                toast.style.maxWidth = "90%"; // Agar tetap muat di layar kecil
+                document.body.appendChild(toast);
+
+                // Responsif untuk layar kecil
+                if (window.innerWidth <= 480) {
+                    toast.style.fontSize = "14px";
+                    toast.style.padding = "10px 15px";
+                }
+
+                setTimeout(() => {
+                    document.body.removeChild(toast);
+                    document.body.removeChild(overlay);
+                    if (callback) callback();
+                }, 2000);
+            }
+
+            function showConfirmToast(message, onConfirm) {
+                let overlay = document.createElement("div");
+                overlay.style.position = "fixed";
+                overlay.style.top = "0";
+                overlay.style.left = "0";
+                overlay.style.width = "100%";
+                overlay.style.height = "100%";
+                overlay.style.backdropFilter = "blur(10px)";
+                overlay.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
+                overlay.style.zIndex = "1000";
+                document.body.appendChild(overlay);
+
+                let toast = document.createElement("div");
+                toast.innerHTML = `
+                    <p style="margin: 0 0 10px;">${message}</p>
+                    <button id="confirm-yes" style="margin-right: 10px; padding: 8px 15px; background-color: green; color: white; border: none; border-radius: 5px; cursor: pointer;">Ya</button>
+                    <button id="confirm-no" style="padding: 8px 15px; background-color: red; color: white; border: none; border-radius: 5px; cursor: pointer;">Tidak</button>
+                `;
+                toast.style.position = "fixed";
+                toast.style.top = "50%";
+                toast.style.left = "50%";
+                toast.style.transform = "translate(-50%, -50%)";
+                toast.style.backgroundColor = "#333";
+                toast.style.color = "#fff";
+                toast.style.padding = "15px";
+                toast.style.borderRadius = "8px";
+                toast.style.textAlign = "center";
+                toast.style.fontSize = "16px";
+                toast.style.zIndex = "1100";
+                document.body.appendChild(toast);
+
+                document.getElementById("confirm-yes").addEventListener("click", function () {
+                    document.body.removeChild(toast);
+                    document.body.removeChild(overlay);
+                    if (onConfirm) onConfirm();
+                });
+
+                document.getElementById("confirm-no").addEventListener("click", function () {
+                    document.body.removeChild(toast);
+                    document.body.removeChild(overlay);
+                });
+            }
+
+            function checkSession() {
+                let aksesKhusus = getQueryParam("akses");
+                let username = sessionStorage.getItem("username");
+                let role = sessionStorage.getItem("role");
+
+                if (!username || !role) {
+                    if (aksesKhusus === "khusus") {
+                        console.log("Percobaan akses langsung terdeteksi!");
+                        showToast("Akses tidak sah! Silakan login terlebih dahulu.", function () {
+                            window.location.href = "../drivers-login.html";
+                        });
+                    } else {
+                        console.log("Sesi telah berakhir, pengguna akan diarahkan ke login.");
+                        showToast("Sesi telah berakhir. Silakan login kembali.", function () {
+                            window.location.href = "../drivers-login.html";
+                        });
+                    }
+                } else {
+                    console.log(`User Logged In: ${username} (${role})`);
+                }
+            }
+
+            checkSession();
+
+            // Cek ulang session saat pengguna kembali ke halaman (mengatasi masalah back button)
+            window.addEventListener("pageshow", function (event) {
+                if (event.persisted) {
+                    checkSession();
+                }
+            });
+
+            // Logout event dengan konfirmasi
+            document.querySelector(".logout").addEventListener("click", function (event) {
+                event.preventDefault();
+                showConfirmToast("Anda yakin ingin keluar?", function () {
+                    sessionStorage.clear();
+                    showToast("Anda telah berhasil keluar.", function () {
+                        window.location.href = "../drivers-login.html";
+                    });
+                });
+            });
+        });
+
         function toggleSidebar() {
             let sidebar = document.getElementById("sidebar");
             sidebar.classList.toggle("minimized");

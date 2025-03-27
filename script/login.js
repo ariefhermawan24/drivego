@@ -18,7 +18,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const toastButton = document.getElementById("toast-button");
     const userName = document.getElementById("user-name");
     const userRole = document.getElementById("user-role");
-    let lastCheckedEmail = ""; // Untuk menyimpan email yang terakhir dicek
 
     function testConnection() {
         const testRef = ref(database, "/");
@@ -64,103 +63,61 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     });
     
-// Fungsi untuk menampilkan toast dengan kontrol tampilan form
-function showToastVerifikasi(mode, message = "") {
-    toastVerifikasi.classList.add("show");
-    toastText.textContent = message;
+    // Fungsi untuk menampilkan toast dengan kontrol tampilan form
+    function showToastVerifikasi(mode, message = "") {
+        toastVerifikasi.classList.add("show");
+        toastText.textContent = message;
 
-    if (mode === "verifikasi") {
-        // Mode soal verifikasi
-        toastInput.style.display = "block";
-        toastButton.style.display = "block";
-        toastInput.type = "text";
-        toastInput.placeholder = "Jawaban Anda";
-        toastButton.textContent = "Verifikasi";
-        showPasswordButton.style.display = "none"; // Sembunyikan tombol Show Password
-    } else if (mode === "reset") {
-        // Mode reset password
-        toastInput.style.display = "block";
-        toastButton.style.display = "block";
-        toastInput.type = "password";
-        toastInput.placeholder = "Password Baru";
-        toastButton.textContent = "Reset Password";
-        showPasswordButton.style.display = "block"; // Sembunyikan tombol Show Password
-        // **Pastikan teks soal tetap tampil di mode reset**
-        toastText.textContent = "Masukkan password baru Anda";
-    } else {
-        // Mode info/error (form tidak perlu muncul)
-        toastInput.style.display = "none";
-        toastButton.style.display = "none";
-        showPasswordButton.style.display = "none"; // Sembunyikan tombol Show Password
-    }
-}
-
-// Fungsi untuk menutup toast dan reset form
-function closeToast() {
-    toastVerifikasi.classList.remove("show");
-    observer.disconnect(); // Hentikan pemantauan email
-    setTimeout(() => {
-        toastInput.value = ""; // Hapus input agar tidak menampilkan password sebelumnya
-    }, 500);
-}
-
-// Fungsi untuk memeriksa email di database secara otomatis
-function checkEmailAndShowToast() {
-    const email = emailInput.value.trim();
-    if (!email) {
-        showToastVerifikasi("info", "⚠️ Harap masukkan email terlebih dahulu!");
-        return;
-    }
-
-    // Cek apakah email ada di database
-    const userRef = ref(database, "users");
-    get(userRef).then((snapshot) => {
-        if (snapshot.exists()) {
-            let userData = null;
-
-            snapshot.forEach((childSnapshot) => {
-                const user = childSnapshot.val();
-                if (user.email === email) {
-                    userData = user;
-                }
-            });
-
-            if (userData) {
-                // Jika email ditemukan, tampilkan soal verifikasi
-                showToastVerifikasi("verifikasi", userData.soal_verifikasi);
-            } else {
-                showToastVerifikasi("info", "❌ Email tidak ditemukan!");
-            }
+        if (mode === "verifikasi") {
+            // Mode soal verifikasi
+            toastButton.disabled = false;
+            toastInput.style.display = "block";
+            toastButton.style.display = "block";
+            toastLabel.style.display = "block";
+            toastInput.type = "text";
+            toastInput.placeholder = "Jawaban Anda";
+            toastButton.textContent = "Verifikasi";
+            showPasswordButton.style.display = "none"; // Sembunyikan tombol Show Password
+        } else if (mode === "reset") {
+            // Mode reset password
+            toastInput.style.display = "block";
+            toastButton.style.display = "block";
+            toastLabel.style.display = "block";
+            toastInput.type = "password";
+            toastInput.placeholder = "Password Baru";
+            toastButton.textContent = "Reset Password";
+            showPasswordButton.style.display = "block"; // Sembunyikan tombol Show Password
         } else {
-            showToastVerifikasi("info", "⚠️ Tidak ada data pengguna!");
+            // Mode info/error (form tidak perlu muncul)
+            toastInput.style.display = "none";
+            toastButton.style.display = "none";
+            toastLabel.style.display = "none";
+            showPasswordButton.style.display = "none"; // Sembunyikan tombol Show Password
         }
-    }).catch((error) => {
-        console.error("🔥 Error saat mengambil data pengguna:", error);
-        showToastVerifikasi("info", "❌ Terjadi kesalahan, coba lagi!");
-    });
-}
+    }
 
-// Event Listener untuk Tombol "Lupa Password?"
-document.getElementById("forgotPassword").addEventListener("click", (event) => {
-    event.preventDefault();
-    checkEmailAndShowToast();
+    // Fungsi untuk menutup toast dan reset form
+    function closeToast() {
+        toastVerifikasi.classList.remove("show");
+        observer.disconnect(); // Hentikan pemantauan email
+        setTimeout(() => {
+            toastInput.value = ""; // Hapus input agar tidak menampilkan password sebelumnya
+        }, 500);
+        }
+        
+    // Pastikan bisa dipanggil dari luar file JS
+    window.closeToast = closeToast;
 
-    // Aktifkan pemantauan perubahan input email
-    observer.observe(emailInput, { attributes: true, childList: true, subtree: true, characterData: true });
-});
-
-// Buat Observer untuk mendeteksi perubahan pada emailInput
-const observer = new MutationObserver(() => {
-    checkEmailAndShowToast();
-});
-
-// Event Listener untuk Tombol dalam Toast
-toastButton.addEventListener("click", () => {
-    if (toastButton.textContent === "Verifikasi") {
-        const jawabanUser = toastInput.value.trim();
+    // Fungsi untuk memeriksa email di database secara otomatis
+    function checkEmailAndShowToast() {
         const email = emailInput.value.trim();
-        const userRef = ref(database, "users");
+        if (!email) {
+            showToastVerifikasi("info", "⚠️ Harap masukkan email terlebih dahulu!");
+            return;
+        }
 
+        // Cek apakah email ada di database
+        const userRef = ref(database, "users");
         get(userRef).then((snapshot) => {
             if (snapshot.exists()) {
                 let userData = null;
@@ -172,73 +129,136 @@ toastButton.addEventListener("click", () => {
                     }
                 });
 
-                if (userData && jawabanUser === userData.jawaban_verifikasi) {
-                    // **Jawaban benar, lanjut ke reset password**
-                    toastInput.classList.remove("is-invalid"); // Hapus efek merah jika sebelumnya ada
-                    toastInput.value = "";
-                    showToastVerifikasi("reset");
+                if (userData) {
+                    // Jika email ditemukan, tampilkan soal verifikasi
+                    showToastVerifikasi("verifikasi", userData.soal_verifikasi);
                 } else {
-                    // **Jawaban salah, tampilkan pesan error & beri efek merah pada input**
-                    toastInput.classList.add("is-invalid");
-                    toastLabel.classList.add("is-invalid-label");
-                    showToastVerifikasi("verifikasi", "❌ Jawaban salah!");
-
-                    setTimeout(() => {
-                        showToastVerifikasi("verifikasi", userData.soal_verifikasi);
-                    }, 1000);
+                    showToastVerifikasi("info", "❌ Email tidak ditemukan!");
                 }
+            } else {
+                showToastVerifikasi("info", "⚠️ Tidak ada data pengguna!");
             }
         }).catch((error) => {
-            console.error("🔥 Error:", error);
+            console.error("🔥 Error saat mengambil data pengguna:", error);
             showToastVerifikasi("info", "❌ Terjadi kesalahan, coba lagi!");
         });
+    }
 
-    } else {
-        // Proses reset password
-        const newPassword = toastInput.value;
-        if (newPassword.length < 6) {
-            showToastVerifikasi("reset", "⚠️ Password minimal 6 karakter!");
-            return;
-        }
+    // Event Listener untuk Tombol "Lupa Password?"
+    document.getElementById("forgotPassword").addEventListener("click", (event) => {
+        event.preventDefault();
+        checkEmailAndShowToast();
 
-        const email = emailInput.value.trim();
-        const userRef = ref(database, "users");
+        // Aktifkan pemantauan perubahan input email
+        observer.observe(emailInput, { attributes: true, childList: true, subtree: true, characterData: true });
+    });
 
-        get(userRef).then((snapshot) => {
-            if (snapshot.exists()) {
-                let userKey = null;
+    // Buat Observer untuk mendeteksi perubahan pada emailInput
+    const observer = new MutationObserver(() => {
+        checkEmailAndShowToast();
+    });
 
-                snapshot.forEach((childSnapshot) => {
-                    const user = childSnapshot.val();
-                    if (user.email === email) {
-                        userKey = childSnapshot.key;
+    // Event Listener untuk Tombol dalam Toast
+        toastButton.addEventListener("click", () => {
+        toastButton.disabled = true;
+        if (toastButton.textContent === "Verifikasi") {
+            const jawabanUser = toastInput.value.trim();
+            const email = emailInput.value.trim();
+            const userRef = ref(database, "users");
+
+            get(userRef).then((snapshot) => {
+                if (snapshot.exists()) {
+                    let userData = null;
+                    toastButton.disabled = false;
+
+                    snapshot.forEach((childSnapshot) => {
+                        const user = childSnapshot.val();
+                        if (user.email === email) {
+                            userData = user;
+                        }
+                    });
+
+                    if (userData && jawabanUser === userData.jawaban_verifikasi) {
+                        toastButton.disabled = false;
+                        // **Jawaban benar, lanjut ke reset password**
+                        toastInput.classList.remove("is-invalid"); // Hapus efek merah jika sebelumnya ada
+                        toastInput.value = "";
+                        showToastVerifikasi("reset", "Masukkan password baru Anda");
+                    } else {
+                        toastButton.disabled = false;
+                        // **Jawaban salah, tampilkan pesan error & beri efek merah pada input**
+                        toastInput.classList.add("is-invalid");
+                        toastLabel.classList.add("is-invalid-label");
+                        showToastVerifikasi("verifikasi", "❌ Jawaban salah!");
+
+                        setTimeout(() => {
+                            showToastVerifikasi("verifikasi", userData.soal_verifikasi);
+                        }, 1000);
                     }
-                });
-
-                if (userKey) {
-                    // Update password di Firebase
-                    update(ref(database, `users/${userKey}`), { password: newPassword })
-                        .then(() => {
-                            showToastVerifikasi("info", "✅ Password berhasil diubah!");
-                            setTimeout(closeToast, 3000); // Tutup toast setelah 3 detik
-                        })
-                        .catch((error) => {
-                            console.error("🔥 Error update password:", error);
-                            showToastVerifikasi("info", "❌ Gagal mengubah password!");
-                        });
                 }
+            }).catch((error) => {
+                console.error("🔥 Error:", error);
+                showToastVerifikasi("info", "❌ Terjadi kesalahan, coba lagi!");
+            });
+
+        } else {
+            // Proses reset password
+            const newPassword = toastInput.value;
+            if (newPassword.length < 6) {
+                toastButton.disabled = false;
+                // **Jawaban salah, tampilkan pesan error & beri efek merah pada input**
+                toastInput.classList.add("is-warning");
+                toastLabel.classList.add("is-warning-label");
+                showToastVerifikasi("reset", "⚠️ Password minimal 6 karakter!");
+
+                setTimeout(() => {
+                    showToastVerifikasi("reset", "Masukkan password baru Anda");
+                }, 1000);
+                return;
             }
-        });
-    }
-});
-    
+
+            const email = emailInput.value.trim();
+            const userRef = ref(database, "users");
+
+            get(userRef).then((snapshot) => {
+                if (snapshot.exists()) {
+                    let userKey = null;
+
+                    snapshot.forEach((childSnapshot) => {
+                        const user = childSnapshot.val();
+                        if (user.email === email) {
+                            userKey = childSnapshot.key;
+                        }
+                    });
+
+                    if (userKey) {
+                        // Update password di Firebase
+                        update(ref(database, `users/${userKey}`), { password: newPassword })
+                            .then(() => {
+                                showToastVerifikasi("info", "✅ Password berhasil diubah!");
+                                setTimeout(closeToast, 3000); // Tutup toast setelah 3 detik
+                            })
+                            .catch((error) => {
+                                console.error("🔥 Error update password:", error);
+                                showToastVerifikasi("info", "❌ Gagal mengubah password!");
+                            });
+                    }
+                }
+            });
+        }
+    });
+        
     // **Event Listener untuk menghapus efek merah ketika user mulai mengetik ulang jawaban**
-toastInput.addEventListener("input", () => {
-    if (toastInput.classList.contains("is-invalid")) {
-        toastInput.classList.remove("is-invalid");
-        toastLabel.classList.remove("is-invalid-label");
-    }
-});
+    toastInput.addEventListener("input", () => {
+        if (toastInput.classList.contains("is-invalid")) {
+            toastInput.classList.remove("is-invalid");
+            toastLabel.classList.remove("is-invalid-label");
+        }
+        else if (toastInput.classList.contains("is-warning")) {
+            toastInput.classList.remove("is-warning");
+            toastLabel.classList.remove("is-warning-label");
+        }
+    });
 
     [emailInput, passwordInput].forEach(input => {
         input.addEventListener("input", () => {
@@ -343,9 +363,11 @@ toastInput.addEventListener("input", () => {
                             console.log(`✅ Login Berhasil!`);
                             console.log(`🔹 Username: ${user.username}`);
                             console.log(`🔹 Role: ${user.role}`);
+                            console.log(`🔹 Email: ${user.email}`);
 
                             sessionStorage.setItem("username", user.username);
                             sessionStorage.setItem("role", user.role);
+                            sessionStorage.setItem("email", user.email);
 
                             userName.textContent = user.username;
                             userRole.textContent = user.role;

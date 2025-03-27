@@ -7,6 +7,10 @@ body {
     justify-content: center;
     align-items: center;
     margin: 0;
+    position: relative;
+    /* Tambahkan ini */
+    overflow: hidden;
+    /* Hindari elemen lain keluar */
 }
 
 .card {
@@ -16,6 +20,8 @@ body {
     padding: 30px;
     max-width: 400px;
     width: 100%;
+    backdrop-filter: blur(10px);
+    /* Efek blur agar terlihat modern */
 }
 
 .logo-img {
@@ -154,6 +160,16 @@ body {
 
 .is-invalid-label {
     color: red !important;
+    font-weight: bold !important;
+}
+
+.is-warning {
+    border: 2px solid yellow;
+    background-color: #1e1e1e;
+}
+
+.is-warning-label {
+    color: yellow !important;
     font-weight: bold !important;
 }
 
@@ -296,7 +312,7 @@ body {
     position: fixed;
     bottom: 20px;
     left: 50%;
-    z-index: 1000;
+    z-index: 1000 !important;
 }
 
 /* Animasi muncul */
@@ -352,25 +368,101 @@ button.btn-primary:disabled {
     }
 }
 
-/* Posisi toast */
-.toast-container {
-    position: fixed;
-    width: auto;
-    bottom: 20px;
-    right: 20px;
-    /* Posisi default untuk desktop */
-    z-index: 1050;
+.toast-verifikasi {
+    pointer-events: auto !important;
 }
 
-/* Toast di tengah bawah khusus untuk ponsel */
-@media (max-width: 768px) {
-    .toast-container {
-        left: 50%;
-        transform: translateX(-50%);
-        right: auto;
+.toast-content {
+    width: 100%;
+    max-width: 100%;
+}
+
+/* Toast Header */
+.toast-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 18px;
+    font-weight: 600;
+    justify-content: space-between;
+    /* Supaya elemen tersebar */
+    color: white !important;
+}
+
+/* Styling untuk tombol close */
+.toast-close {
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.toast-close:hover {
+    color: #ff5555;
+    /* Warna merah saat hover */
+}
+
+/* Garis pemisah */
+.toast-divider {
+    width: 100%;
+    height: 5px;
+    background: #ffffff !important;
+    opacity: 0.5;
+    border: none;
+    margin: 10px 0;
+}
+
+
+/* Toast Verifikasi (mandiri, tidak ikut class .toast) */
+.toast-verifikasi {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: #444;
+    color: white;
+    padding: 16px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 500;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+
+    /* Posisi tetap */
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2000 !important;
+    /* Pastikan lebih tinggi dari elemen lain */
+    max-width: 90%;
+    width: 320px;
+}
+
+/* Tampilkan toast saat dibutuhkan */
+.toast-verifikasi.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+/* Saat layar lebih besar dari 768px (Desktop) */
+@media (min-width: 768px) {
+    .toast-verifikasi {
+        left: auto;
+        right: 20px;
+        transform: translateX(0);
     }
 }
 
+/* Untuk tampilan mobile (muncul di tengah bawah) */
+@media (max-width: 575px) {
+    .toast-verifikasi {
+        left: 50%;
+        transform: translateX(-50%);
+    }
+}
 
 /* Media Queries untuk Responsif */
 @media (max-width: 576px) {

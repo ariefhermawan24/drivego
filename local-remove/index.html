@@ -32,6 +32,7 @@
     <script>
         function clearLocalStorage() {
             localStorage.clear();
+            sessionStorage.clear(); // Hapus semua data di SessionStorage
             document.getElementById("message").innerText = "LocalStorage berhasil dihapus!";
         }
     </script>
