@@ -449,6 +449,143 @@ button:disabled {
     /* Aktifkan kembali pointer events */
 }
 
+.list-group-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.list-group-item span {
+    text-align: end;
+}
+
+/* Default: Toast di kanan bawah (Desktop) */
+.custom-toast {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #1e1e1e;
+    color: #f1f1f1;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0px 5px 15px rgba(255, 255, 255, 0.1);
+    font-size: 14px;
+    display: flex;
+    flex-direction: column;
+    width: 320px;
+    opacity: 0;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    max-width: 400px;
+    z-index: 9999;
+}
+
+.custom-toast h5 {
+    margin-bottom: 10px;
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+}
+
+.toast-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.toast-input {
+    width: 100%;
+    padding: 8px;
+    margin: 5px 0;
+    border: 1px solid #555;
+    border-radius: 5px;
+    background-color: #333;
+    color: #fff;
+}
+
+.toast-footer {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+}
+
+.btn {
+    padding: 8px 12px;
+    font-size: 14px;
+    border-radius: 5px;
+    cursor: pointer;
+    border: none;
+}
+
+.toast-close {
+    background: none;
+    border: none;
+    color: #f1f1f1;
+    font-size: 20px;
+    cursor: pointer;
+    margin-top: -3px !important;
+    transition: color 0.2s ease-in-out;
+}
+
+.toast-close:hover {
+    color: #e74c3c;
+    /* Merah saat hover, biar lebih tegas */
+}
+
+.toast-close i {
+    font-size: 24px;
+}
+
+/* Hover untuk Reset */
+.btn-reset {
+    background-color: #f39c12;
+    /* Kuning */
+    color: #fff;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.btn-reset:hover {
+    background-color: #e67e22;
+    /* Orange lebih gelap */
+}
+
+/* Hover untuk Simpan */
+.btn-save {
+    background-color: #2ecc71;
+    /* Hijau */
+    color: #fff;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.btn-save:hover {
+    background-color: #27ae60;
+    /* Hijau lebih gelap */
+}
+
+/* Untuk Mobile (Android) Toast Berada di Tengah */
+@media (max-width: 768px) {
+    .custom-toast {
+        left: 50%;
+        right: auto;
+        transform: translateX(-50%);
+        width: 90%;
+        max-width: 350px;
+    }
+}
+
+/* Animasi Muncul */
+.custom-toast.show {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* Animasi Muncul di Mobile */
+@media (max-width: 768px) {
+    .custom-toast.show {
+        transform: translateX(-50%) translateY(0);
+    }
+}
+
 /* Keyframes Animasi Bounce */
 @keyframes bounce {
 

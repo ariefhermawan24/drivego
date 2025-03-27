@@ -67,6 +67,8 @@ document.addEventListener("DOMContentLoaded", () => {
     function showToastVerifikasi(mode, message = "") {
         toastVerifikasi.classList.add("show");
         toastText.textContent = message;
+        // Pastikan display berubah ke flex sebelum animasi berjalan
+        toastVerifikasi.style.display = 'flex';
 
         if (mode === "verifikasi") {
             // Mode soal verifikasi
@@ -99,6 +101,8 @@ document.addEventListener("DOMContentLoaded", () => {
     // Fungsi untuk menutup toast dan reset form
     function closeToast() {
         toastVerifikasi.classList.remove("show");
+        // Pastikan display berubah ke flex sebelum animasi berjalan
+        toastVerifikasi.style.display = 'none';
         observer.disconnect(); // Hentikan pemantauan email
         setTimeout(() => {
             toastInput.value = ""; // Hapus input agar tidak menampilkan password sebelumnya

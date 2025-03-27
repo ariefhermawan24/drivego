@@ -417,7 +417,8 @@ button.btn-primary:disabled {
 
 /* Toast Verifikasi (mandiri, tidak ikut class .toast) */
 .toast-verifikasi {
-    display: flex;
+    display: none;
+    /* Awalnya tersembunyi */
     flex-direction: column;
     align-items: center;
     background: #444;
@@ -453,6 +454,10 @@ button.btn-primary:disabled {
         left: auto;
         right: 20px;
         transform: translateX(0);
+        -webkit-transform: translateX(0);
+        -moz-transform: translateX(0);
+        -ms-transform: translateX(0);
+        -o-transform: translateX(0);
     }
 }
 

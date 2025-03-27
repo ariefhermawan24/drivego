@@ -1,14 +1,175 @@
 import { database } from "../admin/script/config.js";
-import { ref, onValue } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-database.js";
+import { ref, onValue , get } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-database.js";
 
 document.addEventListener("DOMContentLoaded", function () {
     let email = sessionStorage.getItem("email") || null; // Ambil email dari session storage
     let username = sessionStorage.getItem("username") || "Guest";
     let role = sessionStorage.getItem("role") || "administrator";
 
+    const usersRef = ref(database, "users");
+
     document.getElementById("navbarUsername").innerText = username;
     document.getElementById("dropdownUsername").innerText = username;
     document.getElementById("dropdownRole").innerText = role;
+
+    // Fungsi untuk mengambil data pengguna berdasarkan username
+    function fetchUserData() {
+        get(usersRef).then((snapshot) => {
+            if (snapshot.exists()) {
+                let usersData = snapshot.val();
+
+                // Cek apakah data dalam format UID (Object) atau Array
+                if (Array.isArray(usersData)) {
+                    // Jika array, cari berdasarkan username
+                    let user = usersData.find(user => user && user.username === username);
+                    if (user) {
+                        updateModal(user);
+                    } else {
+                        console.log("User tidak ditemukan dalam array.");
+                    }
+                } else {
+                    // Jika object dengan UID sebagai key, cari berdasarkan username
+                    let user = Object.values(usersData).find(user => user.username === username);
+                    if (user) {
+                        updateModal(user);
+                    } else {
+                        console.log("User tidak ditemukan dalam object.");
+                    }
+                }
+            } else {
+                console.log("Database kosong.");
+            }
+        }).catch((error) => {
+            console.error("Error fetching user data:", error);
+        });
+    }
+
+    // Fungsi untuk menampilkan data di modal
+    function updateModal(userData) {
+        document.getElementById("modalUsername").textContent = userData.username || "Guest";
+        document.getElementById("modalEmail").textContent = userData.email || "Tidak tersedia";
+        document.getElementById("modalRole").textContent = userData.role || "Administrator";
+        document.getElementById("modalTelepon").textContent = userData.telepon || "-";
+        document.getElementById("modalSoal").textContent = userData.soal_verifikasi || "-";
+        document.getElementById("modalJawaban").textContent = userData.jawaban_verifikasi || "-";
+    }
+
+    // Panggil fungsi saat modal ditampilkan
+    fetchUserData();
+
+    function showEditToast(title, fields, saveCallback) {
+        let existingToast = document.querySelector(".custom-toast");
+        if (existingToast) existingToast.remove();
+
+        const toast = document.createElement("div");
+        toast.classList.add("custom-toast", "toast-form");
+
+        toast.innerHTML = `
+            <div class="toast-header">
+                <h5>${title}</h5>
+                <button class="toast-close" id="closeToastBtn">
+                    <i class="fas fa-times"></i> <!-- Ikon X dari FontAwesome -->
+                </button>
+            </div>
+            <form id="toastForm">
+                ${fields
+                    .map(
+                        (field) => `
+                    <label>${field.label}</label>
+                    <input type="text" id="${field.id}" value="${field.value}" class="toast-input">
+                `
+                    )
+                    .join("")}
+                <div class="toast-footer">
+                    <button type="button" class="btn btn-reset" id="resetToastBtn">Reset</button>
+                    <button type="button" class="btn btn-save" id="saveToastBtn">Simpan</button>
+                </div>
+            </form>
+        `;
+
+        document.body.appendChild(toast);
+
+        if (window.innerWidth <= 768) {
+            toast.classList.add("mobile-toast");
+        }
+
+        setTimeout(() => {
+            toast.classList.add("show");
+        }, 100);
+
+        // Tombol Reset (Mengembalikan ke nilai awal)
+        document.getElementById("resetToastBtn").addEventListener("click", function () {
+            fields.forEach((field) => {
+                document.getElementById(field.id).value = field.value;
+            });
+        });
+
+        // Tombol Simpan
+        document.getElementById("saveToastBtn").addEventListener("click", function () {
+            let formData = {};
+            fields.forEach((field) => {
+                formData[field.id] = document.getElementById(field.id).value;
+            });
+
+            saveCallback(formData);
+
+            toast.classList.remove("show");
+            setTimeout(() => toast.remove(), 300);
+        });
+
+        // Tombol Tutup (X)
+        document.getElementById("closeToastBtn").addEventListener("click", function () {
+            toast.classList.remove("show");
+            setTimeout(() => toast.remove(), 300);
+        });
+    }
+
+    document.querySelector(".modal-footer").addEventListener("click", function (event) {
+        let button = event.target.closest("button");
+        if (!button) return;
+
+        switch (button.id) {
+            case "editUserBtn":
+                showEditToast(
+                    "Edit Profil Pengguna",
+                    [
+                        { id: "editUsername", label: "Username", value: document.getElementById("modalUsername").textContent },
+                        { id: "editEmail", label: "Email", value: document.getElementById("modalEmail").textContent },
+                        { id: "editTelepon", label: "Telepon", value: document.getElementById("modalTelepon").textContent }
+                    ],
+                    (formData) => {
+                        console.log("User Updated:", formData);
+                    }
+                );
+                break;
+
+            case "editPasswordBtn":
+                showEditToast(
+                    "Edit Password",
+                    [
+                        { id: "editPassword", label: "Password Lama", value: "" },
+                        { id: "editNewPassword", label: "Password Baru", value: "" }
+                    ],
+                    (formData) => {
+                        console.log("Password Updated:", formData);
+                    }
+                );
+                break;
+
+            case "editQuestionBtn":
+                showEditToast(
+                    "Edit Soal Verifikasi",
+                    [
+                        { id: "editSoal", label: "Soal Verifikasi", value: document.getElementById("modalSoal").textContent },
+                        { id: "editJawaban", label: "Jawaban", value: document.getElementById("modalJawaban").textContent }
+                    ],
+                    (formData) => {
+                        console.log("Soal Verifikasi Updated:", formData);
+                    }
+                );
+                break;
+        }
+    });
 
     function showToast(message, callback) {
         let overlay = document.createElement("div");
@@ -77,7 +238,7 @@ document.addEventListener("DOMContentLoaded", function () {
         let role = sessionStorage.getItem("role");
         let email = sessionStorage.getItem("email");
 
-        if (!username || !role || !email) {
+        if (!username || !role) {
             showToast("Sesi telah berakhir. Silakan login kembali.", () => {
                 sessionStorage.clear();
                 window.location.href = "../drivers-login.html";
@@ -100,8 +261,6 @@ document.addEventListener("DOMContentLoaded", function () {
     function watchUserUpdates() {
         let userEmail = sessionStorage.getItem("email");
         if (!userEmail) return;
-
-        const usersRef = ref(database, "users");
 
         onValue(usersRef, (snapshot) => {
             if (snapshot.exists()) {

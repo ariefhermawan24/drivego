@@ -19,34 +19,32 @@
         <ul>
             <li><i class="fas fa-home"></i> <span>Dashboard</span></li>
             <div class="divider"></div>
-            <li onclick="toggleSubmenu(this)" class="menu-induk"><i class="fas fa-user-check"></i> <span>User Validation</span><i class="fas fa-chevron-down arrow"></i></li>
+            <li onclick="toggleSubmenu(this)" class="menu-induk">
+                <i class="fas fa-tasks"></i> <span>Rental Management</span><i class="fas fa-chevron-down arrow"></i>
+            </li>
             <ul class="submenu">
-                <li><i class="fas fa-info-circle"></i> <span>Rental Status</span></li>
-                <li><i class="fas fa-check"></i> <span>Rent Validation</span></li>
-                <li><i class="fas fa-check-circle"></i> <span>Rent Accepted</span></li>
-                <li><i class="fas fa-times-circle"></i> <span>Rent Rejected</span></li>
-                <li><i class="fas fa-ban"></i> <span>Rent Canceled</span></li>
+                <li><i class="fas fa-clipboard-list"></i> <span>Jobs Request</span></li>
+                <li><i class="fas fa-history"></i> <span>Jobs History</span></li>
             </ul>
             <div class="divider"></div>
-            <li onclick="toggleSubmenu(this)" class="menu-induk"><i class="fas fa-car"></i> <span>Manage Car</span><i class="fas fa-chevron-down arrow"></i></li>
+
+            <li onclick="toggleSubmenu(this)" class="menu-induk">
+                <i class="fas fa-car"></i> <span>Car Information</span><i class="fas fa-chevron-down arrow"></i>
+            </li>
             <ul class="submenu">
-                <li><i class="fas fa-car"></i> <span>Car Status</span></li>
-                <li><i class="fas fa-list"></i> <span>Car Detail</span></li>
-                <li><i class="fas fa-image"></i> <span>Car Photo</span></li>
-                <li><i class="fas fa-warehouse"></i> <span>Car Garage</span></li>
-                <li><i class="fas fa-car-side"></i> <span>Car Type</span></li>
+                <li><i class="fas fa-car-side"></i> <span>Assigned Vehicle</span></li>
+                <li><i class="fas fa-file-alt"></i> <span>Vehicle History</span></li>
             </ul>
             <div class="divider"></div>
-            <li onclick="toggleSubmenu(this)" class="menu-induk"><i class="fas fa-tools"></i> <span>Manage Garage</span><i class="fas fa-chevron-down arrow"></i></li>
-            <ul class="submenu">
-                <li><i class="fas fa-warehouse"></i> <span>Garage Detail</span></li>
-            </ul>
-            <div class="divider"></div>
-            <li onclick="toggleSubmenu(this)" class="menu-induk"><i class="fas fa-id-badge"></i> <span>Manage Drivers</span><i class="fas fa-chevron-down arrow"></i></li>
+
+            <li onclick="toggleSubmenu(this)" class="menu-induk">
+                <i class="fas fa-user-cog"></i> <span>Driver Management</span><i class="fas fa-chevron-down arrow"></i>
+            </li>
             <ul class="submenu">
                 <li><i class="fas fa-user-check"></i> <span>Driver Status</span></li>
-                <li><i class="fas fa-user"></i> <span>Driver Detail</span></li>
+                <li><i class="fas fa-question-circle"></i> <span>Help & Support</span></li>
             </ul>
+            <div class="divider"></div>
         </ul>
         <button class="toggle-btn-bottom" id="toggleBtnBottom" onclick="toggleSidebar()">
             <i class="fas fa-bars"></i>
