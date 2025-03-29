@@ -5,7 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DriveGo - drivers</title>
     <link rel="shortcut icon" type="image/png" href="../admin/source/image/tittle-logo.png" />
+    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="stylesheet" href="../drivers/source/css/drivers.css">
 </head>
@@ -55,14 +59,25 @@
         <!-- Navbar -->
         <nav class="navbar">
             <div class="navbar-center">
-                <i class="fas fa-cogs"></i>
-                <span>Administrator Panel</span>
+                <i class="fas fa-id-card"></i>
+                <span>Drivers Panel</span>
             </div>
             <div class="navbar-right">
                 <div class="account-dropdown">
+                    <div class="user-info">
+                        <span id="navbarUsername"></span>
+                    </div>
                     <i class="fas fa-user-circle account-icon" onclick="toggleDropdown()"></i>
                     <div class="dropdown-content" id="accountDropdown">
-                        <a href="#"><i class="fas fa-user"></i> Detail Account</a>
+                        <div class="dropdownuser-info">
+                            <i class="fas fa-user-circle user-icon"></i>
+                            <div class="user-details">
+                                <span id="dropdownUsername"></span>
+                                <span id="dropdownRole"></span>
+                            </div>
+                        </div>
+                        <div class="dropdown-divider"></div>
+                        <a href="#" data-bs-toggle="modal" data-bs-target="#accountModal"><i class="fas fa-user" ></i> Detail Account</a>
                         <a class="logout" href="#"><i class="fas fa-sign-out-alt"></i> Logout</a>
                     </div>
                 </div>
@@ -81,147 +96,68 @@
         </footer>
     </div>
 
-    
+    <!-- Modal -->
+    <div class="modal fade" id="accountModal" tabindex="-1" aria-labelledby="accountModalLabel">
+        <div class="modal-dialog">
+            <div class="modal-content bg-dark text-light">
+                <div class="modal-header border-secondary">
+                    <h5 class="modal-title" id="accountModalLabel">Detail Akun</h5>
+                    <span type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></span>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center">
+                        <i class="fas fa-user-circle fa-5x text-light"></i>
+                        <h5 id="modalUsername" class="mt-2"></h5>
+                        <p id="modalEmail" class="text-muted" style="color: white !important;"></p>
+                    </div>
+                    <hr class="border-secondary">
+                    <ul class="list-group">
+                        <li class="list-group-item bg-dark text-light border-secondary">
+                            <strong>Role:</strong> <span id="modalRole"></span>
+                        </li>
+                        <li class="list-group-item bg-dark text-light border-secondary">
+                            <strong>Telepon:</strong> <span id="modalTelepon"></span>
+                        </li>
+                        <li class="list-group-item bg-dark text-light border-secondary">
+                            <strong>Pertanyaan Keamanan:</strong> <span id="modalSoal"></span>
+                        </li>
+                        <li class="list-group-item bg-dark text-light border-secondary">
+                            <strong>Jawaban Keamanan:</strong> <span id="modalJawaban"></span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="modal-footer border-secondary">
+                    <div class="container">
+                        <div class="row g-2 justify-content-center text-center">
+                            <div class="col-12 col-sm-6">
+                                <button type="button" class="btn btn-warning w-100" id="editUserBtn">
+                                    <i class="fas fa-user-edit me-1"></i> Edit User
+                                </button>
+                            </div>
+                            <div class="col-12 col-sm-6">
+                                <button type="button" class="btn btn-info w-100" id="editPasswordBtn">
+                                    <i class="fas fa-key me-1"></i> Edit Password
+                                </button>
+                            </div>
+                            <div class="col-12 col-sm-6">
+                                <button type="button" class="btn btn-primary w-100" id="editQuestionBtn">
+                                    <i class="fas fa-question-circle me-1"></i> Edit Soal Keamanan
+                                </button>
+                            </div>
+                            <div class="col-12 col-sm-6">
+                                <button type="button" class="btn btn-danger w-100" id="logout">
+                                    <i class="fas fa-sign-out-alt me-1"></i> Logout
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="../drivers/drivers.js"> </script>
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            let username = sessionStorage.getItem("username");
-            let role = sessionStorage.getItem("role");
-
-            function getQueryParam(param) {
-                let urlParams = new URLSearchParams(window.location.search);
-                return urlParams.get(param);
-            }
-
-            function showToast(message, callback) {
-                let overlay = document.createElement("div");
-                overlay.style.position = "fixed";
-                overlay.style.top = "0";
-                overlay.style.left = "0";
-                overlay.style.width = "100%";
-                overlay.style.height = "100%";
-                overlay.style.backdropFilter = "blur(10px)";
-                overlay.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
-                overlay.style.zIndex = "1000";
-                document.body.appendChild(overlay);
-
-                let toast = document.createElement("div");
-                toast.innerText = message;
-                toast.style.position = "fixed";
-                toast.style.top = "50%";
-                toast.style.left = "50%";
-                toast.style.transform = "translate(-50%, -50%)";
-                toast.style.backgroundColor = "#333";
-                toast.style.color = "#fff";
-                toast.style.padding = "12px 20px";
-                toast.style.borderRadius = "8px";
-                toast.style.fontSize = "16px";
-                toast.style.zIndex = "1100";
-                toast.style.display = "flex";
-                toast.style.justifyContent = "center";
-                toast.style.alignItems = "center";
-                toast.style.textAlign = "center";
-                toast.style.maxWidth = "90%"; // Agar tetap muat di layar kecil
-                document.body.appendChild(toast);
-
-                // Responsif untuk layar kecil
-                if (window.innerWidth <= 480) {
-                    toast.style.fontSize = "14px";
-                    toast.style.padding = "10px 15px";
-                }
-
-                setTimeout(() => {
-                    document.body.removeChild(toast);
-                    document.body.removeChild(overlay);
-                    if (callback) callback();
-                }, 2000);
-            }
-
-            function showConfirmToast(message, onConfirm) {
-                let overlay = document.createElement("div");
-                overlay.style.position = "fixed";
-                overlay.style.top = "0";
-                overlay.style.left = "0";
-                overlay.style.width = "100%";
-                overlay.style.height = "100%";
-                overlay.style.backdropFilter = "blur(10px)";
-                overlay.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
-                overlay.style.zIndex = "1000";
-                document.body.appendChild(overlay);
-
-                let toast = document.createElement("div");
-                toast.innerHTML = `
-                    <p style="margin: 0 0 10px;">${message}</p>
-                    <button id="confirm-yes" style="margin-right: 10px; padding: 8px 15px; background-color: green; color: white; border: none; border-radius: 5px; cursor: pointer;">Ya</button>
-                    <button id="confirm-no" style="padding: 8px 15px; background-color: red; color: white; border: none; border-radius: 5px; cursor: pointer;">Tidak</button>
-                `;
-                toast.style.position = "fixed";
-                toast.style.top = "50%";
-                toast.style.left = "50%";
-                toast.style.transform = "translate(-50%, -50%)";
-                toast.style.backgroundColor = "#333";
-                toast.style.color = "#fff";
-                toast.style.padding = "15px";
-                toast.style.borderRadius = "8px";
-                toast.style.textAlign = "center";
-                toast.style.fontSize = "16px";
-                toast.style.zIndex = "1100";
-                document.body.appendChild(toast);
-
-                document.getElementById("confirm-yes").addEventListener("click", function () {
-                    document.body.removeChild(toast);
-                    document.body.removeChild(overlay);
-                    if (onConfirm) onConfirm();
-                });
-
-                document.getElementById("confirm-no").addEventListener("click", function () {
-                    document.body.removeChild(toast);
-                    document.body.removeChild(overlay);
-                });
-            }
-
-            function checkSession() {
-                let aksesKhusus = getQueryParam("akses");
-                let username = sessionStorage.getItem("username");
-                let role = sessionStorage.getItem("role");
-
-                if (!username || !role) {
-                    if (aksesKhusus === "khusus") {
-                        console.log("Percobaan akses langsung terdeteksi!");
-                        showToast("Akses tidak sah! Silakan login terlebih dahulu.", function () {
-                            window.location.href = "../drivers-login.html";
-                        });
-                    } else {
-                        console.log("Sesi telah berakhir, pengguna akan diarahkan ke login.");
-                        showToast("Sesi telah berakhir. Silakan login kembali.", function () {
-                            window.location.href = "../drivers-login.html";
-                        });
-                    }
-                } else {
-                    console.log(`User Logged In: ${username} (${role})`);
-                }
-            }
-
-            checkSession();
-
-            // Cek ulang session saat pengguna kembali ke halaman (mengatasi masalah back button)
-            window.addEventListener("pageshow", function (event) {
-                if (event.persisted) {
-                    checkSession();
-                }
-            });
-
-            // Logout event dengan konfirmasi
-            document.querySelector(".logout").addEventListener("click", function (event) {
-                event.preventDefault();
-                showConfirmToast("Anda yakin ingin keluar?", function () {
-                    sessionStorage.clear();
-                    showToast("Anda telah berhasil keluar.", function () {
-                        window.location.href = "../drivers-login.html";
-                    });
-                });
-            });
-        });
-
         function toggleSidebar() {
             let sidebar = document.getElementById("sidebar");
             sidebar.classList.toggle("minimized");

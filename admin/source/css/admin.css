@@ -459,124 +459,45 @@ button:disabled {
     text-align: end;
 }
 
-/* Default: Toast di kanan bawah (Desktop) */
-.custom-toast {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background-color: #1e1e1e;
-    color: #f1f1f1;
-    padding: 15px;
-    border-radius: 10px;
-    box-shadow: 0px 5px 15px rgba(255, 255, 255, 0.1);
-    font-size: 14px;
-    display: flex;
-    flex-direction: column;
-    width: 320px;
-    opacity: 0;
-    transition: opacity 0.3s ease, transform 0.3s ease;
-    max-width: 400px;
-    z-index: 9999;
-}
+/* Animasi masuk dari belakang */
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
 
-.custom-toast h5 {
-    margin-bottom: 10px;
-    font-size: 16px;
-    font-weight: bold;
-    text-align: center;
-}
-
-.toast-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
-}
-
-.toast-input {
-    width: 100%;
-    padding: 8px;
-    margin: 5px 0;
-    border: 1px solid #555;
-    border-radius: 5px;
-    background-color: #333;
-    color: #fff;
-}
-
-.toast-footer {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 10px;
-}
-
-.btn {
-    padding: 8px 12px;
-    font-size: 14px;
-    border-radius: 5px;
-    cursor: pointer;
-    border: none;
-}
-
-.toast-close {
-    background: none;
-    border: none;
-    color: #f1f1f1;
-    font-size: 20px;
-    cursor: pointer;
-    margin-top: -3px !important;
-    transition: color 0.2s ease-in-out;
-}
-
-.toast-close:hover {
-    color: #e74c3c;
-    /* Merah saat hover, biar lebih tegas */
-}
-
-.toast-close i {
-    font-size: 24px;
-}
-
-/* Hover untuk Reset */
-.btn-reset {
-    background-color: #f39c12;
-    /* Kuning */
-    color: #fff;
-    transition: background-color 0.2s ease-in-out;
-}
-
-.btn-reset:hover {
-    background-color: #e67e22;
-    /* Orange lebih gelap */
-}
-
-/* Hover untuk Simpan */
-.btn-save {
-    background-color: #2ecc71;
-    /* Hijau */
-    color: #fff;
-    transition: background-color 0.2s ease-in-out;
-}
-
-.btn-save:hover {
-    background-color: #27ae60;
-    /* Hijau lebih gelap */
-}
-
-/* Untuk Mobile (Android) Toast Berada di Tengah */
-@media (max-width: 768px) {
-    .custom-toast {
-        left: 50%;
-        right: auto;
-        transform: translateX(-50%);
-        width: 90%;
-        max-width: 350px;
+    to {
+        transform: translateX(0);
+        opacity: 1;
     }
 }
 
-/* Animasi Muncul */
-.custom-toast.show {
-    opacity: 1;
-    transform: translateX(0);
+@keyframes slideOut {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+
+    to {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+}
+
+/* Animasi untuk masuk ke form */
+.modal-content {
+    position: relative;
+    overflow: hidden;
+}
+
+.modal-body {
+    animation: slideIn 0.3s ease-in-out;
+}
+
+/* Saat kembali ke akun modal */
+.modal-body.hidden {
+    animation: slideOut 0.3s ease-in-out;
+    -webkit-animation: slideOut 0.3s ease-in-out;
 }
 
 /* Animasi Muncul di Mobile */
@@ -598,6 +519,92 @@ button:disabled {
         transform: translateY(-5px);
     }
 }
+
+/* 🔹 Toast Update */
+.toast-update {
+    position: fixed;
+    padding: 16px;
+    background-color: #343a40;
+    color: white;
+    font-size: 14px;
+    border-radius: 8px;
+    text-align: center;
+    z-index: 2000;
+    opacity: 1;
+    transition: opacity 0.5s, transform 0.3s ease-out;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+    max-width: 300px;
+}
+
+/* 🔹 Toast Konfirmasi */
+.toast-confirm {
+    position: fixed;
+    padding: 16px;
+    background-color: #343a40;
+    color: white;
+    font-size: 14px;
+    border-radius: 8px;
+    text-align: center;
+    z-index: 2000;
+    opacity: 1;
+    transition: opacity 0.5s, transform 0.3s ease-out;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+    max-width: 300px;
+}
+
+/* 🔹 Posisi default untuk desktop (kanan bawah) */
+@media (min-width: 768px) {
+
+    .toast-update,
+    .toast-confirm {
+        right: 20px;
+        bottom: 20px;
+    }
+}
+
+/* 🔹 Posisi untuk mobile (tengah bawah) */
+@media (max-width: 767px) {
+
+    .toast-update,
+    .toast-confirm {
+        left: 50%;
+        bottom: 20px;
+        transform: translateX(-50%);
+    }
+}
+
+/* 🔹 Animasi fade-out */
+.toast-update.fade-out,
+.toast-confirm.fade-out {
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+/* 🔹 Tombol konfirmasi */
+.confirm-buttons {
+    margin-top: 8px;
+}
+
+.confirm-yes,
+.confirm-no {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    margin: 5px;
+}
+
+.confirm-yes {
+    background-color: #28a745;
+    color: white;
+}
+
+.confirm-no {
+    background-color: #dc3545;
+    color: white;
+}
+
 
 /* RESPONSIVE DESIGN */
 @media screen and (max-width: 1024px) {

@@ -4,7 +4,7 @@ import { ref, onValue , get , update } from "https://www.gstatic.com/firebasejs/
 document.addEventListener("DOMContentLoaded", function () {
     let email = sessionStorage.getItem("email") || null; // Ambil email dari session storage
     let username = sessionStorage.getItem("username") || "Guest";
-    let role = sessionStorage.getItem("role") || "administrator";
+    let role = sessionStorage.getItem("role") || "drivers";
     let soal_verifikasi = sessionStorage.getItem("soal_verifikasi") || null; // Ambil soal dari session storage
     
     const editUserBtn = document.getElementById("editUserBtn");
@@ -644,7 +644,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 if (foundUser) {
                     const newUsername = foundUser.username || "Guest";
-                    const newRole = foundUser.role || "administrator";
+                    const newRole = foundUser.role || "drivers";
 
                     // ✅ Update tampilan hanya jika berubah
                     if (document.getElementById("navbarUsername").innerText !== newUsername) {
@@ -663,7 +663,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     }
 
                     // ❌ Logout jika role bukan administrator
-                    if (newRole !== "administrator") {
+                    if (newRole !== "drivers") {
                         showToast("Akses tidak sah! Anda akan logout.", () => {
                             sessionStorage.clear();
                             window.location.href = "../drivers-login.html";

@@ -19,6 +19,33 @@ document.addEventListener("DOMContentLoaded", () => {
     const userName = document.getElementById("user-name");
     const userRole = document.getElementById("user-role");
 
+    // hashed password function 
+    async function hashPasswordWithSalt(password) {
+        // Buat salt acak (16 byte) dan ubah ke hex
+        const salt = crypto.getRandomValues(new Uint8Array(16));
+        const saltHex = Array.from(salt).map(b => b.toString(16).padStart(2, "0")).join("");
+
+        // Gabungkan salt dengan password
+        const encoder = new TextEncoder();
+        const data = encoder.encode(saltHex + password);
+
+        // Hash menggunakan SHA-256
+        const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        const hashHex = hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+
+        return { salt: saltHex, hash: hashHex }; // Simpan salt & hash
+    }
+
+    async function hashPassword(password, salt) {
+        const encoder = new TextEncoder();
+        const data = encoder.encode(salt + password);
+        const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+        return Array.from(new Uint8Array(hashBuffer))
+            .map(b => b.toString(16).padStart(2, "0"))
+            .join("");
+    }
+
     function testConnection() {
         const testRef = ref(database, "/");
 
@@ -236,8 +263,12 @@ document.addEventListener("DOMContentLoaded", () => {
                     });
 
                     if (userKey) {
-                        // Update password di Firebase
-                        update(ref(database, `users/${userKey}`), { password: newPassword })
+                        hashPasswordWithSalt(newPassword).then(({ salt, hash }) => {
+                            // Update password yang sudah di-hash di Firebase
+                            update(ref(database, `users/${userKey}`), { 
+                                password: hash, 
+                                salt: salt 
+                            })
                             .then(() => {
                                 showToastVerifikasi("info", "✅ Password berhasil diubah!");
                                 setTimeout(closeToast, 3000); // Tutup toast setelah 3 detik
@@ -246,6 +277,7 @@ document.addEventListener("DOMContentLoaded", () => {
                                 console.error("🔥 Error update password:", error);
                                 showToastVerifikasi("info", "❌ Gagal mengubah password!");
                             });
+                        });
                     }
                 }
             });
@@ -337,92 +369,105 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     form.addEventListener("submit", async (e) => {
-        e.preventDefault();
+    e.preventDefault();
 
-        const email = emailInput.value.trim();
-        const password = passwordInput.value.trim();
-        submitButton.disabled = true;
+    const email = emailInput.value.trim();
+    const password = passwordInput.value.trim();
+    submitButton.disabled = true;
 
-        if (!email || !password) {
-            console.log("⚠️ Harap isi semua field!");
-            return;
-        }
+    if (!email || !password) {
+        console.log("⚠️ Harap isi semua field!");
+        return;
+    }
 
-        try {
-            const usersRef = ref(database, "users");
-            const snapshot = await get(usersRef);
+    try {
+        const usersRef = ref(database, "users");
+        const snapshot = await get(usersRef);
 
-            if (snapshot.exists()) {
-                const users = snapshot.val();
-                let userFound = false;
-                let correctEmail = false;
+        if (snapshot.exists()) {
+            const users = snapshot.val();
+            let userFound = false;
+            let correctEmail = false;
 
-                for (let key in users) {
-                    const user = users[key];
+            for (let key in users) {
+                const user = users[key];
 
-                    if (user && user.email.trim().toLowerCase() === email.trim().toLowerCase()) {
-                        correctEmail = true; // **Perbarui variabel global, jangan gunakan let lagi**
+                if (user && user.email.trim().toLowerCase() === email.trim().toLowerCase()) {
+                    correctEmail = true; // Email ditemukan
 
-                        if (user.password === password) {
-                            console.log(`✅ Login Berhasil!`);
-                            console.log(`🔹 Username: ${user.username}`);
-                            console.log(`🔹 Role: ${user.role}`);
-                            console.log(`🔹 Email: ${user.email}`);
+                    const storedHash = user.password; // Password di database sudah berupa hash
+                    const storedSalt = user.salt; // Ambil salt dari database
 
-                            sessionStorage.setItem("username", user.username);
-                            sessionStorage.setItem("role", user.role);
-                            sessionStorage.setItem("email", user.email);
+                    if (!storedSalt) {
+                        console.error("❌ Salt tidak ditemukan untuk user:", email);
+                        break;
+                    }
 
-                            userName.textContent = user.username;
-                            userRole.textContent = user.role;
+                    // Hash ulang password yang diinput dengan salt yang sama
+                    const hashedInputPassword = await hashPassword(password, storedSalt);
 
-                            userFound = true; // **Menandakan login sukses**
+                    if (hashedInputPassword === storedHash) {
+                        console.log(`✅ Login Berhasil!`);
+                        console.log(`🔹 Username: ${user.username}`);
+                        console.log(`🔹 Role: ${user.role}`);
+                        console.log(`🔹 Email: ${user.email}`);
+                        console.log(`🔹 soal_verifikasi: ${user.soal_verifikasi}`);
 
-                            // Tampilkan animasi login sukses
-                            successAnimation.style.display = "flex";
-                            setTimeout(() => {
-                                successAnimation.classList.add("show");
-                            }, 100);
+                        sessionStorage.setItem("username", user.username);
+                        sessionStorage.setItem("role", user.role);
+                        sessionStorage.setItem("email", user.email);
+                        sessionStorage.setItem("soal_verifikasi", user.soal_verifikasi);
 
-                            // Tampilkan toast setelah 0.5 detik
-                            setTimeout(() => {
-                                showLoginToast(user.role);
-                            }, 500);
+                        userName.textContent = user.username;
+                        userRole.textContent = user.role;
 
-                            // Redirect berdasarkan role setelah 2 detik
-                            setTimeout(() => {
-                                if (user.role.toLowerCase() === "administrator") {
-                                    window.location.href = "../drivego/admin";
-                                } else if (user.role.toLowerCase() === "drivers") {
-                                    window.location.href = "../drivego/drivers";
-                                }
-                            }, 2000);
+                        userFound = true; // Menandakan login sukses
 
-                            break; // **Keluar dari loop karena login berhasil**
-                        }
+                        // Tampilkan animasi login sukses
+                        successAnimation.style.display = "flex";
+                        setTimeout(() => {
+                            successAnimation.classList.add("show");
+                        }, 100);
+
+                        // Tampilkan toast setelah 0.5 detik
+                        setTimeout(() => {
+                            showLoginToast(user.role);
+                        }, 500);
+
+                        // Redirect berdasarkan role setelah 2 detik
+                        setTimeout(() => {
+                            if (user.role.toLowerCase() === "administrator") {
+                                window.location.href = "../drivego/admin";
+                            } else if (user.role.toLowerCase() === "drivers") {
+                                window.location.href = "../drivego/drivers";
+                            }
+                        }, 2000);
+
+                        break; // Keluar dari loop karena login berhasil
                     }
                 }
-
-                // **Validasi jika login gagal**
-                if (!userFound) {
-                    submitButton.disabled = false;
-                    if (correctEmail) {
-                        showError(passwordInput, "❌ Password salah!"); // **Email ditemukan, tetapi password salah**
-                    } else {
-                        showError(emailInput, "❌ Email tidak ditemukan!"); // **Email tidak ada di database**
-                        showError(passwordInput, "❌ Password salah!");
-                    }
-                }
-
-                // Bersihkan error saat input berubah
-                [emailInput, passwordInput].forEach(input => {
-                    input.addEventListener("input", () => clearError(input));
-                });
-            } else {
-                console.log("⚠️ Tidak ada data pengguna di database!");
             }
-        } catch (error) {
-            console.error("❌ Error saat login:", error);
+
+            // **Validasi jika login gagal**
+            if (!userFound) {
+                submitButton.disabled = false;
+                if (correctEmail) {
+                    showError(passwordInput, "❌ Password salah!"); // Email benar, tapi password salah
+                } else {
+                    showError(emailInput, "❌ Email tidak ditemukan!"); // Email tidak ditemukan di database
+                    showError(passwordInput, "❌ Password salah!");
+                }
+            }
+
+            // Bersihkan error saat input berubah
+            [emailInput, passwordInput].forEach(input => {
+                input.addEventListener("input", () => clearError(input));
+            });
+        } else {
+            console.log("⚠️ Tidak ada data pengguna di database!");
         }
-    });
+    } catch (error) {
+        console.error("❌ Error saat login:", error);
+    }
+});
 });
