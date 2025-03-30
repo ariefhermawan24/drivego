@@ -1,0 +1,145 @@
+.card {
+    border-radius: 15px;
+}
+
+.card i {
+    opacity: 0.8;
+}
+
+.card:hover {
+    transform: scale(1.03);
+    transition: all 0.2s ease-in-out;
+}
+
+/* Ukuran default (1024px ke atas) */
+.card-title {
+    font-size: 1.2rem;
+}
+
+.card-body h3 {
+    font-size: 2rem;
+}
+
+.card-body i {
+    font-size: 3rem;
+}
+
+.dashboard-logo {
+    width: 150px;
+    /* Default untuk 1024px ke atas */
+    height: auto;
+}
+
+/* Tablet (di bawah 1024px) */
+@media (max-width: 1024px) {
+    .dashboard-logo {
+        width: 130px;
+    }
+
+    .card-title {
+        font-size: 1.1rem;
+    }
+
+    .card-body h3 {
+        font-size: 1.8rem;
+    }
+
+    .card-body i {
+        font-size: 2.8rem;
+    }
+}
+
+/* Tablet kecil (di bawah 768px) */
+@media (max-width: 768px) {
+    .dashboard-logo {
+        width: 110px;
+    }
+
+    .card-title {
+        font-size: 1rem;
+    }
+
+    .card-body h3 {
+        font-size: 1.6rem;
+    }
+
+    .card-body i {
+        font-size: 2.5rem;
+    }
+}
+
+/* Smartphone besar (di bawah 620px) */
+@media (max-width: 620px) {
+    .dashboard-logo {
+        width: 100px;
+    }
+
+    .card-title {
+        font-size: 0.95rem;
+    }
+
+    .card-body h3 {
+        font-size: 1.5rem;
+    }
+
+    .card-body i {
+        font-size: 2.3rem;
+    }
+}
+
+/* Smartphone sedang (di bawah 480px) */
+@media (max-width: 480px) {
+    .dashboard-logo {
+        width: 90px;
+    }
+
+    .card-title {
+        font-size: 0.9rem;
+    }
+
+    .card-body h3 {
+        font-size: 1.4rem;
+    }
+
+    .card-body i {
+        font-size: 2.1rem;
+    }
+}
+
+/* Smartphone kecil (di bawah 380px) */
+@media (max-width: 380px) {
+    .dashboard-logo {
+        width: 80px;
+    }
+
+    .card-title {
+        font-size: 0.85rem;
+    }
+
+    .card-body h3 {
+        font-size: 1.3rem;
+    }
+
+    .card-body i {
+        font-size: 2rem;
+    }
+}
+
+/* Smartphone sangat kecil (di bawah 320px) */
+@media (max-width: 320px) {
+    .dashboard-logo {
+        width: 70px;
+    }
+
+    .card-title {
+        font-size: 0.8rem;
+    }
+
+    .card-body h3 {
+        font-size: 1.2rem;
+    }
+
+    .card-body i {
+        font-size: 1.8rem;
+    }
+}

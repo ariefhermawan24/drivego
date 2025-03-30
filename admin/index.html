@@ -21,7 +21,7 @@
             <span class="toggle-btn" onclick="toggleSidebar()"><i class="fas fa-bars"></i></span>
         </div>
         <ul>
-            <li><i class="fas fa-home"></i> <span>Dashboard</span></li>
+            <li id="dashboard-btn"><i class="fas fa-home"></i> <span>Dashboard</span></li>
             <div class="divider"></div>
             <li onclick="toggleSubmenu(this)" class="menu-induk"><i class="fas fa-user-check"></i> <span>User Validation</span><i class="fas fa-chevron-down arrow"></i></li>
             <ul class="submenu">
@@ -35,7 +35,7 @@
             <li onclick="toggleSubmenu(this)" class="menu-induk"><i class="fas fa-car"></i> <span>Manage Car</span><i class="fas fa-chevron-down arrow"></i></li>
             <ul class="submenu">
                 <li><i class="fas fa-car"></i> <span>Car Status</span></li>
-                <li><i class="fas fa-list"></i> <span>Car Detail</span></li>
+                <li data-page="datamobil"><i class="fas fa-list"></i> <span>Car Detail</span></li>
                 <li><i class="fas fa-image"></i> <span>Car Photo</span></li>
                 <li><i class="fas fa-warehouse"></i> <span>Car Garage</span></li>
                 <li><i class="fas fa-car-side"></i> <span>Car Type</span></li>
@@ -87,7 +87,7 @@
         </nav>
 
         <!-- Content -->
-        <div class="content p-3">
+        <div id="content" class="content p-3">
             <h2>Welcome to DriveGo</h2>
             <p>Content goes here...</p>
         </div>
@@ -157,8 +157,148 @@
         </div>
     </div>
 
+    <!-- Modal Tambah Mobil -->
+    <div class="modal fade" id="modalTambahMobil" tabindex="1" aria-labelledby="modalTambahMobilLabel" aria-hidden="true">
+        <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+            <h5 class="modal-title" id="modalTambahMobilLabel">Tambah Mobil</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+            <form id="formTambahMobil">
+                <div class="mb-3">
+                <label for="namaMobil" class="form-label">Nama Mobil</label>
+                <input type="text" id="namaMobil" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                <label for="merkMobil" class="form-label">Merek Mobil</label>
+                <input type="text" id="merkMobil" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                <label for="statusMobil" class="form-label">Status</label>
+                <select id="statusMobil" class="form-select">
+                    <option value="tersedia">Tersedia</option>
+                    <option value="disewa">Disewa</option>
+                </select>
+                </div>
+                <div class="mb-3">
+                <label for="hargaSewa" class="form-label">Harga Sewa</label>
+                <input type="number" id="hargaSewa" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Simpan</button>
+            </form>
+            </div>
+        </div>
+        </div>
+    </div>
+
+    <!-- Modal Edit Mobil -->
+    <div class="modal fade" id="modalEditMobil" tabindex="1" aria-labelledby="modalEditMobilLabel" aria-hidden="true">
+        <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+            <h5 class="modal-title" id="modalEditMobilLabel">Edit Mobil</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+            <form id="formEditMobil">
+                <input type="hidden" id="editMobilId">
+                <div class="mb-3">
+                <label for="editNamaMobil" class="form-label">Nama Mobil</label>
+                <input type="text" id="editNamaMobil" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                <label for="editMerkMobil" class="form-label">Merek Mobil</label>
+                <input type="text" id="editMerkMobil" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                <label for="editStatusMobil" class="form-label">Status</label>
+                <select id="editStatusMobil" class="form-select">
+                    <option value="tersedia">Tersedia</option>
+                    <option value="disewa">Disewa</option>
+                </select>
+                </div>
+                <div class="mb-3">
+                <label for="editHargaSewa" class="form-label">Harga Sewa</label>
+                <input type="number" id="editHargaSewa" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+            </form>
+            </div>
+        </div>
+        </div>
+    </div>
+
     <script type="module" src="../admin/admin.js"> </script>
     <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            async function loadPage(page) {
+                const contentContainer = document.getElementById("content");
+                if (!contentContainer) return;
+
+                try {
+                    const response = await fetch(`content/${page}.html`);
+                    if (!response.ok) throw new Error("Page not found");
+                    const html = await response.text();
+                    contentContainer.innerHTML = html;
+
+                    // Hapus script lama sebelum menambahkan yang baru
+                    document.querySelectorAll("script[data-dynamic]").forEach(script => script.remove());
+
+                    // Load CSS dinamis
+                    document.querySelectorAll("link[data-dynamic]").forEach(link => link.remove());
+                    const linkElement = document.createElement("link");
+                    linkElement.rel = "stylesheet";
+                    linkElement.href = `source/css/${page}.css`;
+                    linkElement.setAttribute("data-dynamic", "true");
+                    document.head.appendChild(linkElement);
+
+                    // Load JS Dinamis dengan Import
+                    try {
+                        const modulePath = `./script/${page}.js`;
+                        await import(modulePath + `?t=${Date.now()}`); // Mencegah cache
+                    } catch (err) {
+                        console.error(`Error loading script: ${page}.js`, err);
+                    }
+
+                } catch (error) {
+                    contentContainer.innerHTML = "<h2>Page not found</h2>";
+                }
+            }
+
+            // Fungsi navigasi halaman
+            function navigateTo(page) {
+                history.pushState({}, "", `?page=${page}`);
+                loadPage(page);
+            }
+
+            // Event listener untuk tombol dashboard (karena tidak memiliki data-page)
+            document.getElementById("dashboard-btn").addEventListener("click", function () {
+                history.pushState({}, "", "?");
+                loadPage("dashboard");
+            });
+
+            // Event listener untuk menu navigasi lainnya
+            document.querySelectorAll("li[data-page]").forEach(li => {
+                li.addEventListener("click", function () {
+                    const page = this.getAttribute("data-page");
+                    navigateTo(page);
+                });
+            });
+
+            // Tangani perubahan history API (tombol back/forward browser)
+            window.addEventListener("popstate", () => {
+                const params = new URLSearchParams(window.location.search);
+                const page = params.get("page") || "dashboard";
+                loadPage(page);
+            });
+
+            // Muat halaman pertama kali sesuai URL atau default ke dashboard
+            const initialPage = new URLSearchParams(window.location.search).get("page") || "dashboard";
+            loadPage(initialPage);
+        });
+
         function toggleSidebar() {
             let sidebar = document.getElementById("sidebar");
             sidebar.classList.toggle("minimized");

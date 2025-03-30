@@ -1,28 +1,5 @@
-import {
-  initializeApp
-} from 'https://www.gstatic.com/firebasejs/9.17.1/firebase-app.js';
-import {
-  getDatabase,
-  ref,
-  onValue,
-  push, // Tambahkan ini
-  update, // Untuk fitur edit
-  remove // Untuk fitur hapus
-} from 'https://www.gstatic.com/firebasejs/9.17.1/firebase-database.js';
-
-
-const firebaseConfig = {
-    apiKey: "AIzaSyCzTvQrtyFVd8gfxMDPenmhiOCD32QLIHk",
-    authDomain: "drivego-f833b.firebaseapp.com",
-    databaseURL: "https://drivego-f833b-default-rtdb.firebaseio.com",
-    projectId: "drivego-f833b",
-    storageBucket: "drivego-f833b.firebasestorage.app",
-    messagingSenderId: "296648552361",
-    appId: "1:296648552361:web:985acfc9a369b3f3841eb8",
-    measurementId: "G-6YE8Z8FDL4"
-};
-const app = initializeApp(firebaseConfig);
-const database = getDatabase(app);
+import { database } from "../script/config.js";
+import { ref, onValue , push , update, remove } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-database.js";
 
 const showToast = (message, type = 'success') => {
   const toastElement = document.getElementById('toastNotification');
@@ -41,62 +18,136 @@ const showToast = (message, type = 'success') => {
 };
 
 
-// Referensi data mobil
 const mobilRef = ref(database, 'mobil');
-
-// Mengambil data secara real-time
 const mobilTableBody = document.getElementById('mobilTableBody');
-onValue(mobilRef, (snapshot) => {
+const itemsPerPage = 5;
+let currentPage = 1;
+let dataMobil = [];
+
+const renderTable = () => {
   mobilTableBody.innerHTML = '';
-  let index = 1;
-
-  snapshot.forEach((childSnapshot) => {
-    const mobil = childSnapshot.val();
-    const key = childSnapshot.key;
-
-    if (mobil) {
-      const row = `
-        <tr>
-          <td>${index++}</td>
-          <td>${mobil.nama_mobil}</td>
-          <td>${mobil.merk_mobil}</td>
-          <td><span class="badge bg-${mobil.status === 'tersedia' ? 'success' : 'danger'}">${mobil.status}</span></td>
-          <td>Rp ${mobil.harga_sewa.toLocaleString()}</td>
-          <td>
-            <button class="btn btn-warning btn-sm" data-key="${key}" onclick="editMobil('${key}')"><i class="fas fa-edit"></i> Edit</button>
-            <button class="btn btn-danger btn-sm" data-key="${key}" onclick="hapusMobil('${key}')"><i class="fas fa-trash"></i> Hapus</button>
-          </td>
-        </tr>
-      `;
-      mobilTableBody.innerHTML += row;
-    }
+  const start = (currentPage - 1) * itemsPerPage;
+  const end = start + itemsPerPage;
+  const paginatedItems = dataMobil.slice(start, end);
+  
+  paginatedItems.forEach((mobil, index) => {
+    const row = `
+      <tr>
+        <td>${start + index + 1}</td>
+        <td>${mobil.nama_mobil}</td>
+        <td>${mobil.merk_mobil}</td>
+        <td><span class="badge bg-${mobil.status === 'tersedia' ? 'success' : 'danger'}">${mobil.status}</span></td>
+        <td>Rp ${mobil.harga_sewa.toLocaleString()}</td>
+        <td>
+          <button class="btn btn-warning btn-sm" onclick="editMobil('${mobil.key}')"><i class="fas fa-edit"></i> Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="hapusMobil('${mobil.key}')"><i class="fas fa-trash"></i> Hapus</button>
+        </td>
+      </tr>
+    `;
+    mobilTableBody.innerHTML += row;
   });
+};
+
+const renderPagination = () => {
+  const paginationElement = document.getElementById('pagination');
+  paginationElement.innerHTML = '';
+
+  const totalPages = Math.ceil(dataMobil.length / itemsPerPage);
+
+  if (totalPages > 1) {
+    paginationElement.innerHTML += `
+      <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+        <button class="page-link" onclick="changePage(${currentPage - 1})">Previous</button>
+      </li>
+    `;
+
+    for (let i = 1; i <= totalPages; i++) {
+      paginationElement.innerHTML += `
+        <li class="page-item ${currentPage === i ? 'active' : ''}">
+          <button class="page-link" onclick="changePage(${i})">${i}</button>
+        </li>
+      `;
+    }
+
+    paginationElement.innerHTML += `
+      <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+        <button class="page-link" onclick="changePage(${currentPage + 1})">Next</button>
+      </li>
+    `;
+  }
+};
+
+const changePage = (page) => {
+  const totalPages = Math.ceil(dataMobil.length / itemsPerPage);
+  if (page >= 1 && page <= totalPages) {
+    currentPage = page;
+    renderTable();
+    renderPagination();
+  }
+};
+
+
+onValue(mobilRef, (snapshot) => {
+  dataMobil = [];
+  snapshot.forEach((childSnapshot) => {
+    dataMobil.push({ key: childSnapshot.key, ...childSnapshot.val() });
+  });
+
+  const totalPages = Math.ceil(dataMobil.length / itemsPerPage);
+
+  // Pastikan currentPage tidak melebihi totalPages
+  if (currentPage > totalPages) {
+    currentPage = totalPages > 0 ? totalPages : 1;
+  }
+
+  renderTable();
+  renderPagination();
 });
 
-// Tambah Mobil
+function searchTable() {
+    let input = document.getElementById("searchMobil").value.toLowerCase();
+    let table = document.getElementById("mobilTableBody");
+    let rows = table.getElementsByTagName("tr");
+
+    for (let row of rows) {
+        let text = row.textContent.toLowerCase();
+        row.style.display = text.includes(input) ? "" : "none";
+    }
+}
+
+window.searchTable = searchTable;
+
+window.nextPage = () => {
+  if (currentPage * itemsPerPage < dataMobil.length) {
+    currentPage++;
+    renderTable();
+  }
+};
+
+window.prevPage = () => {
+  if (currentPage > 1) {
+    currentPage--;
+    renderTable();
+  }
+};
+
+window.changePage = changePage;
+
 document.getElementById('formTambahMobil').addEventListener('submit', (e) => {
   e.preventDefault();
-
   const nama = document.getElementById('namaMobil').value;
   const merk = document.getElementById('merkMobil').value;
   const status = document.getElementById('statusMobil').value;
   const harga = parseInt(document.getElementById('hargaSewa').value);
-
+  
   push(mobilRef, { nama_mobil: nama, merk_mobil: merk, status, harga_sewa: harga })
-    .then(() => {
-      showToast('Mobil berhasil ditambahkan!', 'success');
-    })
-    .catch((error) => {
-      console.error('Error adding data:', error);
-      showToast('Terjadi kesalahan saat menambahkan mobil.', 'danger');
-    });
+    .then(() => showToast('Mobil berhasil ditambahkan!', 'success'))
+    .catch(() => showToast('Terjadi kesalahan saat menambahkan mobil.', 'danger'));
 
   document.getElementById('formTambahMobil').reset();
   bootstrap.Modal.getInstance(document.getElementById('modalTambahMobil')).hide();
 });
 
-
-// Edit Mobil
 window.editMobil = (key) => {
   const modal = new bootstrap.Modal(document.getElementById('modalEditMobil'));
   const editMobilRef = ref(database, `mobil/${key}`);
@@ -116,52 +167,30 @@ window.editMobil = (key) => {
 
 document.getElementById('formEditMobil').addEventListener('submit', (e) => {
   e.preventDefault();
-
   const key = document.getElementById('editMobilId').value;
   const nama = document.getElementById('editNamaMobil').value;
   const merk = document.getElementById('editMerkMobil').value;
   const status = document.getElementById('editStatusMobil').value;
   const harga = parseInt(document.getElementById('editHargaSewa').value);
-
-  // Update data di Firebase
-  update(ref(database, `mobil/${key}`), {
-    nama_mobil: nama,
-    merk_mobil: merk,
-    status,
-    harga_sewa: harga,
-  })
+  
+  update(ref(database, `mobil/${key}`), { nama_mobil: nama, merk_mobil: merk, status, harga_sewa: harga })
     .then(() => {
-       showToast('Mobil berhasil diperbarui!', 'success');
-      // Tutup modal setelah berhasil
-      const editModal = bootstrap.Modal.getInstance(
-        document.getElementById('modalEditMobil')
-      );
-      if (editModal) editModal.hide();
+      showToast('Mobil berhasil diperbarui!', 'success');
+      bootstrap.Modal.getInstance(document.getElementById('modalEditMobil')).hide();
     })
-    .catch((error) => {
-      console.error('Error updating data:', error);
-      alert('Terjadi kesalahan saat mengedit data.');
-    });
+    .catch(() => showToast('Terjadi kesalahan saat mengedit data.', 'danger'));
 });
 
-
-
-document.addEventListener('hidden.bs.modal', () => {
-  const modalBackdrop = document.querySelector('.modal-backdrop');
-  if (modalBackdrop) modalBackdrop.remove();
-});
-
-
-// Hapus Mobil
 window.hapusMobil = (key) => {
   if (confirm('Apakah Anda yakin ingin menghapus mobil ini?')) {
     remove(ref(database, `mobil/${key}`))
-      .then(() => {
-        showToast('Mobil berhasil dihapus!', 'success');
-      })
-      .catch((error) => {
-        console.error('Error deleting data:', error);
-        showToast('Terjadi kesalahan saat menghapus mobil.', 'danger');
-      });
+      .then(() => showToast('Mobil berhasil dihapus!', 'success'))
+      .catch(() => showToast('Terjadi kesalahan saat menghapus mobil.', 'danger'));
   }
 };
+
+document.addEventListener("hidden.bs.modal", function () {
+  setTimeout(() => {
+    document.querySelectorAll(".modal-backdrop").forEach((backdrop) => backdrop.remove());
+  }, 300); // Beri sedikit delay untuk memastikan Bootstrap sudah selesai menutup modal
+});

@@ -1,6 +1,5 @@
 body {
     display: flex;
-    margin: 0;
 }
 
 .sidebar {
@@ -8,12 +7,17 @@ body {
     height: 100vh;
     background: #343a40;
     color: white;
-    overflow: hidden;
     position: relative;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
+    overflow-y: hidden;
+    /* Mencegah scroll keluar batas */
     transition: width 0.3s ease-in-out;
+    flex-shrink: 0;
+    /* Mencegah sidebar menyusut */
+    min-height: 100vh !important;
+    /* Memastikan sidebar tidak lebih kecil dari viewport */
 }
 
 .sidebar.minimized {
@@ -214,12 +218,19 @@ body {
     color: #db974b;
 }
 
-/* Wrapper utama agar layout menjadi atas-bawah */
 .main-container {
+    flex-grow: 1;
+    min-height: 100vh;
+    background: #f8f9fa;
     display: flex;
     flex-direction: column;
-    flex-grow: 1;
-    height: 100vh;
+    overflow: hidden;
+    /* Mencegah scroll ke kanan */
+    position: relative;
+    width: calc(100vw + 200px);
+    /* Membuat tampilan lebih lebar dari viewport */
+    clip-path: inset(0 0 0 0);
+    /* Memotong agar tidak bisa discroll */
 }
 
 /* NAVBAR */
@@ -233,12 +244,14 @@ body {
     box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
 }
 
+
 /* Navbar Center (Administrator Panel) */
 .navbar-center {
     display: flex;
     align-items: center;
     font-size: 18px;
     font-weight: bold;
+    margin-left: 20px;
 }
 
 .navbar-center i {
@@ -251,12 +264,18 @@ body {
     align-items: center;
 }
 
+.navbar-right i {
+    margin-right: 10px !important;
+}
+
 /* Account Dropdown */
 .account-dropdown {
     position: relative;
     cursor: pointer;
     display: flex;
     align-items: center;
+    z-index: 1;
+    margin-right: 10px !important;
 }
 
 .user-info {
@@ -390,13 +409,12 @@ body {
     transition: all 0.3s ease-in-out;
 }
 
-
-
-/* Content Styling */
 .content {
-    flex-grow: 1;
-    padding: 20px;
-    background: #f4f4f4;
+    max-height: calc(100vh - 100px);
+    /* Sesuaikan tinggi agar tidak dorong footer */
+    overflow-y: auto;
+    /* Tambahkan scrollbar hanya untuk konten */
+    padding: 15px;
 }
 
 /* FOOTER */
@@ -408,6 +426,7 @@ body {
     margin: 0;
     padding: 10px;
     font-size: 14px;
+    margin-top: auto;
 }
 
 /* Untuk Chrome, Safari */
@@ -450,13 +469,13 @@ button:disabled {
 }
 
 .list-group-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
 }
 
 .list-group-item span {
-    text-align: end;
+    text-align: end !important;
 }
 
 /* Animasi masuk dari belakang */
@@ -580,11 +599,15 @@ button:disabled {
     transform: translateY(20px);
 }
 
-/* 🔹 Tombol konfirmasi */
+/* 🔹 Pastikan tombol konfirmasi tetap dalam satu baris */
 .confirm-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
     margin-top: 8px;
 }
 
+/* 🔹 Sesuaikan gaya tombol dengan tetap sejajar */
 .confirm-yes,
 .confirm-no {
     padding: 6px 12px;
@@ -593,6 +616,9 @@ button:disabled {
     cursor: pointer;
     font-size: 14px;
     margin: 5px;
+    min-width: 80px;
+    /* Pastikan tombol memiliki lebar minimal */
+    text-align: center;
 }
 
 .confirm-yes {
@@ -819,6 +845,39 @@ button:disabled {
     }
 }
 
+@media screen and (max-width: 392px) {
+
+    /* Pastikan navbar-right tetap terlihat */
+    .navbar-right {
+        display: flex;
+        align-items: center;
+    }
+
+    /* Sembunyikan icon secara default */
+    .account-icon {
+        display: none !important;
+    }
+
+    /* Perbaiki selector dengan spasi */
+    .sidebar.minimized~.main-container .navbar-right .account-icon {
+        display: block !important;
+    }
+
+    /* Navbar center saat sidebar terbuka (posisi di tengah) */
+    .sidebar~.main-container .navbar-center {
+        justify-content: center;
+        margin-left: 0;
+        width: 100%;
+    }
+
+    /* Navbar center kembali ke posisi awal saat sidebar minimized */
+    .sidebar.minimized~.main-container .navbar-center {
+        justify-content: flex-start;
+        margin-left: 20px;
+        width: auto;
+    }
+}
+
 @media screen and (max-width: 320px) {
     .sidebar {
         width: 140px;
@@ -872,10 +931,6 @@ button:disabled {
 
     .navbar-center {
         font-size: 12px;
-    }
-
-    .account-icon {
-        font-size: 16px;
     }
 
     .dropdown-content {

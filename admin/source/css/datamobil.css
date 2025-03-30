@@ -1,0 +1,223 @@
+/* RESPONSIVE TABLE */
+.table-responsive {
+    overflow-x: auto;
+    /* Agar tabel bisa di-scroll di layar kecil */
+}
+
+.table thead {
+    background-color: #007bff;
+    color: white;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+/* TOMBOL EDIT & HAPUS */
+.table td .btn {
+    width: 100%;
+    /* Buat tombol sama panjang */
+    min-width: 80px;
+    /* Pastikan tombol tidak terlalu kecil */
+    padding: 6px 10px;
+    /* Tambahkan sedikit padding */
+    font-size: 14px;
+    text-align: center;
+    margin-bottom: 5px;
+    /* Beri jarak antar tombol */
+}
+
+th {
+    white-space: nowrap !important;
+}
+
+/* Pagination */
+.pagination {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    list-style: none;
+    padding: 0;
+}
+
+.pagination .page-item {
+    margin: 3px;
+}
+
+.pagination .page-link {
+    padding: 8px 12px;
+    font-size: 14px;
+    border-radius: 5px;
+    border: 1px solid #007bff;
+    background-color: white;
+    color: #007bff;
+    transition: all 0.3s;
+}
+
+.pagination .page-link:hover {
+    background-color: #007bff;
+    color: white;
+}
+
+.pagination .page-item.active .page-link {
+    background-color: #007bff;
+    color: white;
+    border-color: #007bff;
+}
+
+.pagination .page-item.disabled .page-link {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+/* Responsive Button */
+.btn-tambah {
+    white-space: nowrap;
+}
+
+/* Posisi Search & Button */
+.sticky-header .d-flex {
+    width: 100%;
+}
+
+/* Responsive Button */
+.btn-tambah {
+    white-space: nowrap;
+}
+
+/* RESPONSIVENESS */
+@media (max-width: 1024px) {
+    .container {
+        max-width: 960px;
+    }
+}
+
+@media (max-width: 768px) {
+    .container {
+        max-width: 720px;
+    }
+}
+
+@media (max-width: 620px) {
+    .container {
+        max-width: 580px;
+    }
+}
+
+/* RESPONSIVE TABLE */
+@media (max-width: 480px) {
+    .container {
+        max-width: 450px;
+    }
+
+    /* Header dan Tombol */
+    .d-flex.responsive {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .d-flex.responsive h4 {
+        font-size: 18px;
+        margin-bottom: 10px;
+    }
+
+    .d-flex.responsive .btn {
+        font-size: 14px;
+        padding: 8px 12px;
+    }
+
+    /* TABEL */
+    .table-responsive {
+        overflow-x: auto;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+    }
+
+    .table thead {
+        display: none;
+        /* Sembunyikan header */
+    }
+
+    .table,
+    .table tbody,
+    .table tr,
+    .table td {
+        display: block;
+        width: 100%;
+    }
+
+    .table tr {
+        margin-bottom: 10px;
+        border-bottom: 2px solid #ddd;
+        padding: 10px;
+        background-color: #f9f9f9;
+    }
+
+    .table td {
+        text-align: right;
+        padding-left: 45%;
+        position: relative;
+        padding-top: 8px;
+        padding-bottom: 8px;
+        font-size: 14px;
+        border-bottom: 1px solid #ccc;
+    }
+
+    .table td::before {
+        position: absolute;
+        left: 10px;
+        content: attr(data-label);
+        font-weight: bold;
+        text-align: left;
+        color: #555;
+        font-size: 13px;
+    }
+
+    .table td {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        padding-left: 0;
+    }
+
+    .table td::before {
+        position: static;
+        font-weight: bold;
+        text-align: center;
+        display: block;
+        margin-bottom: 5px;
+    }
+
+    /* Atur tombol agar rata */
+    .table td .btn {
+        width: 90%;
+        padding: 8px;
+        font-size: 14px;
+    }
+
+    .pagination {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .pagination .page-link {
+        padding: 6px 10px;
+        font-size: 12px;
+    }
+
+    .btn-tambah span {
+        display: none;
+    }
+
+    .btn-tambah {
+        width: 45px;
+        /* Hanya ikon */
+        height: 45px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 0;
+    }
+}

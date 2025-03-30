@@ -1,97 +1,92 @@
 <body>
   <div class="container my-4">
-    <!-- Row 1: Logo + Card Keuntungan -->
-    <div class="row mb-4">
-      <!-- Logo Card -->
-        <div class="col-lg-6 mb-4">
-        <div class="card text-center shadow">
-            <div class="card-body">
-            <img src="../source/image/dashboard-logo.png" alt="Logo Perusahaan" style="width: 150px; height: auto; margin-bottom: 15px; margin-top: 15px">
-            </div>
-        </div>
-        </div>
+      <!-- Row 1: Logo + Card Keuntungan -->
+      <div class="row mb-4">
+          <!-- Logo Card -->
+          <div class="col-lg-6 mb-4">
+              <div class="card text-center shadow h-100">
+                  <div class="card-body d-flex flex-column align-items-center justify-content-center">
+                      <img src="../source/image/dashboard-logo.png" alt="Logo Perusahaan" class="dashboard-logo" style="height: auto; margin-bottom: 15px; margin-top: 15px;">
+                  </div>
+              </div>
+          </div>
 
-      <!-- Card Keuntungan -->
-      <div class="col-lg-6">
-        <div class="card shadow mb-4">
-          <div class="card-body">
-            <h5 class="card-title">Keuntungan Bulanan</h5>
-            <div class="d-flex align-items-center">
-              <i class="fas fa-wallet fa-2x text-success me-3"></i>
-              <h4 class="mb-0">Rp 25,000,000</h4>
-            </div>
-          </div>
-        </div>
-        <div class="card shadow">
-          <div class="card-body">
-            <h5 class="card-title">Keuntungan Tahunan</h5>
-            <div class="d-flex align-items-center">
-              <i class="fas fa-chart-line fa-2x text-info me-3"></i>
-              <h4 class="mb-0">Rp 300,000,000</h4>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+          <!-- Card Mobil Tersedia & Tersewa -->
+          <div class="col-lg-6">
+              <div class="row h-100">
+                  <!-- Mobil Tersedia -->
+                  <div class="col-lg-6 col-md-6 mb-4">
+                      <div class="card shadow text-center h-100">
+                          <div class="card-body d-flex flex-column align-items-center justify-content-center">
+                              <i class="fas fa-car-side fa-3x text-success mb-3"></i>
+                              <h5 class="card-title">Mobil Tersedia</h5>
+                              <h3 id="mobil-tersedia" class="mb-0">15</h3>
+                          </div>
+                      </div>
+                  </div>
 
-    <!-- Row 2: Statistik -->
-    <div class="row" style="margin-top: -30px;">
-      <!-- Jumlah Mobil -->
-      <div class="col-lg-3 col-md-6 mb-4">
-        <div class="card shadow text-center">
-          <div class="card-body">
-            <i class="fas fa-car fa-3x text-primary mb-3"></i>
-            <h5 class="card-title">Jumlah Mobil</h5>
-            <h3 class="mb-0">25</h3>
+                  <!-- Mobil Tersewa -->
+                  <div class="col-lg-6 col-md-6 mb-4">
+                      <div class="card shadow text-center h-100">
+                          <div class="card-body d-flex flex-column align-items-center justify-content-center">
+                              <i class="fas fa-car-alt fa-3x text-danger mb-3"></i>
+                              <h5 class="card-title">Mobil Tersewa</h5>
+                              <h3 id="mobil-tersewa" class="mb-0">10</h3>
+                          </div>
+                      </div>
+                  </div>
+              </div>
           </div>
-        </div>
       </div>
 
-      <!-- Jumlah Supir -->
-      <div class="col-lg-3 col-md-6 mb-4">
-        <div class="card shadow text-center">
-          <div class="card-body">
-            <i class="fas fa-user-tie fa-3x text-success mb-3"></i>
-            <h5 class="card-title">Jumlah Supir</h5>
-            <h3 class="mb-0">10</h3>
+      <!-- Row 2: Statistik -->
+      <div class="row">
+          <!-- Jumlah Mobil -->
+          <div class="col-lg-3 col-md-6 mb-4">
+              <div class="card shadow text-center h-100">
+                  <div class="card-body">
+                      <i class="fas fa-car fa-3x text-primary mb-3"></i>
+                      <h5 class="card-title">Jumlah Mobil</h5>
+                      <h3 id="jumlah-mobil" class="mb-0">25</h3>
+                  </div>
+              </div>
           </div>
-        </div>
-      </div>
 
-      <!-- Jumlah Penyewa -->
-      <div class="col-lg-3 col-md-6 mb-4">
-        <div class="card shadow text-center">
-          <div class="card-body">
-            <i class="fas fa-users fa-3x text-warning mb-3"></i>
-            <h5 class="card-title">Jumlah Penyewa</h5>
-            <h3 class="mb-0">50</h3>
+          <!-- Jumlah Supir -->
+          <div class="col-lg-3 col-md-6 mb-4">
+              <div class="card shadow text-center h-100">
+                  <div class="card-body">
+                      <i class="fas fa-user-tie fa-3x text-success mb-3"></i>
+                      <h5 class="card-title">Jumlah Supir</h5>
+                      <h3 id="jumlah-supir" class="mb-0">10</h3>
+                  </div>
+              </div>
           </div>
-        </div>
-      </div>
 
-      <!-- Jumlah Garasi -->
-      <div class="col-lg-3 col-md-6 mb-4">
-        <div class="card shadow text-center">
-          <div class="card-body">
-            <i class="fas fa-warehouse fa-3x text-danger mb-3"></i>
-            <h5 class="card-title">Jumlah Garasi</h5>
-            <h3 class="mb-0">5</h3>
+          <!-- Jumlah Penyewa -->
+          <div class="col-lg-3 col-md-6 mb-4">
+              <div class="card shadow text-center h-100">
+                  <div class="card-body">
+                      <i class="fas fa-users fa-3x text-warning mb-3"></i>
+                      <h5 class="card-title">Jumlah Penyewa</h5>
+                      <h3 id="jumlah-penyewa" class="mb-0">50</h3>
+                  </div>
+              </div>
           </div>
-        </div>
+
+          <!-- Jumlah Garasi -->
+          <div class="col-lg-3 col-md-6 mb-4">
+              <div class="card shadow text-center h-100">
+                  <div class="card-body">
+                      <i class="fas fa-warehouse fa-3x text-danger mb-3"></i>
+                      <h5 class="card-title">Jumlah Garasi</h5>
+                      <h3 id="jumlah-garasi" class="mb-0">5</h3>
+                  </div>
+              </div>
+          </div>
       </div>
-    </div>
   </div>
 
-  <!-- Scripts -->
-  <script src="../assets/libs/jquery/dist/jquery.min.js"></script>
-  <script src="../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="../assets/libs/apexcharts/dist/apexcharts.min.js"></script>
-  <script src="../assets/js/dashboard.js"></script>
-  <!-- Bootstrap CSS -->
-  <link href="../assets/libs/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
-  <!-- ApexCharts CSS -->
-  <link href="../assets/libs/apexcharts/dist/apexcharts.css" rel="stylesheet">
-  <!-- Custom CSS -->
   <style>
     .card {
         border-radius: 15px;
@@ -106,7 +101,8 @@
         transition: all 0.2s ease-in-out;
     }
 
-  </style>>
+  </style>
   <!-- Icons (Font Awesome or similar) -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <script type="module" src="../script/dashboard.js"> </script>
 </body>

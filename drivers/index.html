@@ -21,7 +21,7 @@
             <span class="toggle-btn" onclick="toggleSidebar()"><i class="fas fa-bars"></i></span>
         </div>
         <ul>
-            <li><i class="fas fa-home"></i> <span>Dashboard</span></li>
+            <li id="dashboard-btn"><i class="fas fa-home"></i> <span>Dashboard</span></li>
             <div class="divider"></div>
             <li onclick="toggleSubmenu(this)" class="menu-induk">
                 <i class="fas fa-tasks"></i> <span>Rental Management</span><i class="fas fa-chevron-down arrow"></i>
@@ -85,7 +85,7 @@
         </nav>
 
         <!-- Content -->
-        <div class="content p-3">
+        <div id="content" class="content p-3">
             <h2>Welcome to DriveGo</h2>
             <p>Content goes here...</p>
         </div>
@@ -158,6 +158,74 @@
 
     <script type="module" src="../drivers/drivers.js"> </script>
     <script>
+
+        document.addEventListener("DOMContentLoaded", function () {
+            async function loadPage(page) {
+                const contentContainer = document.getElementById("content");
+                if (!contentContainer) return;
+
+                try {
+                    const response = await fetch(`content/${page}.html`);
+                    if (!response.ok) throw new Error("Page not found");
+                    const html = await response.text();
+                    contentContainer.innerHTML = html;
+
+                    // Hapus script lama sebelum menambahkan yang baru
+                    document.querySelectorAll("script[data-dynamic]").forEach(script => script.remove());
+
+                    // Load CSS dinamis
+                    document.querySelectorAll("link[data-dynamic]").forEach(link => link.remove());
+                    const linkElement = document.createElement("link");
+                    linkElement.rel = "stylesheet";
+                    linkElement.href = `source/css/${page}.css`;
+                    linkElement.setAttribute("data-dynamic", "true");
+                    document.head.appendChild(linkElement);
+
+                    // Load JS Dinamis dengan Import
+                    try {
+                        const modulePath = `./script/${page}.js`;
+                        await import(modulePath + `?t=${Date.now()}`); // Mencegah cache
+                    } catch (err) {
+                        console.error(`Error loading script: ${page}.js`, err);
+                    }
+
+                } catch (error) {
+                    contentContainer.innerHTML = "<h2>Page not found</h2>";
+                }
+            }
+
+            // Fungsi navigasi halaman
+            function navigateTo(page) {
+                history.pushState({}, "", `?page=${page}`);
+                loadPage(page);
+            }
+
+            // Event listener untuk tombol dashboard (karena tidak memiliki data-page)
+            document.getElementById("dashboard-btn").addEventListener("click", function () {
+                history.pushState({}, "", "?");
+                loadPage("dashboard");
+            });
+
+            // Event listener untuk menu navigasi lainnya
+            document.querySelectorAll("li[data-page]").forEach(li => {
+                li.addEventListener("click", function () {
+                    const page = this.getAttribute("data-page");
+                    navigateTo(page);
+                });
+            });
+
+            // Tangani perubahan history API (tombol back/forward browser)
+            window.addEventListener("popstate", () => {
+                const params = new URLSearchParams(window.location.search);
+                const page = params.get("page") || "dashboard";
+                loadPage(page);
+            });
+
+            // Muat halaman pertama kali sesuai URL atau default ke dashboard
+            const initialPage = new URLSearchParams(window.location.search).get("page") || "dashboard";
+            loadPage(initialPage);
+        });
+
         function toggleSidebar() {
             let sidebar = document.getElementById("sidebar");
             sidebar.classList.toggle("minimized");
