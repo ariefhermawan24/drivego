@@ -5,7 +5,6 @@ import { ref, onValue } from "https://www.gstatic.com/firebasejs/9.17.1/firebase
 const mobilRef = ref(database, "mobil");
 const garasiRef = ref(database, "garasi");const usersRef = ref(database, "users");
 
-// Ambil data mobil
 onValue(mobilRef, (snapshot) => {
     const data = snapshot.val();
     let totalMobil = 0;
@@ -14,25 +13,25 @@ onValue(mobilRef, (snapshot) => {
     let totalPenyewa = 0;
 
     if (data) {
-        data.forEach((mobil, index) => {
-            if (index !== 0 && mobil) {  // Mengabaikan elemen pertama (null)
+        Object.values(data)
+            .filter(mobil => mobil !== null) // Filter null dulu
+            .forEach((mobil) => {
                 totalMobil++;
                 if (mobil.status === "tersedia") {
                     mobilTersedia++;
                 } else if (mobil.status === "disewa") {
                     mobilTersewa++;
-                    totalPenyewa++; // Penyewa = jumlah mobil tersewa
+                    totalPenyewa++;
                 }
-            }
-        });
+            });
     }
 
-    // Masukkan ke dalam HTML
     document.getElementById("mobil-tersedia").textContent = mobilTersedia;
     document.getElementById("mobil-tersewa").textContent = mobilTersewa;
     document.getElementById("jumlah-mobil").textContent = totalMobil;
     document.getElementById("jumlah-penyewa").textContent = totalPenyewa;
 });
+
 
 // Ambil data user untuk menghitung jumlah supir
 onValue(usersRef, (snapshot) => {
