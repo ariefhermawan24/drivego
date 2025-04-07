@@ -113,7 +113,7 @@ body {
 }
 
 .text-center p {
-    color: #cccccc;
+    color: white !important;
     margin-bottom: 20px;
     font-size: 14px;
 }

@@ -94,9 +94,16 @@ function cariMobil() {
 
             // Tampilkan mobil yang sesuai filter
             tampilkanMobil(filteredMobil, dataGarasi);
+
+            // Scroll ke bagian #garasi setelah hasil ditampilkan
+            const targetSection = document.getElementById('garasi');
+            if (targetSection) {
+                targetSection.scrollIntoView({ behavior: 'smooth' }); // Scroll halus
+            }
         });
     });
 }
+
 
 // Event listener untuk pencarian dan filter
 searchInput.addEventListener('input', cariMobil);
@@ -158,7 +165,9 @@ function tampilkanMobil(dataMobil, dataGarasi) {
                     data-bs-toggle="modal" 
                     data-bs-target="#transaksiModal" 
                     data-mobil="${mobil.nama_mobil || ''}"
-                    data-foto="${encodeURIComponent(mobil.foto || 'default.png')}"
+                    data-foto="${mobil.foto && mobil.foto.startsWith('http') 
+                    ? mobil.foto 
+                    : encodeURIComponent(mobil.foto || 'default.png')}"
                     data-harga="${mobil.harga_sewa || 0}"
                     data-tipe="${mobil.tipe_mobil || 'Tidak Diketahui'}"
                     data-tempat-duduk="${mobil.jumlah_tempat_duduk || '0'}"
@@ -169,8 +178,10 @@ function tampilkanMobil(dataMobil, dataGarasi) {
                     data-garasi="${dataGarasi[mobil.id_tempat]?.nama_tempat || 'Garasi Tidak Diketahui'}"
                     data-status="${mobil.status || 'Tidak Diketahui'}"
                 ` : ''}>
-                <img src="../drivego/source/image/mobil/${encodeURIComponent(mobil.foto || 'default.png')}" 
-                    class="card-img-top" alt="${mobil.nama_mobil || 'Nama Mobil'}">
+                <img 
+                    src="${mobil.foto && mobil.foto.startsWith('http') ? mobil.foto : `../drivego/source/image/mobil/${encodeURIComponent(mobil.foto || 'default.png')}`}" 
+                    class="card-img-top" 
+                    alt="${mobil.nama_mobil || 'Nama Mobil'}">
                 <div class="card-body">
                     <h5 class="card-title nama-mobil">${mobil.nama_mobil || 'Nama Mobil Tidak Tersedia'}</h5>
                     <div class="harga">
@@ -221,7 +232,11 @@ function tampilkanMobil(dataMobil, dataGarasi) {
 
             // Isi modal dengan data dari kartu
             if (modalNamaMobil) modalNamaMobil.textContent = dataset.mobil || 'Nama Mobil Tidak Diketahui';
-            if (modalFoto) modalFoto.src = `../drivego/source/image/mobil/${dataset.foto || 'default.png'}`;
+            if (modalFoto) {
+                modalFoto.src = dataset.foto && dataset.foto.startsWith('http')
+                ? dataset.foto
+                : `../drivego/source/image/mobil/${encodeURIComponent(dataset.foto || 'default.png')}`;
+            }
             if (modalHarga) modalHarga.textContent = `Rp ${new Intl.NumberFormat('id-ID').format(dataset.harga || 0)}`;
             if (modalTipe) modalTipe.textContent = dataset.tipe || 'Tidak Diketahui';
             if (modalTempatDuduk) modalTempatDuduk.textContent = dataset.tempatDuduk || '0';
@@ -631,7 +646,7 @@ async function simpanKeFirebase() {
         const formattedUsername = username.replace(/\s+/g, "-");
 
         // 🔥 Tentukan path folder
-        const folderPath = `${orderId}/${formattedUsername}/${kategori}`;
+        const folderPath = `pesanan/${orderId}/${formattedUsername}/${kategori}`;
         const formData = new FormData();
         formData.append("file", file);
         formData.append("upload_preset", uploadPreset);
@@ -647,7 +662,11 @@ async function simpanKeFirebase() {
 
             const data = await response.json();
             console.log("✅ Upload berhasil:", data);
-            return file.name; // 🔥 Simpan nama file saja, bukan URL
+
+            // 🔥 Simpan path lengkap file, sesuai dengan folder yang diinginkan
+            const filePath = `${folderPath}/${data.public_id.split('/').pop()}.${data.format}`;
+            return data.secure_url;
+
         } catch (error) {
             console.error("❌ Error saat upload ke Cloudinary:", error);
             return null;

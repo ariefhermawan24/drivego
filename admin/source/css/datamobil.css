@@ -27,6 +27,13 @@
 
 th {
     white-space: nowrap !important;
+    text-align: center;
+    vertical-align: middle;
+}
+
+td {
+    text-align: center;
+    vertical-align: middle;
 }
 
 /* Pagination */

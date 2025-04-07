@@ -926,21 +926,6 @@ td {
     animation: dotAnimation 1.5s infinite steps(1);
 }
 
-.order-details {
-    display: flex;
-    justify-content: center;
-    /* Memusatkan tabel secara horizontal */
-    align-items: center;
-    /* Memusatkan tabel secara vertikal */
-}
-
-.order-details table {
-    width: 90%;
-    /* Pastikan tabel tidak terlalu lebar */
-    max-width: 600px;
-    /* Batasi lebar maksimal */
-}
-
 .sticky-filters {
     position: sticky;
     top: 58px !important;

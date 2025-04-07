@@ -1,5 +1,13 @@
 body {
     display: flex;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+.bg-secondary.text-white.form-control::placeholder {
+    color: #dddddd;
+    opacity: 1;
 }
 
 .sidebar {

@@ -12,6 +12,7 @@
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="stylesheet" href="../admin/source/css/admin.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 </head>
 <body>
     <div class="sidebar" id="sidebar">
@@ -157,78 +158,332 @@
         </div>
     </div>
 
-    <!-- Modal Tambah Mobil -->
-    <div class="modal fade" id="modalTambahMobil" tabindex="1" aria-labelledby="modalTambahMobilLabel" aria-hidden="true">
-        <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-            <h5 class="modal-title" id="modalTambahMobilLabel">Tambah Mobil</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+<!-- Modal Tambah Mobil -->
+<div class="modal fade" id="modalTambahMobil" tabindex="-1" aria-labelledby="modalTambahMobilLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content bg-dark text-white" style="max-height: 90vh;">
+      <div class="modal-header border-secondary sticky-top bg-dark">
+        <h5 class="modal-title" id="modalTambahMobilLabel">Tambah Mobil</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body overflow-auto" style="max-height: 65vh;">
+        <form id="formTambahMobil">
+          <div class="mb-3">
+            <label for="namaMobil" class="form-label">Nama Mobil</label>
+            <input type="text" id="namaMobil" class="form-control bg-secondary text-white border-0" required>
+          </div>
+          <div class="mb-3">
+            <label for="merkMobil" class="form-label">Merek Mobil</label>
+            <input type="text" id="merkMobil" class="form-control bg-secondary text-white border-0" required>
+          </div>
+          <div class="mb-3">
+            <label for="tahunMobil" class="form-label">Tahun</label>
+            <input type="number" id="tahunMobil" class="form-control bg-secondary text-white border-0" required>
+          </div>
+          <div class="mb-3">
+            <label for="warnaMobil" class="form-label">Warna</label>
+            <input type="text" id="warnaMobil" class="form-control bg-secondary text-white border-0" required>
+          </div>
+          <div class="mb-3">
+            <label for="transmisiMobil" class="form-label">Transmisi</label>
+            <select id="transmisiMobil" class="form-select bg-secondary text-white border-0" required>
+              <option value="manual">Manual</option>
+              <option value="automatic">Matic</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="bahanBakarMobil" class="form-label">Bahan Bakar</label>
+            <select id="bahanBakarMobil" class="form-select bg-secondary text-white border-0" required>
+              <optgroup label="Bahan Bakar Bensin">
+                    <option value="pertalite">Pertalite</option>
+                        <option value="pertamax">Pertamax</option>
+                        <option value="pertamax-turbo">Pertamax Turbo</option>
+                    </optgroup>
+
+                    <optgroup label="Bahan Bakar Solar / Diesel">
+                        <option value="solar">Solar Subsidi</option>
+                        <option value="dexlite">Dexlite</option>
+                        <option value="pertamina-dex">Pertamina Dex</option>
+                    </optgroup>
+
+                    <optgroup label="Bahan Bakar Ramah Lingkungan">
+                        <option value="listrik">Listrik (Full Electric)</option>
+                        <option value="hybrid">Hybrid (Bensin + Listrik)</option>
+                        <option value="plug-in-hybrid">Plug-in Hybrid (Colokan Listrik + Bensin)</option>
+                    </optgroup>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="jumlahTempatDuduk" class="form-label">Jumlah Tempat Duduk</label>
+            <input type="number" id="jumlahTempatDuduk" class="form-control bg-secondary text-white border-0" required>
+          </div>
+          <div class="mb-3">
+            <label for="GarasiMobil" class="form-label">Garasi</label>
+            <select id="GarasiMobil" class="form-select bg-secondary text-white border-0 GarasiMobil" required>
+                <option value="" disabled>Pilih Garasi</option>
+                <!-- Opsi akan diisi dari JavaScript -->
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="tipemobil" class="form-label">Tipe Mobil</label>
+            <select id="tipemobil" class="form-select bg-secondary text-white border-0" required>
+                <optgroup label="Mobil Keluarga">
+                    <option value="mpv">MPV (Mobil Keluarga 7 Penumpang)</option>
+                    <option value="minibus">Minibus (Kapasitas Besar)</option>
+                    <option value="van">Van (Mobil Barang/Penumpang Besar)</option>
+                </optgroup>
+
+                <optgroup label="Mobil Perkotaan">
+                    <option value="city-car">City Car (Mobil Perkotaan)</option>
+                    <option value="hatchback">Hatchback (Bagasi Menyatu)</option>
+                    <option value="sedan">Sedan (Mobil Sedan)</option>
+                    <option value="crossover">Crossover (Gabungan Sedan & SUV)</option>
+                </optgroup>
+
+                <optgroup label="Mobil SUV & Offroad">
+                    <option value="suv">SUV (Sport Utility Vehicle)</option>
+                    <option value="offroad">Offroad (Khusus Medan Berat)</option>
+                    <option value="double-cabin">Double Cabin (Pickup 4 Pintu)</option>
+                </optgroup>
+
+                <optgroup label="Mobil Mewah & Spesial">
+                    <option value="luxury">Luxury Car (Mobil Mewah)</option>
+                    <option value="convertible">Convertible (Atap Terbuka)</option>
+                    <option value="coupe">Coupe (2 Pintu Sporty)</option>
+                    <option value="electric">Mobil Listrik</option>
+                </optgroup>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="StatusMobil" class="form-label">Status</label>
+            <select id="StatusMobil" class="form-control bg-secondary text-white border-0">
+              <option value="tersedia">Tersedia</option>
+              <option value="disewa">Disewa</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="HargaSewa" class="form-label">Harga Sewa</label>
+            <input type="number" id="HargaSewa" class="form-control bg-secondary text-white border-0" required>
+          </div>
+          <div class="mb-3">
+            <label for="fotomobil" class="form-label">Foto Mobil</label>
+
+            <div class="input-group">
+                <!-- Input readonly -->
+                <input type="text" class="form-control bg-secondary text-white border-0" placeholder="Pilih file gambar..." id="namaFile" readonly>
+
+                <!-- Clear/reset button -->
+                <button type="button" class="btn btn-secondary d-none" id="resetButton" onclick="resetFile()">
+                <i class="fa-solid fa-xmark"></i>
+                </button>
+
+                <!-- Browse button -->
+                <button type="button" class="btn btn-warning" onclick="document.getElementById('fotomobil').click()">
+                <i class="fa-solid fa-folder-open"></i>
+                </button>
             </div>
-            <div class="modal-body">
-            <form id="formTambahMobil">
-                <div class="mb-3">
-                <label for="namaMobil" class="form-label">Nama Mobil</label>
-                <input type="text" id="namaMobil" class="form-control" required>
-                </div>
-                <div class="mb-3">
-                <label for="merkMobil" class="form-label">Merek Mobil</label>
-                <input type="text" id="merkMobil" class="form-control" required>
-                </div>
-                <div class="mb-3">
-                <label for="statusMobil" class="form-label">Status</label>
-                <select id="statusMobil" class="form-select">
-                    <option value="tersedia">Tersedia</option>
-                    <option value="disewa">Disewa</option>
-                </select>
-                </div>
-                <div class="mb-3">
-                <label for="hargaSewa" class="form-label">Harga Sewa</label>
-                <input type="number" id="hargaSewa" class="form-control" required>
-                </div>
-                <button type="submit" class="btn btn-primary">Simpan</button>
-            </form>
+
+            <!-- Hidden file input -->
+            <input type="file" id="fotomobil" class="d-none" accept="image/*" required>
+
+            <div class="form-text text-warning">Maksimal ukuran gambar 1MB.</div>
             </div>
-        </div>
-        </div>
+
+            <!-- Progress bar upload Cloudinary -->
+          <div class="progress my-2" style="height: 20px; display: none;" id="progressContainer">
+            <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" id="progressBar" style="width: 0%;">0%</div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer border-secondary sticky-bottom bg-dark">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+        <button type="submit" form="formTambahMobil" class="btn btn-primary">Simpan</button>
+      </div>
     </div>
+  </div>
+</div>
 
     <!-- Modal Edit Mobil -->
-    <div class="modal fade" id="modalEditMobil" tabindex="1" aria-labelledby="modalEditMobilLabel" aria-hidden="true">
-        <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-            <h5 class="modal-title" id="modalEditMobilLabel">Edit Mobil</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-            <form id="formEditMobil">
-                <input type="hidden" id="editMobilId">
-                <div class="mb-3">
+<div class="modal fade" id="modalEditMobil" tabindex="-1" aria-labelledby="modalEditMobilLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content bg-dark text-white" style="max-height: 90vh; border: 1px solid #444;">
+      <div class="modal-header border-secondary sticky-top bg-dark">
+        <h5 class="modal-title fs-4 text-primary fw-bold" id="modalEditMobilLabel">
+          <i class="fas fa-car me-2"></i>Edit Mobil
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      
+      <div class="modal-body overflow-auto" style="max-height: 65vh;">
+        <form id="formEditMobil" class="needs-validation" novalidate>
+          <div class="row g-3">
+            <input type="hidden" id="editMobilId">
+            <!-- Kolom Kiri -->
+            <div class="col-md-6">
+              <div class="mb-3">
                 <label for="editNamaMobil" class="form-label">Nama Mobil</label>
-                <input type="text" id="editNamaMobil" class="form-control" required>
+                <div class="input-group">
+                    <span class="input-group-text bg-dark border-secondary text-white">
+                    <i class="fas fa-car-side"></i>
+                    </span>
+                    <input type="text" id="editNamaMobil" class="form-control bg-dark text-white border-secondary" required pattern=".{3,}">
+                    <span class="input-group-text bg-dark border-secondary text-white" id="displayInisialMobil">
+                    DAXE 01
+                    </span>
                 </div>
-                <div class="mb-3">
+              </div>
+
+              <div class="mb-3">
                 <label for="editMerkMobil" class="form-label">Merek Mobil</label>
-                <input type="text" id="editMerkMobil" class="form-control" required>
+                <div class="input-group">
+                  <span class="input-group-text bg-dark border-secondary text-white"><i class="fas fa-trademark"></i></span>
+                  <input type="text" id="editMerkMobil" class="form-control bg-dark text-white border-secondary" required>
                 </div>
-                <div class="mb-3">
-                <label for="editStatusMobil" class="form-label">Status</label>
-                <select id="editStatusMobil" class="form-select">
-                    <option value="tersedia">Tersedia</option>
-                    <option value="disewa">Disewa</option>
-                </select>
+              </div>
+
+              <div class="mb-3">
+                <label for="edittahunMobil" class="form-label">Tahun</label>
+                <div class="input-group">
+                  <span class="input-group-text bg-dark border-secondary text-white"><i class="fas fa-calendar-alt"></i></span>
+                  <input type="number" id="edittahunMobil" class="form-control bg-dark text-white border-secondary" 
+                         min="2000" max="2024" required>
                 </div>
-                <div class="mb-3">
-                <label for="editHargaSewa" class="form-label">Harga Sewa</label>
-                <input type="number" id="editHargaSewa" class="form-control" required>
+              </div>
+
+              <div class="mb-3">
+                <label for="editwarnaMobil" class="form-label">Warna</label>
+                <div class="input-group">
+                  <span class="input-group-text bg-dark border-secondary text-white"><i class="fas fa-palette"></i></span>
+                  <input type="text" id="editwarnaMobil" class="form-control bg-dark text-white border-secondary" required>
                 </div>
-                <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
-            </form>
+              </div>
             </div>
-        </div>
-        </div>
+
+            <!-- Kolom Kanan -->
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="edittransmisiMobil" class="form-label">Transmisi</label>
+                <select id="edittransmisiMobil" class="form-select bg-dark text-white border-secondary" required>
+                  <option value="manual" class="bg-secondary">Manual</option>
+                  <option value="automatic" class="bg-secondary">Matic</option>
+                </select>
+              </div>
+
+              <div class="mb-3">
+                <label for="editbahanBakarMobil" class="form-label">Bahan Bakar</label>
+                <select id="editbahanBakarMobil" class="form-select bg-dark text-white border-secondary" required>
+                  <optgroup label="Bahan Bakar Bensin" class="bg-secondary">
+                    <option value="pertalite">Pertalite</option>
+                    <option value="pertamax">Pertamax</option>
+                    <option value="pertamax-turbo">Pertamax Turbo</option>
+                  </optgroup>
+
+                  <optgroup label="Solar / Diesel" class="bg-secondary">
+                    <option value="solar">Solar Subsidi</option>
+                    <option value="dexlite">Dexlite</option>
+                    <option value="pertamina-dex">Pertamina Dex</option>
+                  </optgroup>
+
+                  <optgroup label="Ramah Lingkungan" class="bg-secondary">
+                    <option value="listrik">Listrik</option>
+                    <option value="hybrid">Hybrid</option>
+                    <option value="plug-in-hybrid">Plug-in Hybrid</option>
+                  </optgroup>
+                </select>
+              </div>
+
+              <div class="mb-3">
+                <label for="editjumlahTempatDuduk" class="form-label">Kursi</label>
+                <div class="input-group">
+                  <span class="input-group-text bg-dark border-secondary text-white"><i class="fas fa-chair"></i></span>
+                  <input type="number" id="editjumlahTempatDuduk" class="form-control bg-dark text-white border-secondary" 
+                         min="2" max="12" required>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label for="editHargaSewa" class="form-label">Harga Sewa</label>
+                <div class="input-group">
+                  <span class="input-group-text bg-dark border-secondary text-white">Rp</span>
+                  <input type="number" id="editHargaSewa" class="form-control bg-dark text-white border-secondary" 
+                         min="100000" step="50000" required>
+                  <span class="input-group-text bg-dark border-secondary text-white">/hari</span>
+                </div>
+                <div class="form-text">Minimal Rp 100.000</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bagian Bawah -->
+          <div class="row g-3">
+            <div class="col-md-4">
+              <div class="mb-3">
+                <label for="editGarasiMobil" class="form-label">Garasi</label>
+                <select id="editGarasiMobil" class="form-select bg-dark text-white border-secondary GarasiMobil" required>
+                  <option value="" disabled class="bg-secondary">Pilih Garasi</option>
+                  <!-- Opsi akan diisi dari JavaScript -->
+                </select>
+              </div>
+            </div>
+
+            <div class="col-md-4">
+              <div class="mb-3">
+                <label for="editTipeMobil" class="form-label">Tipe Mobil</label>
+                <select id="editTipeMobil" class="form-select bg-dark text-white border-secondary" required>
+                  <optgroup label="Mobil Keluarga">
+                    <option value="mpv">MPV (Mobil Keluarga 7 Penumpang)</option>
+                    <option value="minibus">Minibus (Kapasitas Besar)</option>
+                    <option value="van">Van (Mobil Barang/Penumpang Besar)</option>
+                </optgroup>
+
+                <optgroup label="Mobil Perkotaan">
+                    <option value="city-car">City Car (Mobil Perkotaan)</option>
+                    <option value="hatchback">Hatchback (Bagasi Menyatu)</option>
+                    <option value="sedan">Sedan (Mobil Sedan)</option>
+                    <option value="crossover">Crossover (Gabungan Sedan & SUV)</option>
+                </optgroup>
+
+                <optgroup label="Mobil SUV & Offroad">
+                    <option value="suv">SUV (Sport Utility Vehicle)</option>
+                    <option value="offroad">Offroad (Khusus Medan Berat)</option>
+                    <option value="double-cabin">Double Cabin (Pickup 4 Pintu)</option>
+                </optgroup>
+
+                <optgroup label="Mobil Mewah & Spesial">
+                    <option value="luxury">Luxury Car (Mobil Mewah)</option>
+                    <option value="convertible">Convertible (Atap Terbuka)</option>
+                    <option value="coupe">Coupe (2 Pintu Sporty)</option>
+                    <option value="electric">Mobil Listrik</option>
+                </optgroup>
+                </select>
+              </div>
+            </div>
+
+            <div class="col-md-4">
+              <div class="mb-3">
+                <label for="editStatusMobil" class="form-label">Status</label>
+                <select id="editStatusMobil" class="form-select bg-dark text-white border-secondary">
+                  <option value="tersedia" class="text-success">Tersedia</option>
+                  <option value="disewa" class="text-danger">Disewa</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <div class="modal-footer border-secondary sticky-bottom bg-dark d-flex justify-content-between">
+        <button type="button" class="btn btn-outline-secondary" id="resetEditMobilButton">
+            <i class="fas fa-undo me-2"></i>Reset Form
+        </button>
+        <button type="submit" form="formEditMobil" class="btn btn-success">
+          <i class="fas fa-save me-2"></i>Simpan Perubahan
+        </button>
+      </div>
     </div>
+  </div>
+</div>
+
 
     <script type="module" src="../admin/admin.js"> </script>
     <script>
@@ -382,6 +637,36 @@
                 }, 300);
             }
         };
+
+        const fotomobil = document.getElementById('fotomobil');
+const namaFileInput = document.getElementById('namaFile');
+const resetButton = document.getElementById('resetButton');
+
+fotomobil.addEventListener('change', function() {
+  const file = this.files[0];
+
+  if (file) {
+    if (file.size > 1 * 1024 * 1024) { // 1MB
+      alert('Ukuran file terlalu besar! Maksimal 1MB.');
+      this.value = '';
+      namaFileInput.value = '';
+      resetButton.classList.add('d-none');
+    } else {
+      namaFileInput.value = file.name;
+      resetButton.classList.remove('d-none');
+    }
+  } else {
+    namaFileInput.value = '';
+    resetButton.classList.add('d-none');
+  }
+});
+
+function resetFile() {
+  fotomobil.value = '';
+  namaFileInput.value = '';
+  resetButton.classList.add('d-none');
+}
+
 
     </script>
 </body>
