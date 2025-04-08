@@ -1,29 +1,5 @@
-// Inisialisasi Firebase
-import {
-    initializeApp
-} from 'https://www.gstatic.com/firebasejs/9.17.1/firebase-app.js';
-import {
-    getDatabase,
-    ref,
-    set,
-    onValue,
-    get, // 🔥 Tambahkan ini
-    child, // 🔥 Tambahkan ini
-    update // 🔥 Tambahkan ini untuk memperbarui status mobil
-} from 'https://www.gstatic.com/firebasejs/9.17.1/firebase-database.js';
-
-const firebaseConfig = {
-    apiKey: "AIzaSyCzTvQrtyFVd8gfxMDPenmhiOCD32QLIHk",
-    authDomain: "drivego-f833b.firebaseapp.com",
-    databaseURL: "https://drivego-f833b-default-rtdb.firebaseio.com",
-    projectId: "drivego-f833b",
-    storageBucket: "drivego-f833b.firebasestorage.app",
-    messagingSenderId: "296648552361",
-    appId: "1:296648552361:web:985acfc9a369b3f3841eb8",
-    measurementId: "G-6YE8Z8FDL4"
-};
-const app = initializeApp(firebaseConfig);
-const database = getDatabase(app);
+import { database } from "../admin/script/config.js";
+import { getDatabase, ref, set, remove, onValue,get, child, update } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-database.js";
 
 // Referensi ke data 'mobil' di Firebase
 const mobilRef = ref(database, 'mobil');
@@ -371,6 +347,7 @@ document.addEventListener("DOMContentLoaded", function() {
         toggleDetailMobil();
         updateFields();
         updateLabel();
+        updateStep4Details();
     }
 
     // 🔥 Membuat container pembungkus untuk input "Tujuan lainnya"
@@ -474,14 +451,14 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     function updateLabel() {
-    if (jenisSewa.value === "lepasKunci") {
-        document.getElementById("label-jam").textContent = "Jam Pengambilan";
-        document.getElementById("penjelasan-jam").textContent = "Pilih jam untuk pengambilan mobil di garasi kami.";
-    } else {
-        document.getElementById("label-jam").textContent = "Jam Penjemputan";
-        document.getElementById("penjelasan-jam").textContent = "Pilih jam penjemputan yang diinginkan.";
+        if (jenisSewa.value === "lepasKunci") {
+            document.getElementById("label-jam").textContent = "Jam Pengambilan";
+            document.getElementById("penjelasan-jam").textContent = "Pilih jam untuk pengambilan mobil di garasi kami.";
+        } else {
+            document.getElementById("label-jam").textContent = "Jam Penjemputan";
+            document.getElementById("penjelasan-jam").textContent = "Pilih jam penjemputan yang diinginkan.";
+        }
     }
-}
 
     jenisSewa.value = "lepasKunci";
     updateFields();
@@ -537,9 +514,9 @@ document.addEventListener("DOMContentLoaded", function() {
                     saveProgress();
                 }
 
-                // 🔥 Simpan & kirim data saat Step 3 Next ditekan
                 if (currentStep === 4) {
                     simpanKeFirebase();
+                    updateStep4Details(); // 🔥 Update tampilan Step 4 pakai localStorage terbaru
                 }
             }
         });
@@ -695,34 +672,48 @@ async function simpanKeFirebase() {
         }
     }
 
-    await saveFileName("fotoKTP", "fotoKTP", "fotobukti");
-    await saveFileName("fotoSIM", "fotoSIM", "fotobukti");
-    await saveFileName("fotoVerifikasi", "fotoVerifikasi", "fotobukti");
-    await saveFileName("buktiBayar", "buktiBayar", "pembayaran");
+    const batalkanPesananButton = document.getElementById("batalkan-pesanan");
+    const batalkanPesananSpinner = document.getElementById("batalkanPesananSpinner");
+    const batalkanPesananText = document.getElementById("batalkanPesananText");
 
-    // 🔥 Tambahkan ID Pesanan
-    formData.orderId = orderId;
+    // Sebelum proses mulai
+    batalkanPesananButton.disabled = true;
+    batalkanPesananSpinner.classList.remove('d-none');
+    batalkanPesananText.innerHTML = 'Memproses<span class="wait-dots"></span>';
 
-    // 🔥 Simpan ke LocalStorage
-    localStorage.setItem("formProgress", JSON.stringify(formData));
+    try {
+        await saveFileName("fotoKTP", "fotoKTP", "fotobukti");
+        await saveFileName("fotoSIM", "fotoSIM", "fotobukti");
+        await saveFileName("fotoVerifikasi", "fotoVerifikasi", "fotobukti");
+        await saveFileName("buktiBayar", "buktiBayar", "pembayaran");
 
-    console.log("✅ Data Tersimpan di LocalStorage:", formData);
+        // 🔥 Tambahkan ID Pesanan
+        formData.orderId = orderId;
 
-    // 🔥 Buat Salinan Data Tanpa `currentStep`
-    let firebaseData = { ...formData }; 
-    delete firebaseData.currentStep; // 🔥 Hapus currentStep sebelum dikirim ke Firebase
-    
-    // 🔥 Simpan Data ke Firebase Realtime Database
-    set(ref(database, "transaksi/" + orderId), firebaseData)
-    .then(() => {
+        // 🔥 Simpan ke LocalStorage
+        localStorage.setItem("formProgress", JSON.stringify(formData));
+        updateStep4Details(); // ✅ Update tampilan
+
+        console.log("✅ Data Tersimpan di LocalStorage:", formData);
+
+        // 🔥 Buat salinan data tanpa currentStep
+        let firebaseData = { ...formData };
+        delete firebaseData.currentStep;
+
+        // 🔥 Simpan ke Firebase
+        await set(ref(database, "transaksi/" + orderId), firebaseData);
         console.log("✅ Data berhasil disimpan ke Firebase!");
 
-        // 🔥 Update Status Mobil ke "pending"
+        // 🔥 Update status mobil ke "pending"
         updateMobilStatus(firebaseData.namaMobil);
-    })
-    .catch((error) => {
-        console.error("❌ Gagal menyimpan ke Firebase:", error);
-    });
+    } catch (error) {
+        console.error("❌ Terjadi kesalahan:", error);
+    } finally {
+        // Setelah proses selesai
+        batalkanPesananButton.disabled = false;
+        batalkanPesananSpinner.classList.add('d-none');
+        batalkanPesananText.textContent = "Batalkan Pesanan";
+    }
 }
 
 function updateMobilStatus(namaMobil) {
@@ -753,6 +744,142 @@ function updateMobilStatus(namaMobil) {
             console.error("❌ Gagal mengambil data mobil:", error);
         });
 }
+
+function updateStep4Details() {
+    const formData = JSON.parse(localStorage.getItem("formProgress")) || {};
+    console.log('Data localStorage saat updateStep4Details:', formData);
+    document.querySelector('.order-id').textContent = formData.orderId || "-";
+    document.querySelector('.jenis-sewa').textContent = formData.jenisSewa || "Harian";
+    document.querySelector('.mobil-disewa').textContent = formData.namaMobil || "-";
+    document.querySelector('.garasi-mobil').textContent = formData.garasi || "-";
+    document.querySelector('.nama-penyewa').textContent = formData.namaPenyewa || "-";
+    document.querySelector('.nomor-telepon').textContent = formData.nomertelephone || "-";
+    document.querySelector('.hari-sewa').textContent = `${formData.hariSewa || 0} Hari`;
+    document.querySelector('.range-sewa').textContent = formData.rangeSewa || "-";
+    document.querySelector('.total-harga').textContent = `Rp ${formData.totalHarga?.toLocaleString() || "0"}`;
+    document.querySelector('.dp').textContent = `Rp ${formData.pembayaranDP?.toLocaleString() || "0"}`;
+    document.querySelector('.pembayaran-di-tempat').textContent = `Rp ${formData.pembayaranDiTempat?.toLocaleString() || "0"}`;
+}
+
+function batalkanPesanan() {
+    const formData = JSON.parse(localStorage.getItem("formProgress")) || {};
+    const orderId = formData.orderId;
+    const namaMobil = formData.namaMobil;
+
+    if (!orderId) {
+        showCustomToast("Order ID tidak ditemukan!", 'danger');
+        return;
+    }
+
+    const konfirmasiToastEl = document.getElementById('konfirmasiToast');
+    const konfirmasiToast = new bootstrap.Toast(konfirmasiToastEl);
+
+    konfirmasiToast.show();
+
+    document.getElementById('confirmYes').onclick = function () {
+        konfirmasiToast.hide();
+
+        konfirmasiToastEl.addEventListener('hidden.bs.toast', function handleToastHidden() {
+            konfirmasiToastEl.removeEventListener('hidden.bs.toast', handleToastHidden);
+
+            // Setelah konfirmasi toast hide, proses cancel
+            processCancellation(orderId, namaMobil);
+        });
+    };
+}
+
+function processCancellation(orderId, namaMobil) {
+    remove(ref(database, `transaksi/${orderId}`))
+        .then(() => get(mobilRef))
+        .then((snapshot) => {
+            if (snapshot.exists()) {
+                snapshot.forEach((childSnapshot) => {
+                    const data = childSnapshot.val();
+                    if (data.nama_mobil === namaMobil) {
+                        update(ref(database, `mobil/${childSnapshot.key}`), {
+                            status: "tersedia"
+                        });
+                    }
+                });
+            }
+
+            localStorage.removeItem("formProgress");
+
+            const transaksiModalElement = document.getElementById('transaksiModal');
+            const transaksiModal = bootstrap.Modal.getInstance(transaksiModalElement);
+
+            const finish = () => {
+                showCustomToast("Pesanan berhasil dibatalkan", "success");
+
+                // Tunggu 2.5 detik, lalu reload dengan anchor ke #garasi
+                setTimeout(() => {
+                    location.href = location.pathname + location.search + '#garasi';
+                    location.reload();
+                }, 2500);
+            };
+
+            if (transaksiModal) {
+                // 1. Tampilkan toast sukses dulu
+                finish();
+
+                // 2. Delay sebentar biar toast muncul duluan, baru modal di-hide
+                setTimeout(() => {
+                    transaksiModalElement.addEventListener('hidden.bs.modal', function handleModalHidden() {
+                        transaksiModalElement.removeEventListener('hidden.bs.modal', handleModalHidden);
+                        // Tidak perlu apa-apa di sini, reload sudah dihandle di toast
+                    });
+
+                    transaksiModal.hide();
+                }, 2000); // delay supaya toast kelihatan
+            } else {
+                finish();
+            }
+        })
+        .catch((error) => {
+            console.error("Gagal membatalkan pesanan:", error);
+            showCustomToast("Terjadi kesalahan saat membatalkan pesanan. Silakan coba lagi.", 'danger');
+        });
+}
+
+window.batalkanPesanan = batalkanPesanan;
+
+function showCustomToast(message, type = 'info') {
+    const toastContainer = document.getElementById('toastContainer');
+
+    if (!toastContainer) {
+        console.error('Toast container tidak ditemukan!');
+        return;
+    }
+
+    // Bikin elemen toast baru
+    const toastElement = document.createElement('div');
+    toastElement.className = `toast align-items-center text-bg-${type} border-0`;
+    toastElement.setAttribute('role', 'alert');
+    toastElement.setAttribute('aria-live', 'assertive');
+    toastElement.setAttribute('aria-atomic', 'true');
+
+    toastElement.innerHTML = `
+        <div class="d-flex">
+            <div class="toast-body">
+                ${message}
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    `;
+
+    // Masukkan ke container
+    toastContainer.appendChild(toastElement);
+
+    // Tampilkan toast
+    const bsToast = new bootstrap.Toast(toastElement);
+    bsToast.show();
+
+    // Hapus setelah selesai biar gak numpuk
+    toastElement.addEventListener('hidden.bs.toast', () => {
+        toastElement.remove();
+    });
+}
+
 
 // ============================
 // 📌 Form Nama Penyewa (Modal)

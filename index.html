@@ -481,11 +481,104 @@
                     <button class="btn btn-primary next-step">Lanjut</button>
                 </div>
                 <div id="step4" class="step d-none">
-                    <!-- Bagian Status Persetujuan -->
-                    <div class="waiting-approval" id="statusApproval">
-                        <div class="loader"></div>
-                        <h5>Peninjauan Berkas Anda</h5>
-                        <p>Berkas Anda sedang dalam proses validasi<span class="wait-dots"></span></p> 
+                    <div class="step4">
+                        <!-- Bagian Status Persetujuan -->
+                        <div class="waiting-approval">
+                            <div id="statusApproval">      
+                                <div class="loader"></div>
+                                <h5>Peninjauan Berkas Anda</h5>
+                                <p>Berkas Anda sedang dalam proses validasi<span class="wait-dots"></span></p> 
+                            </div>
+                            <!-- Kondisi Diterima -->
+                            <div id="approvalAccepted" class="d-none text-center">
+                                <div class="icon icon-success mb-3">
+                                    <i class="fas fa-check-circle fa-2x"></i>
+                                </div>
+                                <h5>Berkas Anda Diterima</h5>
+
+                                <!-- Penjelasan tentang QR code -->
+                                <p>Scan QR code di bawah untuk melihat e-ticket pesanan rental mobil Anda.</p>
+
+                                <!-- QR Code Container -->
+                                <div id="qrcode" class="my-3 d-flex justify-content-center"></div>
+
+                                <!-- Tombol Alternatif -->
+                                <button class="btn btn-primary" id="manualLocationButton">
+                                    <i class="fas fa-qrcode"></i> Periksa E-Ticket
+                                </button>
+                            </div>
+                            <!-- Kondisi Ditolak -->
+                            <div id="approvalRejected" class="d-none text-center">
+                                <div class="icon icon-error mb-3">
+                                    <i class="fas fa-times-circle fa-2x"></i>
+                                </div>
+                                <h5>Mohon Maaf, Berkas Anda Ditolak</h5>
+                                <p>Periksa kembali persyaratan dan unggah ulang berkas yang diminta.</p>
+
+                                <!-- Guide Scroll -->
+                                <div class="mt-4">
+                                    <p class="text-muted">scroll ke bawah untuk membatalkan pesanan Anda.</p>
+                                    <div class="scroll-guide-animation" role="button" style="cursor: pointer;" onclick="scrollToCancelButton()">
+                                        <i class="fas fa-arrow-down fa-2x"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>  
+                        <!-- Detail Pemesanan (Upgrade Style) -->
+                        <div class="detail-order">
+                            <h5>Detail Pemesanan</h5>
+                            <ul>
+                                <li>
+                                    <strong>Order ID:</strong>
+                                    <span class="order-id float-end">#12345678</span>
+                                </li>
+                                <li>
+                                    <strong>Jenis Sewa:</strong>
+                                    <span class="jenis-sewa float-end">Harian</span>
+                                </li>
+                                <li>
+                                    <strong>Mobil Disewa:</strong>
+                                    <span class="mobil-disewa float-end">Harian</span>
+                                </li>
+                                <li>
+                                    <strong>Garasi Mobil:</strong>
+                                    <span class="garasi-mobil float-end">Harian</span>
+                                </li>
+                                <li>
+                                    <strong>Nama Penyewa:</strong>
+                                    <span class="nama-penyewa float-end">John Doe</span>
+                                </li>
+                                <li>
+                                    <strong>Nomor Telepon:</strong>
+                                    <span class="nomor-telepon float-end">08123456789</span>
+                                </li>
+                                <li>
+                                    <strong>Durasi Sewa:</strong>
+                                    <span class="hari-sewa float-end">3 Hari</span>
+                                </li>
+                                <li>
+                                    <strong>Range Sewa:</strong>
+                                    <span class="range-sewa float-end">08 Apr - 10 Apr 2025</span>
+                                </li>
+                                <li>
+                                    <strong>Total Harga:</strong>
+                                    <span class="total-harga float-end">Rp 1.500.000</span>
+                                </li>
+                                <li>
+                                    <strong>Total DP:</strong>
+                                    <span class="dp float-end">Rp 500.000</span>
+                                </li>
+                                <li>
+                                    <strong>Pembayaran di Tempat:</strong>
+                                    <span class="pembayaran-di-tempat float-end">Rp 1.000.000</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <!-- Tombol Batalkan Pesanan -->
+                        <button class="btn-batalkan-pesanan" id="batalkan-pesanan" onclick="batalkanPesanan()">
+                            <span id="batalkanPesananSpinner" class="spinner-border spinner-border-sm me-2 d-none" role="status" aria-hidden="true"></span>
+                            <span id="batalkanPesananText">Batalkan Pesanan</span>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -501,6 +594,88 @@
             </div>
         </div>
     </div>
-</div>
+    <!-- Toast Konfirmasi -->
+    <div id="konfirmasiToast" class="toast text-bg-dark border-0 shadow-lg" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header bg-warning text-dark">
+            <strong class="me-auto">Konfirmasi Pembatalan</strong>
+            <small>Perhatian</small>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body">
+            <p class="mb-2">
+                Apakah Anda yakin ingin membatalkan pesanan ini?
+                <br><strong class="text-warning">Catatan:</strong> Jika dibatalkan, DP Anda akan hangus dan tidak dikembalikan.
+            </p>
+            <div class="d-flex justify-content-end">
+                <button type="button" class="btn btn-sm btn-light me-2" id="confirmYes">Ya, batalkan</button>
+                <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="toast">Batal</button>
+            </div>
+        </div>
+    </div>
 
+    <!-- Container untuk toast pesan umum (success/error/info) -->
+    <div id="toastContainer" class="toast-container position-fixed top-0 end-0 p-3"></div>
+
+
+</div>
+<!-- Script QR Code -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+    // Koordinat atau URL yang mau dipakai untuk QR Code
+    const mapURL = "https://maps.google.com/?q=-7.250445,112.768845";
+
+    // Generate QR code
+    const qrcode = new QRCode(document.getElementById("qrcode"), {
+        text: mapURL,
+        width: 150,
+        height: 150,
+        colorDark: "#000000",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.H
+    });
+
+    // Tombol manual buka link
+    document.getElementById('manualLocationButton').addEventListener('click', function() {
+        window.open(mapURL, '_blank');
+    });
+
+    function scrollToCancelButton() {
+        const cancelButton = document.getElementById('batalkan-pesanan');
+        if (cancelButton) {
+            cancelButton.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    }
+
+    function setApprovalStatus(status) {
+        const loading = document.getElementById('statusApproval');
+        const accepted = document.getElementById('approvalAccepted');
+        const rejected = document.getElementById('approvalRejected');
+
+        const acceptedIcon = accepted.querySelector('i');
+        const rejectedIcon = rejected.querySelector('i');
+
+        // Reset animasi
+        acceptedIcon.classList.remove('show-animation');
+        rejectedIcon.classList.remove('show-animation');
+        // Reset semua kondisi
+        loading.classList.add('d-none');
+        accepted.classList.add('d-none');
+        rejected.classList.add('d-none');
+
+        if (status === 'loading') {
+            loading.classList.remove('d-none');
+        } else if (status === 'accepted') {
+            accepted.classList.remove('d-none');
+            // Trigger animasi sekali jalan
+            setTimeout(() => {
+                acceptedIcon.classList.add('show-animation');
+            }, 10);
+        } else if (status === 'rejected') {
+            rejected.classList.remove('d-none');
+            setTimeout(() => {
+                rejectedIcon.classList.add('show-animation');
+            }, 10);
+        }
+    }
+</script>
 </html>

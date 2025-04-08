@@ -629,17 +629,284 @@ td {
     }
 }
 
-.waiting-approval {
-    text-align: center;
+.step4 {
     padding: 30px;
     border-radius: 20px;
     background-color: #fff;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
 }
 
+/* Container utama detail order */
+.detail-order {
+    margin-top: 35px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08);
+    animation: fadeInUp 0.8s ease forwards;
+    transform: translateY(20px);
+    opacity: 0;
+    transition: all 0.4s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Animasi masuk */
+@keyframes fadeInUp {
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Judul */
+.detail-order h5 {
+    font-size: 1.4rem;
+    margin-bottom: 20px;
+    color: #2c3e50;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 2px solid #e1e8ed;
+    padding-bottom: 10px;
+}
+
+.detail-order ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.detail-order li {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+.detail-order strong {
+    font-weight: 600;
+    color: #333;
+}
+
+.detail-order .float-end {
+    text-align: right;
+    flex-shrink: 0;
+    margin-left: 16px;
+    white-space: nowrap;
+    color: #555;
+}
+
+.detail-order span {
+    text-align: right;
+    min-width: 150px;
+    /* Biar stabil rata kanan */
+}
+
+/* Responsive adjustments */
+
+/* Mobile (max-width: 480px) */
+@media (max-width: 480px) {
+    .detail-order {
+        padding: 15px;
+    }
+
+    .detail-order h5 {
+        font-size: 1.1rem;
+    }
+
+    .detail-order li {
+        flex-direction: column;
+        align-items: flex-start;
+        font-size: 13px;
+    }
+
+    .detail-order .float-end,
+    .detail-order span {
+        text-align: left;
+        min-width: auto;
+        margin-left: 0;
+        margin-top: 4px;
+    }
+}
+
+/* Tablet (481px - 768px) */
+@media (min-width: 481px) and (max-width: 768px) {
+    .detail-order {
+        padding: 18px;
+    }
+
+    .detail-order h5 {
+        font-size: 1.2rem;
+    }
+
+    .detail-order li {
+        font-size: 13.5px;
+    }
+}
+
+/* Desktop (768px ke atas, opsional tweak) */
+@media (min-width: 769px) {
+    .detail-order li {
+        font-size: 14px;
+    }
+}
+
+/* Hover efek */
+.detail-order ul li:hover {
+    background-color: rgba(0, 123, 255, 0.05);
+    border-radius: 8px;
+    padding: 5px 8px;
+    cursor: default;
+}
+
+.btn-batalkan-pesanan {
+    margin-top: 20px;
+    padding: 10px 20px;
+    background-color: #e74c3c;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+    width: 100%;
+}
+
+.btn-batalkan-pesanan:hover {
+    background-color: #c0392b;
+}
+
+.waiting-approval {
+    text-align: center;
+}
+
 .waiting-approval h5 {
     font-size: 1.5rem;
     margin-bottom: 10px;
+}
+
+/* Icon Sukses dan Error */
+.icon {
+    font-size: 60px;
+}
+
+/* Pulse sekali (untuk diterima) */
+@keyframes pulse-once {
+    0% {
+        transform: scale(0.8);
+        opacity: 0;
+    }
+
+    50% {
+        transform: scale(1.2);
+        opacity: 1;
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.icon-success i.show-animation {
+    color: green;
+    animation: pulse-once 0.6s ease;
+    transform-origin: center;
+}
+
+/* Shake sekali (untuk ditolak) */
+@keyframes shake-once {
+    0% {
+        transform: translateX(0);
+    }
+
+    20% {
+        transform: translateX(-8px);
+    }
+
+    40% {
+        transform: translateX(8px);
+    }
+
+    60% {
+        transform: translateX(-5px);
+    }
+
+    80% {
+        transform: translateX(5px);
+    }
+
+    100% {
+        transform: translateX(0);
+    }
+}
+
+.icon-error i.show-animation {
+    color: red;
+    animation: shake-once 0.5s ease;
+    transform-origin: center;
+}
+
+#konfirmasiToast {
+    position: fixed;
+    bottom: 30px;
+    /* Lebih naik dari bawah */
+    right: 30px;
+    /* Pindah ke kanan bawah */
+    z-index: 1080;
+    /* Lebih tinggi dari modal backdrop */
+    width: 320px;
+    max-width: 90%;
+    border-radius: 10px;
+}
+
+/* Responsif untuk mobile biar tetep nyaman */
+@media (max-width: 576px) {
+    #konfirmasiToast {
+        right: 50%;
+        left: auto;
+        transform: translateX(50%);
+        bottom: 20px;
+        width: 90%;
+        /* Lebarkan toast biar gak terlalu pipih */
+        max-width: 400px;
+        /* Biar kalau layarnya lebih besar, tetap terkontrol */
+    }
+}
+
+#toastContainer {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: 1055 !important;
+    /* Lebih tinggi dari modal backdrop (1055) */
+}
+
+.btn-batalkan-pesanan:disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
+    /* opsional biar lebih jelas kalau disable */
+}
+
+.btn-batalkan-pesanan {
+    transition: opacity 0.3s ease, cursor 0.3s ease;
+}
+
+.scroll-guide-animation {
+    animation: bounce 1.5s infinite;
+    color: #6c757d;
+    margin-top: 10px;
+}
+
+@keyframes bounce {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(10px);
+    }
 }
 
 .btn-primary {
@@ -652,84 +919,6 @@ td {
 .btn-primary:hover {
     transform: translateY(-3px);
     box-shadow: 0 5px 15px rgba(0, 123, 255, 0.4);
-}
-
-/* Transaksi Sukses (Seperti sebelumnya) */
-@keyframes fadeSlideUp {
-    0% {
-        opacity: 0;
-        transform: translateY(30px);
-    }
-
-    100% {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.order-summary {
-    background: #fff;
-    border-radius: 20px;
-    padding: 30px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-    text-align: center;
-    animation: fadeSlideUp 0.8s ease-out forwards;
-    opacity: 0;
-}
-
-.order-summary.animate {
-    opacity: 1;
-}
-
-.order-summary h5 {
-    font-size: 1.8rem;
-    color: #28a745;
-    margin-bottom: 15px;
-}
-
-.order-details {
-    text-align: left;
-    margin-top: 20px;
-    padding: 20px;
-    background-color: #f9f9f9;
-    border-radius: 15px;
-    animation: fadeSlideUp 1s ease-out 0.5s forwards;
-    opacity: 0;
-}
-
-.checkmark-container {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 20px;
-}
-
-.checkmark {
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-    background-color: #28a745;
-    color: rgb(255, 255, 255) !important;
-    font-size: 50px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    animation: popCheck 0.5s ease-out forwards;
-}
-
-@keyframes popCheck {
-    0% {
-        transform: scale(0);
-        opacity: 0;
-    }
-
-    80% {
-        transform: scale(1.1);
-        opacity: 1;
-    }
-
-    100% {
-        transform: scale(1);
-    }
 }
 
 .step-label {

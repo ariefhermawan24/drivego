@@ -3,7 +3,8 @@ import { ref, onValue } from "https://www.gstatic.com/firebasejs/9.17.1/firebase
 
 // Referensi ke database
 const mobilRef = ref(database, "mobil");
-const garasiRef = ref(database, "garasi");const usersRef = ref(database, "users");
+const garasiRef = ref(database, "garasi");
+const usersRef = ref(database, "users");
 
 onValue(mobilRef, (snapshot) => {
     const data = snapshot.val();
