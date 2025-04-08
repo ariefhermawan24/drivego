@@ -1104,24 +1104,47 @@ onValue(garasiRef, (snapshot) => {
 
 
 
+// Throttle function
+function throttle(func, limit) {
+    let lastFunc;
+    let lastRan;
+    return function() {
+        const context = this;
+        const args = arguments;
+        if (!lastRan) {
+            func.apply(context, args);
+            lastRan = Date.now();
+        } else {
+            clearTimeout(lastFunc);
+            lastFunc = setTimeout(function() {
+                if ((Date.now() - lastRan) >= limit) {
+                    func.apply(context, args);
+                    lastRan = Date.now();
+                }
+            }, limit - (Date.now() - lastRan));
+        }
+    };
+}
+
 // Ambil semua link navbar
 const navLinks = document.querySelectorAll('.text-nav');
 
 // Fungsi untuk memperbarui status aktif
 const updateActiveNav = () => {
-    let currentSection = "home"; // Set nilai awal ke "home"
+    let currentSection = "home";
 
-    // Ambil semua section dengan ID
     document.querySelectorAll('section').forEach((section) => {
         const sectionTop = section.offsetTop;
         const sectionHeight = section.clientHeight;
+        const scrollPosition = window.pageYOffset;
+        const windowHeight = window.innerHeight;
 
-        if (window.pageYOffset >= sectionTop - sectionHeight / 3) {
+        // Optimasi: gunakan windowHeight untuk deteksi lebih stabil
+        if (scrollPosition >= sectionTop - windowHeight / 3) {
             currentSection = section.getAttribute('id');
         }
     });
 
-    // Hapus dan tambahkan class 'active' pada link yang sesuai
     navLinks.forEach((link) => {
         link.classList.remove('active');
         if (link.getAttribute('href').includes(currentSection)) {
@@ -1130,11 +1153,11 @@ const updateActiveNav = () => {
     });
 };
 
-// Jalankan fungsi saat halaman pertama kali dimuat
+// Panggil saat load
 updateActiveNav();
 
-// Tambahkan event listener pada scroll
-window.addEventListener('scroll', updateActiveNav);
+// Pasang event listener dengan throttle + passive untuk performa mobile
+window.addEventListener('scroll', throttle(updateActiveNav, 200), { passive: true });
 
 document.addEventListener("DOMContentLoaded", function () {
     const toggler = document.querySelector(".navbar-toggler");

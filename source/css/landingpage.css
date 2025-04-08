@@ -103,10 +103,8 @@ button[type="submit"] {
         min-height: 100vh;
     }
 
-    .service-item {
-        flex: 1 1 30%;
-        /* 3 kolom pada tablet */
-        max-width: 30% !important;
+    .fix-bug-service {
+        margin-bottom: 100px !important;
     }
 
     .mobile-login {
@@ -148,8 +146,6 @@ button[type="submit"] {
         padding: 10px 20px;
         /* Padding untuk ukuran tombol */
     }
-
-
 
     .mobile-login {
         width: 100%;
