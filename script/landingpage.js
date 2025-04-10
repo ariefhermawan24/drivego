@@ -977,9 +977,11 @@ function generateQRCode(token) {
     const formData = JSON.parse(localStorage.getItem("formProgress")) || {};
     const orderId = formData.orderId;
     const jenisSewa = formData.jenisSewa;
+
     // Gunakan origin supaya QR code dapat URL lengkap
     const baseURL = window.location.origin;
-    const mapURL = `${baseURL}/detail-pemesanan/?orderID=${orderId}&jenisSewa=${jenisSewa}&token=${token}`;
+    const mapURL = `${baseURL}/drivego/detail-pemesanan/?orderID=${orderId}&jenisSewa=${jenisSewa}&token=${token}`;
+
     const qrContainer = document.getElementById("qrcode");
 
     // Bersihkan QR container dulu
@@ -1005,6 +1007,7 @@ function generateQRCode(token) {
         window.open(mapURL, '_blank');
     });
 }
+
 
 // Fungsi untuk generate token random
 function generateRandomToken(length = 16) {

@@ -26,69 +26,89 @@
         }
 
         .header {
+            width: 100%;
+            padding: 15px 0;
+            display: flex;
+            flex-direction: column; /* ini yang bikin turun ke bawah */
+            justify-content: center;
+            align-items: center;
             text-align: center;
-            border-bottom: 2px solid #eee;
-            padding-bottom: 20px;
-            margin-bottom: 25px;
         }
 
-        .header h1 {
-            color: #2c3e50;
-            margin: 0;
-        }
-
-        .header p {
-            color: #7f8c8d;
-            margin: 5px 0;
+        .header .logo {
+            max-width: 150px; /* atau kamu bisa sesuaikan 120px - 200px */
+            height: auto;
         }
 
         .ticket-info {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
-            margin-bottom: 25px;
+            display: flex;
+            flex-wrap: wrap; /* Biar responsif */
+            justify-content: center;
+            gap: 5px; /* Jarak antar section */
+            margin-top: -20px;
         }
 
         .info-section {
-            padding: 15px;
-            background-color: #f8f9fa;
+            flex: 1 1 250px; /* Minimal lebar 250px, supaya responsif */
             border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
 
         .info-section h3 {
-            color: #3498db;
-            margin-top: 0;
-            font-size: 16px;
+            margin-bottom: 15px;
+            color: #d25f0c;
         }
 
         .info-item {
-            margin: 10px 0;
+            margin-bottom: 10px;
         }
 
         .info-item label {
             display: block;
-            color: #7f8c8d;
-            font-size: 14px;
+            font-weight: bold;
+            color: #555;
         }
 
         .info-item span {
             display: block;
-            font-weight: bold;
-            color: #2c3e50;
-            margin-top: 5px;
+            color: #777;
+        }
+
+        .driver-columns {
+            display: flex;
+            gap: 40px; /* Jarak antara kiri dan kanan */
+        }
+
+        .left-column,
+        .right-column {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+
+        .right-column {
+            margin-left: -30px;
+        }
+
+        .driver-headers {
+            display: flex;
+            gap: 40px; /* Jarak antara kiri dan kanan */
+        }
+
+        .driver-headers h3 {
+            flex: 1;
+        }
+
+        .d-right {
+            margin-left: -30px;
         }
 
         .qr-code {
-            text-align: center;
-            padding: 20px;
-            border-top: 2px solid #eee;
-            margin-top: 25px;
+            margin-left: 40px!important;;
         }
-
         .qr-code img {
             width: 150px;
             height: 150px;
-            margin: 15px;
         }
 
         .print-btn {
@@ -124,6 +144,7 @@
             display: inline-block;
             margin-top: 15px;
             transition: background-color 0.3s;
+            margin-left: -20px !important;
         }
 
         .maps-button:hover {
@@ -134,9 +155,10 @@
 <body>
     <div class="ticket-container">
         <div class="header">
-            <h1>RENTAL MOBIL XYZ</h1>
-            <p>Jl. Contoh No. 123, Kota Contoh</p>
-            <p>Telp: 0812-3456-7890 | Email: rental@example.com</p>
+            <img src="../drivers/source/image/dashboard-logo.png" alt="Logo" class="logo">
+            <div class="ticket-title">
+                <p class="subtitle">Tunjukkan e-ticket ini sebagai bukti saat pengambilan mobil</p>
+            </div>
         </div>
 
         <div class="ticket-info">
@@ -151,8 +173,8 @@
                     <span>0812-3456-7890</span>
                 </div>
                 <div class="info-item">
-                    <label>Email</label>
-                    <span>john@example.com</span>
+                    <label>Lokasi Penjemputan</label>
+                    <span>Bandara</span>
                 </div>
             </div>
 
@@ -191,59 +213,91 @@
             <div class="info-section">
                 <h3>Status Pembayaran</h3>
                 <div class="info-item">
-                    <label>Total Pembayaran</label>
+                    <label>pembayaran dp</label>
                     <span>Rp 1.500.000</span>
                 </div>
                 <div class="info-item">
                     <label>Status</label>
                     <span style="color: #27ae60;">Lunas</span>
                 </div>
+                <div class="info-item">
+                    <label>Pembayaran di Tempat</label>
+                    <span>Rp 1.500.000</span>
+                    <small>Bayar saat penjemputan oleh supir</small>
+                </div>
             </div>
 
-            <!-- Opsi Dengan Supir -->
-            <div class="info-section driver-option" style="display: none;">
-                <h3>Detail Supir</h3>
-                <div class="info-item">
-                    <label>Nama Supir</label>
-                    <span>Budi Santoso</span>
+            <div class="info-section driver-option">
+                <div class="driver-headers">
+                    <h3>Detail Supir</h3>
+                    <h3 class="d-right">Lokasi Tujuan</h3>
                 </div>
-                <div class="info-item">
-                    <label>Kontak Supir</label>
-                    <span>0813-9876-5432</span>
-                </div>
-                <div class="info-item">
-                    <label>Catatan</label>
-                    <span>Supir akan menjemput pukul 08.00 WIB</span>
+                <div class="driver-columns">
+                    <!-- Kolom Kiri -->
+                    <div class="left-column">
+                        <div class="info-item">
+                            <label>Nama Supir</label>
+                            <span>Budi Santoso</span>
+                        </div>
+                        <div class="info-item">
+                            <label>Kontak Supir</label>
+                            <span>0813-9876-5432</span>
+                        </div>
+                        <div class="info-item">
+                            <label>Jam Penjemputan</label>
+                            <span>Pukul 08.00 WIB</span>
+                            <small>Harap sudah siap sebelum jam ini</small>
+                        </div>
+                    </div>
+
+                    <!-- Kolom Kanan -->
+                    <div class="right-column">
+                        <div class="info-item">
+                            <label>Tujuan Anda:</label>
+                            <span>B 1234 CD</span>
+                        </div>
+                    </div>
                 </div>
             </div>
 
             <!-- Opsi Lepas Kunci -->
             <div class="info-section self-drive-option" style="display: none;">
-                <h3>Detail Lepas Kunci</h3>
-                <div class="info-item">
-                    <label>Persyaratan</label>
-                    <span>Fotokopi KTP & SIM A</span>
+                <div class="driver-headers">
+                    <h3>Detail Supir</h3>
+                    <h3 class="d-right">Lokasi pengambilan Mobil</h3>
                 </div>
-                <div class="info-item">
-                    <label>Deposit</label>
-                    <span>Rp 500.000</span>
-                </div>
-                <div class="info-item">
-                    <label>Catatan</label>
-                    <span>Deposit akan dikembalikan setelah masa sewa selesai</span>
+                <div class="driver-columns">
+                    <!-- Kolom Kiri -->
+                    <div class="left-column">
+                        <h3>Detail Lepas Kunci</h3>
+                        <div class="info-item">
+                            <label>Persyaratan</label>
+                            <span>Fotokopi KTP & SIM A</span>
+                        </div>
+                        <div class="info-item">
+                            <label>Deposit</label>
+                            <span>Rp 500.000</span>
+                        </div>
+                        <div class="info-item">
+                            <label>Catatan</label>
+                            <span>Deposit akan dikembalikan setelah masa sewa selesai</span>
+                        </div>
+                    </div>
+
+                    <!-- Kolom Kanan -->
+                    <div class="right-column">
+                       <!-- Ubah bagian QR code menjadi: -->
+                        <div class="qr-code">
+                            <div id="qrcode"></div>
+                            <a href="#" id="mapsLink" class="maps-button" target="_blank">
+                                Buka di Google Maps
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-        <!-- Ubah bagian QR code menjadi: -->
-        <div class="qr-code">
-            <h3>Lokasi Pengambilan Mobil</h3>
-            <div id="qrcode"></div>
-            <a href="#" id="mapsLink" class="maps-button" target="_blank">
-                Buka di Google Maps
-            </a>
-            <p>Kode Booking: XYZ123456</p>
-        </div>
-
+        <p>Kode Booking: XYZ123456</p>
         <button class="print-btn" onclick="window.print()">Cetak Tiket</button>
     </div>
 </body>
