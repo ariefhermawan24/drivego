@@ -392,16 +392,20 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
-    function addTujuanInput(value = "", index = 2) {
-        console.log("📌 addTujuanInput() dipanggil dengan:", value, index);
+    function addTujuanInput(value = "") {
+        console.log("📌 addTujuanInput() dipanggil dengan:", value);
 
         const lokasiTujuanContainer = document.getElementById("lokasiTujuanContainer");
         if (!lokasiTujuanContainer) return;
 
+        // 🟢 Hitung jumlah input yang sudah ada
+        const existingInputs = lokasiTujuanContainer.querySelectorAll("input[name='lokasiTujuan[]']");
+        const index = existingInputs.length + 1;
+
         const inputGroup = document.createElement("div");
         inputGroup.classList.add("input-group", "mb-2");
 
-        const newId = `tujuan-${index}`; // 🟢 Pastikan ID mulai dari tujuan-2
+        const newId = `tujuan-${index}`; // Dinamis sesuai jumlah input
 
         const inputField = document.createElement("input");
         inputField.type = "text";
@@ -410,7 +414,7 @@ document.addEventListener("DOMContentLoaded", function() {
         inputField.placeholder = `Tujuan ${index}`;
         inputField.required = true;
         inputField.value = value;
-        inputField.id = newId; // 🟢 ID dimulai dari tujuan-2
+        inputField.id = newId;
 
         inputField.addEventListener("input", saveProgress);
 
@@ -424,7 +428,7 @@ document.addEventListener("DOMContentLoaded", function() {
         removeButton.addEventListener("click", function () {
             inputGroup.remove();
             saveProgress();
-            updatePlaceholders();
+            updatePlaceholders(); // ✅ Supaya setelah hapus, nomor & ID rapih
         });
 
         const buttonWrapper = document.createElement("div");
@@ -596,6 +600,7 @@ async function simpanKeFirebase() {
         let status = "pending";
         let tarifSupir = 150000 * hariSewa;
         // ✅ Ambil dari formData, bukan dari localStorage langsung
+        let kompensasi = 200000;
         let jenisSewa = formData.jenisSewa;
         console.log("Jenis Sewa dari formData:", jenisSewa);
 
@@ -630,6 +635,13 @@ async function simpanKeFirebase() {
             formData.tarifSupir = tarifSupir;
         } else {
             formData.tarifSupir = 0;
+        }
+
+        // ✅ Pastikan ini ada!
+        if (jenisSewa === "lepasKunci") {
+            formData.kompensasi = kompensasi;
+        } else {
+            formData.kompensasi = 0;
         }
     }
 
@@ -732,6 +744,10 @@ async function simpanKeFirebase() {
         batalkanPesananButton.disabled = false;
         batalkanPesananSpinner.classList.add('d-none');
         batalkanPesananText.textContent = "Batalkan Pesanan";
+        // 🔄 Tambahkan delay 2 detik sebelum reload
+        setTimeout(() => {
+            location.reload();
+        }, 2000);
     }
 }
 
@@ -767,6 +783,8 @@ function updateMobilStatus(namaMobil) {
 function updateStep4Details() {
     const formData = JSON.parse(localStorage.getItem("formProgress")) || {};
     console.log('Data localStorage saat updateStep4Details:', formData);
+    const jenisewa = formData.jenisSewa;
+    console.log(jenisewa);
     
     document.querySelector('.order-id').textContent = formData.orderId || "-";
     document.querySelector('.jenis-sewa').textContent = formData.jenisSewa || "Harian";
@@ -780,17 +798,49 @@ function updateStep4Details() {
     document.querySelector('.dp').textContent = `Rp ${formData.pembayaranDP?.toLocaleString() || "0"}`;
     document.querySelector('.pembayaran-di-tempat').textContent = `Rp ${formData.pembayaranDiTempat?.toLocaleString() || "0"}`;
 
-    // Tambahan untuk tarifSupir, pastikan dalam .detail-order ul
-    if (formData.tarifSupir && formData.tarifSupir > 0) {
-        const detailOrderList = document.querySelector('.detail-order ul');
-        if (detailOrderList) {
-            const li = document.createElement('li');
-            li.innerHTML = `
-                <strong>Tarif Supir:</strong>
-                <span class="tarif-supir float-end">Rp ${formData.tarifSupir.toLocaleString()}</span>
-            `;
-            detailOrderList.appendChild(li);
+    function appendDetail(label, value, className) {
+        const li = document.createElement('li');
+        li.innerHTML = `
+            <strong>${label}:</strong>
+            <span class="${className} float-end">Rp ${value.toLocaleString()}</span>
+        `;
+        detailOrderList.appendChild(li);
+    }
+
+    const detailOrderList = document.querySelector('.detail-order ul');
+
+    if (detailOrderList) {
+        if (formData.tarifSupir > 0) {
+            appendDetail('Tarif Supir', formData.tarifSupir, 'tarif-supir');
+        } else if (formData.kompensasi > 0) {
+            appendDetail('Kompensasi', formData.kompensasi, 'kompensasi');
         }
+    }
+
+    // 🔥 Tambahkan bagian khusus untuk gabungan tujuan
+    if (jenisewa === "denganSupir") {
+        // Gabungkan semua lokasi dari array dan individual tujuan-x
+        let tujuanArray = formData.lokasiTujuan || [];
+
+        // Cari semua key yang diawali dengan "tujuan-"
+        Object.keys(formData).forEach(key => {
+            if (key.startsWith("tujuan-") && formData[key]) {
+                tujuanArray.push(formData[key]);
+            }
+        });
+
+        // Hapus duplikat dan kosong
+        const tujuanUnik = [...new Set(tujuanArray.filter(Boolean))];
+
+        // Buat elemen list
+        const li = document.createElement('li');
+        li.innerHTML = `
+            <strong>Lokasi Tujuan:</strong>
+            <ul>
+                ${tujuanUnik.map(tujuan => `<li>• ${tujuan}</li>`).join('')}
+            </ul>
+        `;
+        detailOrderList.appendChild(li);
     }
 }
 
@@ -922,7 +972,6 @@ function listenToken(tokenRef) {
     onValue(tokenRef, (snapshot) => {
         const token = snapshot.val();
         if (token) {
-            console.log('Token listener triggered:', token);
             generateQRCode(token);
         }
     });
