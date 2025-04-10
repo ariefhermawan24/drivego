@@ -977,7 +977,9 @@ function generateQRCode(token) {
     const formData = JSON.parse(localStorage.getItem("formProgress")) || {};
     const orderId = formData.orderId;
     const jenisSewa = formData.jenisSewa;
-    const mapURL = `./detail-pemesanan/?orderID=${orderId}&jenisSewa=${jenisSewa}&token=${token}`;
+    // Gunakan origin supaya QR code dapat URL lengkap
+    const baseURL = window.location.origin;
+    const mapURL = `${baseURL}/detail-pemesanan/?orderID=${orderId}&jenisSewa=${jenisSewa}&token=${token}`;
     const qrContainer = document.getElementById("qrcode");
 
     // Bersihkan QR container dulu
