@@ -171,20 +171,69 @@
                     <span>Toyota Avanza</span>
                 </div>
             </div>
-        </div>
 
-        <div class="info-section">
-            <h3>Status Pembayaran</h3>
-            <div class="info-item">
-                <label>Total Pembayaran</label>
-                <span>Rp 1.500.000</span>
+            <div class="info-section">
+                <h3>Detail Pembayaran</h3>
+                <div class="info-item">
+                    <label>Harga per Hari</label>
+                    <span>Rp 350.000</span>
+                </div>
+                <div class="info-item">
+                    <label>Total Harga</label>
+                    <span>Rp 1.050.000</span>
+                </div>
+                <div class="info-item">
+                    <label>Metode Pembayaran</label>
+                    <span>Transfer Bank</span>
+                </div>
             </div>
-            <div class="info-item">
-                <label>Status</label>
-                <span style="color: #27ae60;">Lunas</span>
+
+            <div class="info-section">
+                <h3>Status Pembayaran</h3>
+                <div class="info-item">
+                    <label>Total Pembayaran</label>
+                    <span>Rp 1.500.000</span>
+                </div>
+                <div class="info-item">
+                    <label>Status</label>
+                    <span style="color: #27ae60;">Lunas</span>
+                </div>
+            </div>
+
+            <!-- Opsi Dengan Supir -->
+            <div class="info-section driver-option" style="display: none;">
+                <h3>Detail Supir</h3>
+                <div class="info-item">
+                    <label>Nama Supir</label>
+                    <span>Budi Santoso</span>
+                </div>
+                <div class="info-item">
+                    <label>Kontak Supir</label>
+                    <span>0813-9876-5432</span>
+                </div>
+                <div class="info-item">
+                    <label>Catatan</label>
+                    <span>Supir akan menjemput pukul 08.00 WIB</span>
+                </div>
+            </div>
+
+            <!-- Opsi Lepas Kunci -->
+            <div class="info-section self-drive-option" style="display: none;">
+                <h3>Detail Lepas Kunci</h3>
+                <div class="info-item">
+                    <label>Persyaratan</label>
+                    <span>Fotokopi KTP & SIM A</span>
+                </div>
+                <div class="info-item">
+                    <label>Deposit</label>
+                    <span>Rp 500.000</span>
+                </div>
+                <div class="info-item">
+                    <label>Catatan</label>
+                    <span>Deposit akan dikembalikan setelah masa sewa selesai</span>
+                </div>
             </div>
         </div>
-
         <!-- Ubah bagian QR code menjadi: -->
         <div class="qr-code">
             <h3>Lokasi Pengambilan Mobil</h3>
@@ -200,6 +249,27 @@
 </body>
 
 <script>
+    const params = new URLSearchParams(window.location.search);
+
+    const orderId = params.get('orderID');
+    const jenisSewa = params.get('jenisSewa');
+    const token = params.get('token');
+
+    // Atur tampilan berdasarkan jenis sewa
+    if (jenisSewa === 'denganSupir') {
+        document.querySelector('.driver-option').style.display = 'block';
+        document.querySelector('.self-drive-option').style.display = 'none';
+    } else if (jenisSewa === 'lepasKunci') {
+        document.querySelector('.driver-option').style.display = 'none';
+        document.querySelector('.self-drive-option').style.display = 'block';
+    } else {
+        // Jika tidak terdefinisi, bisa kasih default atau sembunyikan dua-duanya
+        document.querySelector('.driver-option').style.display = 'none';
+        document.querySelector('.self-drive-option').style.display = 'none';
+    }
+
+    console.log(orderId, jenisSewa, token);
+    // Output: { orderId: "12345", jenisSewa: "bulanan", token: "abcde123" }
     // Koordinat garasi (ganti dengan koordinat sebenarnya)
         const garageCoordinates = "-6.175392,106.827153";
         
@@ -218,5 +288,8 @@
 
         // Set link maps
         document.getElementById('mapsLink').href = mapsUrl;
+
+        const formData = JSON.parse(localStorage.getItem("formProgress")) || {};
+        console.log(formData);
 </script>
 </html>

@@ -329,9 +329,11 @@ document.addEventListener("DOMContentLoaded", function() {
         console.log("🔄 Data dimuat, Current Step:", currentStep);
 
         updateProgress();
-        showStep(currentStep);
+            showStep(currentStep);
+        
+        }
+    
     }
-}
 
     // ✅ Simpan data setiap input berubah
     document.querySelectorAll("input, select, textarea").forEach(input => {
@@ -585,16 +587,24 @@ async function simpanKeFirebase() {
     if (garasi) formData.garasi = garasi.textContent.trim();
     if (harga) {
         let hargaSewa = parseInt(harga.textContent.replace(/\D/g, ''), 10);
-        let hariSewa = parseInt(localStorage.getItem("hariSewa"), 10) || 1;
+        // Pastikan ini ngambil jumlah hari sewa, bukan total harga!
+        let hariSewa = parseInt(formData.hariSewa, 10); // pastikan parseInt biar aman
+        console.log("Hari Sewa:", hariSewa); // ✅ cek dulu hasilnya
         let totalHarga = hargaSewa * hariSewa;
         let pembayaranDP = totalHarga * 0.2;
         let pembayaranDiTempat = totalHarga - pembayaranDP;
+        let status = "pending";
+        let tarifSupir = 150000 * hariSewa;
+        // ✅ Ambil dari formData, bukan dari localStorage langsung
+        let jenisSewa = formData.jenisSewa;
+        console.log("Jenis Sewa dari formData:", jenisSewa);
 
         let tanggalSewaInput = document.querySelector("#tanggalSewa").value;
         let [tahun, bulan, tanggal] = tanggalSewaInput.split('-').map(Number);
+
         let tanggalSewa = new Date(tahun, bulan - 1, tanggal);
-        let tanggalAkhirSewa = new Date(tahun, bulan - 1, tanggal);
-        tanggalAkhirSewa.setDate(tanggalAkhirSewa.getDate() + hariSewa);
+        let tanggalAkhirSewa = new Date(tanggalSewa); // ✔️ buat salinan
+        tanggalAkhirSewa.setDate(tanggalSewa.getDate() + hariSewa);
 
         const formatTanggal = (tanggal) => {
             const bulan = [
@@ -608,10 +618,19 @@ async function simpanKeFirebase() {
         formData.hariSewa = hariSewa;
         formData.totalHarga = totalHarga;
         formData.pembayaranDP = pembayaranDP;
+        formData.status = status;
         formData.pembayaranDiTempat = pembayaranDiTempat;
         formData.tanggalSewa = formatTanggal(tanggalSewa);
         formData.tanggalAkhirSewa = formatTanggal(tanggalAkhirSewa);
-        formData.rangeSewa = `${formatTanggal(tanggalSewa)} - ${formatTanggal(tanggalAkhirSewa)}`;
+        formData.rangeSewa = `${formData.tanggalSewa} - ${formData.tanggalAkhirSewa}`;
+        // formData.jenisSewa = jenisSewa; // ✅ sekalian simpan jenis sewa
+
+        // ✅ Pastikan ini ada!
+        if (jenisSewa === "denganSupir") {
+            formData.tarifSupir = tarifSupir;
+        } else {
+            formData.tarifSupir = 0;
+        }
     }
 
     // 🔥 Fungsi untuk Upload Gambar ke Cloudinary
@@ -748,6 +767,7 @@ function updateMobilStatus(namaMobil) {
 function updateStep4Details() {
     const formData = JSON.parse(localStorage.getItem("formProgress")) || {};
     console.log('Data localStorage saat updateStep4Details:', formData);
+    
     document.querySelector('.order-id').textContent = formData.orderId || "-";
     document.querySelector('.jenis-sewa').textContent = formData.jenisSewa || "Harian";
     document.querySelector('.mobil-disewa').textContent = formData.namaMobil || "-";
@@ -759,6 +779,19 @@ function updateStep4Details() {
     document.querySelector('.total-harga').textContent = `Rp ${formData.totalHarga?.toLocaleString() || "0"}`;
     document.querySelector('.dp').textContent = `Rp ${formData.pembayaranDP?.toLocaleString() || "0"}`;
     document.querySelector('.pembayaran-di-tempat').textContent = `Rp ${formData.pembayaranDiTempat?.toLocaleString() || "0"}`;
+
+    // Tambahan untuk tarifSupir, pastikan dalam .detail-order ul
+    if (formData.tarifSupir && formData.tarifSupir > 0) {
+        const detailOrderList = document.querySelector('.detail-order ul');
+        if (detailOrderList) {
+            const li = document.createElement('li');
+            li.innerHTML = `
+                <strong>Tarif Supir:</strong>
+                <span class="tarif-supir float-end">Rp ${formData.tarifSupir.toLocaleString()}</span>
+            `;
+            detailOrderList.appendChild(li);
+        }
+    }
 }
 
 function batalkanPesanan() {
@@ -842,6 +875,145 @@ function processCancellation(orderId, namaMobil) {
 }
 
 window.batalkanPesanan = batalkanPesanan;
+
+// Ambil data form dari localStorage
+const formData = JSON.parse(localStorage.getItem("formProgress")) || {};
+const orderId = formData.orderId;
+
+// Pastikan orderId tersedia sebelum lanjut
+if (orderId) {
+    const transaksiRef = ref(database, 'transaksi/' + orderId);
+    const statusRef = child(transaksiRef, '/status');
+    const tokenRef = child(transaksiRef, '/token');
+
+    // Pasang listener global duluan
+    onValue(statusRef, (snapshot) => {
+        const status = snapshot.val();
+        console.log('Realtime status update:', status);
+
+        if (status) {
+            // Panggil function kamu, passing status
+            listenTransactionStatus(status, transaksiRef, tokenRef, orderId);
+        } else {
+            console.log('Status not found in database.');
+        }
+    });
+}
+
+// Function tetap ada, hanya dipanggil dari listener
+function listenTransactionStatus(status, transaksiRef, tokenRef, orderId) {
+    console.log('Function listenTransactionStatus jalan.');
+
+    // Setelah reload, buka modal
+    const transaksiModal = new bootstrap.Modal(document.getElementById('transaksiModal'));
+    transaksiModal.show();
+
+    // Update tampilan status
+    setApprovalStatus(status, transaksiRef, orderId);
+
+    if (status === 'accepted') {
+        // Pasang listener token setelah status accepted
+        listenToken(tokenRef);
+    }
+}
+
+// Listener token seperti biasa
+function listenToken(tokenRef) {
+    onValue(tokenRef, (snapshot) => {
+        const token = snapshot.val();
+        if (token) {
+            console.log('Token listener triggered:', token);
+            generateQRCode(token);
+        }
+    });
+}
+
+function setApprovalStatus(status, transaksiRef) {
+    const formData = JSON.parse(localStorage.getItem("formProgress")) || {};
+    const orderId = formData.orderId;
+    const tokenRef = ref(database, 'transaksi/' + orderId + '/token');
+
+    const loading = document.getElementById('statusApproval');
+    const accepted = document.getElementById('approvalAccepted');
+    const rejected = document.getElementById('approvalRejected');
+
+    const acceptedIcon = accepted.querySelector('i');
+    const rejectedIcon = rejected.querySelector('i');
+
+    acceptedIcon.classList.remove('show-animation');
+    rejectedIcon.classList.remove('show-animation');
+
+    loading.classList.add('d-none');
+    accepted.classList.add('d-none');
+    rejected.classList.add('d-none');
+
+    if (status === 'pending') {
+        loading.classList.remove('d-none');
+    } else if (status === 'accepted') {
+        accepted.classList.remove('d-none');
+
+        get(tokenRef).then(snapshot => {
+            if (!snapshot.exists()) {
+                const token = generateRandomToken();
+                return update(transaksiRef, { token: token });
+            }
+        }).catch(error => {
+            console.error('Error handling token:', error);
+        });
+
+        setTimeout(() => {
+            acceptedIcon.classList.add('show-animation');
+        }, 10);
+    } else if (status === 'rejected') {
+        rejected.classList.remove('d-none');
+        setTimeout(() => {
+            rejectedIcon.classList.add('show-animation');
+        }, 10);
+    }
+}
+
+// Generate QR Code dari token
+function generateQRCode(token) {
+    const formData = JSON.parse(localStorage.getItem("formProgress")) || {};
+    const orderId = formData.orderId;
+    const jenisSewa = formData.jenisSewa;
+    const mapURL = `./detail-pemesanan/?orderID=${orderId}&jenisSewa=${jenisSewa}&token=${token}`;
+    const qrContainer = document.getElementById("qrcode");
+
+    // Bersihkan QR container dulu
+    qrContainer.innerHTML = "";
+
+    // Generate QR code baru
+    new QRCode(qrContainer, {
+        text: mapURL,
+        width: 150,
+        height: 150,
+        colorDark: "#000000",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.H
+    });
+
+    // Hapus event listener lama dengan cara clone node
+    const manualButton = document.getElementById('manualLocationButton');
+    const newManualButton = manualButton.cloneNode(true);
+    manualButton.parentNode.replaceChild(newManualButton, manualButton);
+
+    // Pasang event listener baru
+    newManualButton.addEventListener('click', function () {
+        window.open(mapURL, '_blank');
+    });
+}
+
+// Fungsi untuk generate token random
+function generateRandomToken(length = 16) {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let token = '';
+    for (let i = 0; i < length; i++) {
+        token += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return token;
+}
+
 
 function showCustomToast(message, type = 'info') {
     const toastContainer = document.getElementById('toastContainer');
