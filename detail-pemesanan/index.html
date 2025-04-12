@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>E-Ticket Rental Mobil</title>
+    <title>E-Ticket Rental Mobil Drivego</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <style>
@@ -222,54 +222,54 @@
         }
 
          /* Blur background */
-    .blur-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        backdrop-filter: blur(8px);
-        background: rgba(0, 0, 0, 0.4);
-        z-index: 9998;
-    }
+        .blur-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            backdrop-filter: blur(8px);
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 9998;
+        }
 
-    /* Toast style */
-    .toast {
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background-color: #ff4d4d;
-        color: white;
-        padding: 16px 24px;
-        border-radius: 8px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-        z-index: 9999 !important;
-        font-family: sans-serif;
-        animation: fadeIn 0.5s, fadeOut 0.5s 2.5s;
-    }
+        /* Toast style */
+        .toast {
+            display: block!important;
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #ff4d4d;
+            color: white;
+            padding: 16px 24px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            z-index: 9999 !important;
+            font-family: sans-serif;
+            animation: fadeIn 0.5s, fadeOut 0.5s 2.5s;
+        }
 
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(-20px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-    @keyframes fadeOut {
-        from { opacity: 1; transform: translateY(0); }
-        to { opacity: 0; transform: translateY(-20px); }
-    }
+        @keyframes fadeOut {
+            from { opacity: 1; transform: translateY(0); }
+            to { opacity: 0; transform: translateY(-20px); }
+        }
 
-    .booking-code {
-        display: inline-block;
-        color: #333; /* Warna teks */
-        padding: 8px 16px; /* Padding biar lega */
-        border-radius: 8px; /* Rounded corner */
-        font-weight: 600; /* Sedikit tebal */
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Shadow lembut */
-        margin-top: -20px;
-        margin-bottom: 20px; /* Spacing bawah */
-        font-size: 16px; /* Ukuran teks */
-        text-align: center;
-    }
+        .booking-code {
+            display: inline-block;
+            color: #333; /* Warna teks */
+            padding: 8px 16px; /* Padding biar lega */
+            border-radius: 8px; /* Rounded corner */
+            font-weight: 600; /* Sedikit tebal */
+            margin-top: -20px;
+            margin-bottom: 20px; /* Spacing bawah */
+            font-size: 16px; /* Ukuran teks */
+            text-align: center;
+        }
 
     </style>
 </head>

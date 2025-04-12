@@ -746,14 +746,6 @@ td {
     }
 }
 
-/* Hover efek */
-.detail-order ul li:hover {
-    background-color: rgba(0, 123, 255, 0.05);
-    border-radius: 8px;
-    padding: 5px 8px;
-    cursor: default;
-}
-
 .btn-batalkan-pesanan {
     margin-top: 20px;
     padding: 10px 20px;

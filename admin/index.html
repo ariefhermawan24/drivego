@@ -27,27 +27,25 @@
             <li onclick="toggleSubmenu(this)" class="menu-induk"><i class="fas fa-user-check"></i> <span>User Validation</span><i class="fas fa-chevron-down arrow"></i></li>
             <ul class="submenu">
                 <li><i class="fas fa-info-circle"></i> <span>Rental Status</span></li>
-                <li><i class="fas fa-check"></i> <span>Rent Validation</span></li>
+                <li><i class="fas fa-check"></i> <span>Request Validation</span></li>
                 <li><i class="fas fa-check-circle"></i> <span>Rent Accepted</span></li>
                 <li><i class="fas fa-times-circle"></i> <span>Rent Rejected</span></li>
             </ul>
             <div class="divider"></div>
             <li onclick="toggleSubmenu(this)" class="menu-induk"><i class="fas fa-car"></i> <span>Manage Car</span><i class="fas fa-chevron-down arrow"></i></li>
             <ul class="submenu">
-                <li><i class="fas fa-car"></i> <span>Car Status</span></li>
                 <li data-page="datamobil"><i class="fas fa-list"></i> <span>Car Detail</span></li>
-                <li><i class="fas fa-image"></i> <span>Car Photo</span></li>
+                <li data-page="imagemobil"><i class="fas fa-image"></i> <span>Car Photo</span></li>
             </ul>
             <div class="divider"></div>
             <li onclick="toggleSubmenu(this)" class="menu-induk"><i class="fas fa-tools"></i> <span>Manage Garage</span><i class="fas fa-chevron-down arrow"></i></li>
             <ul class="submenu">
-                <li><i class="fas fa-warehouse"></i> <span>Garage Detail</span></li>
+                <li data-page="datagarasi"><i class="fas fa-warehouse"></i><span>Garage Detail</span></li>
             </ul>
             <div class="divider"></div>
             <li onclick="toggleSubmenu(this)" class="menu-induk"><i class="fas fa-id-badge"></i> <span>Manage Drivers</span><i class="fas fa-chevron-down arrow"></i></li>
             <ul class="submenu">
-                <li><i class="fas fa-user-check"></i> <span>Driver Status</span></li>
-                <li><i class="fas fa-id-card"></i> <span>Driver Details</span></li>
+                <li data-page="datasupir"><i class="fas fa-id-card"></i> <span>Driver Details</span></li>
             </ul>
         </ul>
         <button class="toggle-btn-bottom" id="toggleBtnBottom" onclick="toggleSidebar()">
@@ -300,7 +298,7 @@
   </div>
 </div>
 
-    <!-- Modal Edit Mobil -->
+<!-- Modal Edit Mobil -->
 <div class="modal fade" id="modalEditMobil" tabindex="-1" aria-labelledby="modalEditMobilLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-lg">
     <div class="modal-content bg-dark text-white" style="max-height: 90vh; border: 1px solid #444;">
@@ -481,6 +479,191 @@
   </div>
 </div>
 
+<!-- Modal Edit Foto Mobil -->
+<div class="modal fade" id="modalEditFoto" tabindex="-1" aria-labelledby="modalEditFotoLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content bg-dark text-white">
+      
+      <!-- Header (tetap) -->
+      <div class="modal-header bg-dark text-white">
+        <h5 class="modal-title" id="modalEditFotoLabel">Edit Foto Mobil - <span id="nama-mobil"></span></h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      
+      <!-- Body (scrollable) -->
+      <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
+        <div class="d-flex flex-wrap justify-content-center align-items-start mb-3">
+          <!-- Preview Foto Lama -->
+          <div class="text-center me-3 mb-3">
+            <label class="form-label fw-bold">Foto Saat Ini</label><br>
+            <img id="currentFotoMobil" src="" alt="Foto Mobil Saat Ini"
+              style="width: 250px; height: 150px; border-radius: 8px; object-fit: cover;" />
+          </div>
+
+          <!-- Preview Foto Baru -->
+          <div class="text-center mb-3 preview d-none">
+            <label class="form-label fw-bold">Foto Terbaru Nanti</label><br>
+            <img id="previewFoto" src="" alt="Foto Mobil Saat Ini"
+              style="width: 250px; height: 150px; border-radius: 8px; object-fit: cover;" />
+          </div>
+        </div>
+
+        <!-- Progress bar upload Cloudinary -->
+        <div class="progress my-2" style="height: 20px; display: none;" id="progressContainerEdit">
+          <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" id="progressBarEdit" style="width: 0%;">0%</div>
+        </div>
+
+        <!-- Form Upload Foto Baru (Edit Mobil) -->
+        <div class="mb-3">
+          <label class="form-label fw-bold">Ganti Foto Mobil</label>
+
+          <div class="input-group">
+            <!-- Input readonly -->
+            <input type="text" class="form-control bg-secondary text-white border-0" placeholder="Pilih file gambar..." id="namaFileEdit" readonly>
+
+            <!-- Clear/reset button -->
+            <button type="button" class="btn btn-secondary d-none" id="resetButtonEdit" onclick="resetFileEdit()">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <!-- Browse button -->
+            <button type="button" class="btn btn-warning" onclick="document.getElementById('fotomobilEdit').click()">
+              <i class="fa-solid fa-folder-open"></i>
+            </button>
+          </div>
+
+          <!-- Hidden file input -->
+          <input type="file" id="fotomobilEdit" class="d-none" accept="image/*" required>
+
+          <!-- Preview foto baru -->
+          <div class="mt-3 text-center">
+            <img id="previewFotoBaruEdit" src="" alt="Preview Foto Baru" style="width: 250px; height: 150px; border-radius: 8px; object-fit: cover; display: none;" />
+          </div>
+
+          <div class="form-text text-warning">Maksimal ukuran gambar 1MB.</div>
+        </div>
+      </div>
+
+      <!-- Footer (tetap) -->
+      <div class="modal-footer bg-dark">
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button>
+        <button type="button" class="btn btn-warning" onclick="uploadFotoMobilEdit()" id="uploadEditFoto">Upload Foto</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Edit Garasi -->
+<div class="modal fade" id="editGarasiModal" tabindex="-1" aria-labelledby="editGarasiModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content bg-dark">
+      <div class="modal-header">
+        <h5 class="modal-title text-white" id="editGarasiModalLabel">Edit Garasi</h5>
+        <span type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></span>
+      </div>
+      <div class="modal-body">
+        <form id="editGarasiForm">
+          <div class="mb-3">
+            <label for="editNamaTempat" class="form-label text-white">Kota</label>
+            <input type="text" class="form-control text-white bg-dark" id="editNamaTempat" name="kota" placeholder="Masukkan nama kota" required>
+          </div>
+          <div class="mb-3">
+            <label for="editAlama t" class="form-label text-white">Alamat</label>
+            <input type="text" class="form-control text-white bg-dark" id="editAlamat" name="alamat" placeholder="Masukkan alamat lengkap" required>
+          </div>
+          <div class="mb-3">
+            <label for="editTelepon" class="form-label text-white">Telepon</label>
+            <input type="tel" class="form-control text-white bg-dark" id="editTelepon" name="telepon" placeholder="Masukkan nomor telepon" required>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+            <button type="submit" class="btn btn-primary">Update</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Modal Tambah Garasi with Dark Theme -->
+<div class="modal fade" id="modalTambahGarasi" tabindex="-1" aria-labelledby="modalTambahGarasiLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content bg-dark text-white">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalTambahGarasiLabel">Tambah Garasi</h5>
+        <span type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></span>
+      </div>
+      <div class="modal-body">
+        <form id="formTambahGarasi">
+          <div class="mb-3">
+            <label for="namaTempat" class="form-label">Kota</label>
+            <input type="text" class="form-control bg-dark text-white" id="namaTempat" required>
+          </div>
+          <div class="mb-3">
+            <label for="alamat" class="form-label">Alamat</label>
+            <input type="text" class="form-control bg-dark text-white" id="alamat" required>
+          </div>
+          <div class="mb-3">
+            <label for="telepon" class="form-label">Telepon</label>
+            <input type="text" class="form-control bg-dark text-white" id="telepon" required>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+        <button type="button" class="btn btn-primary" onclick="tambahGarasi()">Tambah</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Tambah Sopir -->
+<!-- Modal Tambah Sopir -->
+<div class="modal fade" id="modalTambahSopir" tabindex="-1" aria-labelledby="modalTambahSopirLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalTambahSopirLabel"><i class="fas fa-user-plus me-2"></i>Tambah Supir Baru</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="formTambahSopir">
+          <div class="mb-4">
+            <label for="namaSopir" class="form-label"><i class="fas fa-user me-2"></i>Nama</label>
+            <input type="text" class="form-control" id="namaSopir" required placeholder="Masukkan nama lengkap">
+          </div>
+          
+          <div class="mb-4">
+            <label for="teleponSopir" class="form-label"><i class="fas fa-phone me-2"></i>Nomor Telephone</label>
+            <input type="tel" class="form-control" id="teleponSopir" required placeholder="Contoh: 081234567890">
+          </div>
+          
+          <div class="mb-4">
+            <label for="emailSopir" class="form-label"><i class="fas fa-envelope me-2"></i>Email</label>
+            <input type="email" class="form-control" id="emailSopir" required placeholder="Contoh: example@mail.com">
+          </div>
+          
+          <div class="mb-4">
+            <label for="statusSopir" class="form-label"><i class="fas fa-circle-check me-2"></i>Status</label>
+            <select class="form-select" id="statusSopir" required>
+              <option value="tersedia" class="text-success">🟢 Tersedia</option>
+              <option value="tidak tersedia" class="text-danger">🔴 Tidak Tersedia</option>
+            </select>
+          </div>
+          
+          <div class="modal-footer border-top-0">
+            <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Tutup</button>
+            <button type="submit" class="btn btn-primary px-4">
+              <i class="fas fa-save me-2"></i>Simpan
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
 
     <script type="module" src="../admin/admin.js"> </script>
     <script>
@@ -636,34 +819,80 @@
         };
 
         const fotomobil = document.getElementById('fotomobil');
-const namaFileInput = document.getElementById('namaFile');
-const resetButton = document.getElementById('resetButton');
+        const namaFileInput = document.getElementById('namaFile');
+        const resetButton = document.getElementById('resetButton');
 
-fotomobil.addEventListener('change', function() {
-  const file = this.files[0];
+        fotomobil.addEventListener('change', function() {
+          const file = this.files[0];
 
-  if (file) {
-    if (file.size > 1 * 1024 * 1024) { // 1MB
-      alert('Ukuran file terlalu besar! Maksimal 1MB.');
-      this.value = '';
-      namaFileInput.value = '';
-      resetButton.classList.add('d-none');
-    } else {
-      namaFileInput.value = file.name;
-      resetButton.classList.remove('d-none');
-    }
-  } else {
-    namaFileInput.value = '';
-    resetButton.classList.add('d-none');
-  }
-});
+          if (file) {
+            if (file.size > 1 * 1024 * 1024) { // 1MB
+              alert('Ukuran file terlalu besar! Maksimal 1MB.');
+              this.value = '';
+              namaFileInput.value = '';
+              resetButton.classList.add('d-none');
+            } else {
+              namaFileInput.value = file.name;
+              resetButton.classList.remove('d-none');
+            }
+          } else {
+            namaFileInput.value = '';
+            resetButton.classList.add('d-none');
+          }
+        });
 
-function resetFile() {
-  fotomobil.value = '';
-  namaFileInput.value = '';
-  resetButton.classList.add('d-none');
-}
+        function resetFile() {
+          fotomobil.value = '';
+          namaFileInput.value = '';
+          resetButton.classList.add('d-none');
+        }
 
+        // Event saat file input berubah
+        document.getElementById('fotomobilEdit').addEventListener('change', function (event) {
+          const fileInput = event.target;
+          const file = fileInput.files[0];
+
+          if (file) {
+            // Tampilkan nama file di input readonly
+            document.getElementById('namaFileEdit').value = file.name;
+
+            // Tampilkan preview gambar baru
+            const preview = document.getElementById('previewFoto');
+            preview.src = URL.createObjectURL(file);
+
+            // Tampilkan parent div preview
+            const previewContainer = document.querySelector('.preview');
+            previewContainer.classList.remove('d-none');
+            previewContainer.style.display = 'block';
+
+            // Tampilkan tombol reset
+            document.getElementById('resetButtonEdit').classList.remove('d-none');
+          }
+        });
+
+        // Fungsi reset form file input
+        function resetFileEdit() {
+          const fileInput = document.getElementById('fotomobilEdit');
+          const preview = document.getElementById('previewFotoBaruEdit');
+          const previewContainer = document.querySelector('.preview');
+          const namaFile = document.getElementById('namaFileEdit');
+          const resetButton = document.getElementById('resetButtonEdit');
+
+          // Reset input file
+          fileInput.value = '';
+
+          // Sembunyikan preview
+          preview.src = '';
+          preview.style.display = 'none';
+
+          // Hapus nama file
+          namaFile.value = '';
+
+          // Sembunyikan tombol reset
+          resetButton.classList.add('d-none');
+
+          previewContainer.style.display = 'none';
+        }
 
     </script>
 </body>

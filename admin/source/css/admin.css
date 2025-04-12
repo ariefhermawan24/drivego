@@ -976,3 +976,73 @@ button:disabled {
         margin-bottom: 50px !important;
     }
 }
+
+/* Custom Dark Mode Styles */
+#modalTambahSopir .modal-content {
+    background: #2a3042;
+    border: 1px solid #3e4a63;
+    border-radius: 8px;
+}
+
+#modalTambahSopir .modal-header {
+    background: linear-gradient(135deg, #363f54 0%, #2a3042 100%);
+    border-bottom: 1px solid #3e4a63;
+    color: #fff;
+}
+
+#modalTambahSopir .modal-title {
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+#modalTambahSopir .btn-close {
+    filter: invert(1);
+}
+
+#modalTambahSopir .form-label {
+    color: #a6b0cf;
+    font-weight: 500;
+}
+
+#modalTambahSopir .form-control {
+    background-color: #1a1f2d;
+    border: 1px solid #3e4a63;
+    color: #fff;
+    transition: all 0.3s ease;
+}
+
+#modalTambahSopir .form-control:focus {
+    background-color: #1a1f2d;
+    border-color: #5a67d8;
+    box-shadow: 0 0 0 3px rgba(90, 103, 216, 0.2);
+    color: #fff;
+}
+
+#modalTambahSopir .form-select {
+    background-color: #1a1f2d;
+    border: 1px solid #3e4a63;
+    color: #fff;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='%23a6b0cf' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
+}
+
+#modalTambahSopir .btn-primary {
+    background: linear-gradient(135deg, #5a67d8 0%, #4c51bf 100%);
+    border: none;
+    padding: 8px 20px;
+    transition: all 0.3s ease;
+}
+
+#modalTambahSopir .btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+}
+
+#modalTambahSopir .btn-secondary {
+    background-color: #3e4a63;
+    border: none;
+    color: #fff;
+}
+
+#modalTambahSopir .btn-secondary:hover {
+    background-color: #4a5773;
+}

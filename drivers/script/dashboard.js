@@ -14,23 +14,23 @@ onValue(mobilRef, (snapshot) => {
     let totalPenyewa = 0;
 
     if (data) {
-        data.forEach((mobil, index) => {
-            if (index !== 0 && mobil) {  // Mengabaikan elemen pertama (null)
+        Object.values(data)
+            .filter(mobil => mobil !== null) // Filter null terlebih dahulu
+            .forEach((mobil) => {
                 totalMobil++;
                 if (mobil.status === "tersedia") {
                     mobilTersedia++;
                 } else if (mobil.status === "disewa") {
                     mobilTersewa++;
-                    totalPenyewa++; // Penyewa = jumlah mobil tersewa
+                    totalPenyewa++; // Asumsi 1 penyewa per mobil yang disewa
                 }
-            }
-        });
+            });
     }
 
-    // Masukkan ke dalam HTML
+    // Update semua elemen DOM
+    document.getElementById("jumlah-mobil").textContent = totalMobil;
     document.getElementById("mobil-tersedia").textContent = mobilTersedia;
     document.getElementById("mobil-tersewa").textContent = mobilTersewa;
-    document.getElementById("jumlah-mobil").textContent = totalMobil;
     document.getElementById("jumlah-penyewa").textContent = totalPenyewa;
 });
 
@@ -53,9 +53,13 @@ onValue(usersRef, (snapshot) => {
 
 // Fungsi untuk mengambil data garasi dan menghitung jumlahnya
 onValue(garasiRef, (snapshot) => {
-    const garasiData = snapshot.val();
-    let jumlahGarasi = garasiData ? garasiData.length - 1 : 0;
-    
-    // Menampilkan hasil ke elemen HTML
-    document.getElementById("jumlah-garasi").innerText = jumlahGarasi;
+  const garasiData = snapshot.val();
+  
+  let jumlahGarasi = 0;
+  
+  if (garasiData) {
+    jumlahGarasi = Object.keys(garasiData).length;
+  }
+  
+  document.getElementById("jumlah-garasi").innerText = jumlahGarasi;
 });

@@ -6,6 +6,42 @@ const mobilRef = ref(database, "mobil");
 const garasiRef = ref(database, "garasi");
 const usersRef = ref(database, "users");
 
+function countTransactions() {
+  const transaksiRef = ref(database, "transaksi");
+  
+  onValue(transaksiRef, (snapshot) => {
+    let requestRentCount = 0;
+    let lateRentCount = 0;
+
+    // Loop melalui semua transaksi
+    snapshot.forEach((childSnapshot) => {
+      const transaction = childSnapshot.val();
+      
+      // Hitung Request Rent (pending)
+      if (transaction.status === "pending") {
+        requestRentCount++;
+      }
+      
+      // Hitung Late Rent (terlambat)
+      if (transaction.status === "terlambat") {
+        lateRentCount++;
+      }
+    });
+
+    // Update tampilan
+    document.getElementById('request-rent').textContent = requestRentCount;
+    document.getElementById('late-rent').textContent = lateRentCount;
+    
+  }, (error) => {
+    console.error("Error reading data: ", error);
+    document.getElementById('request-rent').textContent = 0;
+    document.getElementById('late-rent').textContent = 0;
+  });
+}
+
+// Panggil fungsi untuk pertama kali
+countTransactions();
+
 onValue(mobilRef, (snapshot) => {
     const data = snapshot.val();
     let totalMobil = 0;
@@ -26,9 +62,6 @@ onValue(mobilRef, (snapshot) => {
                 }
             });
     }
-
-    document.getElementById("mobil-tersedia").textContent = mobilTersedia;
-    document.getElementById("mobil-tersewa").textContent = mobilTersewa;
     document.getElementById("jumlah-mobil").textContent = totalMobil;
     document.getElementById("jumlah-penyewa").textContent = totalPenyewa;
 });
@@ -51,11 +84,14 @@ onValue(usersRef, (snapshot) => {
     document.getElementById("jumlah-supir").textContent = totalSupir;
 });
 
-// Fungsi untuk mengambil data garasi dan menghitung jumlahnya
 onValue(garasiRef, (snapshot) => {
-    const garasiData = snapshot.val();
-    let jumlahGarasi = garasiData ? garasiData.length - 1 : 0;
-    
-    // Menampilkan hasil ke elemen HTML
-    document.getElementById("jumlah-garasi").innerText = jumlahGarasi;
+  const garasiData = snapshot.val();
+  
+  let jumlahGarasi = 0;
+  
+  if (garasiData) {
+    jumlahGarasi = Object.keys(garasiData).length;
+  }
+  
+  document.getElementById("jumlah-garasi").innerText = jumlahGarasi;
 });
