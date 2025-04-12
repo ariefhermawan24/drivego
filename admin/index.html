@@ -687,13 +687,13 @@
                   // Load CSS dinamis
                   const linkElement = document.createElement("link");
                   linkElement.rel = "stylesheet";
-                  linkElement.href = page === "dataSupir" ? `source/css/dengansupir.css` : `source/css/${page}.css`;
+                  linkElement.href = page === "dataSupir" ? `source/css/datasupir.css` : `source/css/${page}.css`;
                   linkElement.setAttribute("data-dynamic", "true");
                   document.head.appendChild(linkElement);
 
                   // Load JS dinamis dengan import
                   try {
-                      const modulePath = page === "dataSupir" ? `./script/dengansupir.js` : `./script/${page}.js`;
+                      const modulePath = page === "dataSupir" ? `./script/datasupir.js` : `./script/${page}.js`;
                       await import(modulePath + `?t=${Date.now()}`); // Mencegah cache
                   } catch (err) {
                       console.error(`Error loading script: ${page}.js`, err);
