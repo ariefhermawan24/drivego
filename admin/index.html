@@ -669,44 +669,46 @@
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             async function loadPage(page) {
-                const contentContainer = document.getElementById("content");
-                if (!contentContainer) return;
+              const contentContainer = document.getElementById("content");
+              if (!contentContainer) return;
 
-                try {
-                    const response = await fetch(`content/${page}.html`);
-                    if (!response.ok) throw new Error("Page not found");
-                    const html = await response.text();
-                    contentContainer.innerHTML = html;
+              try {
+                  const response = await fetch(`content/${page}.html`);
+                  if (!response.ok) throw new Error("Page not found");
+                  const html = await response.text();
+                  contentContainer.innerHTML = html;
 
-                    // Hapus script lama sebelum menambahkan yang baru
-                    document.querySelectorAll("script[data-dynamic]").forEach(script => script.remove());
+                  // Hapus script lama sebelum menambahkan yang baru
+                  document.querySelectorAll("script[data-dynamic]").forEach(script => script.remove());
 
-                    // Load CSS dinamis
-                    document.querySelectorAll("link[data-dynamic]").forEach(link => link.remove());
-                    const linkElement = document.createElement("link");
-                    linkElement.rel = "stylesheet";
-                    linkElement.href = `source/css/${page}.css`;
-                    linkElement.setAttribute("data-dynamic", "true");
-                    document.head.appendChild(linkElement);
+                  // Hapus CSS lama sebelum menambahkan yang baru
+                  document.querySelectorAll("link[data-dynamic]").forEach(link => link.remove());
 
-                    // Load JS Dinamis dengan Import
-                    try {
-                        const modulePath = `./script/${page}.js`;
-                        await import(modulePath + `?t=${Date.now()}`); // Mencegah cache
-                    } catch (err) {
-                        console.error(`Error loading script: ${page}.js`, err);
-                    }
+                  // Load CSS dinamis
+                  const linkElement = document.createElement("link");
+                  linkElement.rel = "stylesheet";
+                  linkElement.href = page === "denganSupir" ? `source/css/dengansupir.css` : `source/css/${page}.css`;
+                  linkElement.setAttribute("data-dynamic", "true");
+                  document.head.appendChild(linkElement);
 
-                } catch (error) {
-                    contentContainer.innerHTML = "<h2>Page not found</h2>";
-                }
-            }
+                  // Load JS dinamis dengan import
+                  try {
+                      const modulePath = page === "denganSupir" ? `./script/dengansupir.js` : `./script/${page}.js`;
+                      await import(modulePath + `?t=${Date.now()}`); // Mencegah cache
+                  } catch (err) {
+                      console.error(`Error loading script: ${page}.js`, err);
+                  }
 
-            // Fungsi navigasi halaman
-            function navigateTo(page) {
-                history.pushState({}, "", `?page=${page}`);
-                loadPage(page);
-            }
+              } catch (error) {
+                  contentContainer.innerHTML = "<h2>Page not found</h2>";
+              }
+          }
+
+          // Fungsi navigasi halaman
+          function navigateTo(page) {
+              history.pushState({}, "", `?page=${page}`);
+              loadPage(page);
+          }
 
             // Event listener untuk tombol dashboard (karena tidak memiliki data-page)
             document.getElementById("dashboard-btn").addEventListener("click", function () {
