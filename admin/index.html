@@ -13,6 +13,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="stylesheet" href="../admin/source/css/admin.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/medium-zoom@1.0.6/dist/medium-zoom.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/medium-zoom@1.0.6/dist/medium-zoom.min.js"></script>
 </head>
 <body>
     <div class="sidebar" id="sidebar">
@@ -26,10 +28,9 @@
             <div class="divider"></div>
             <li onclick="toggleSubmenu(this)" class="menu-induk"><i class="fas fa-user-check"></i> <span>User Validation</span><i class="fas fa-chevron-down arrow"></i></li>
             <ul class="submenu">
-                <li><i class="fas fa-info-circle"></i> <span>Rental Status</span></li>
-                <li><i class="fas fa-check"></i> <span>Request Validation</span></li>
-                <li><i class="fas fa-check-circle"></i> <span>Rent Accepted</span></li>
-                <li><i class="fas fa-times-circle"></i> <span>Rent Rejected</span></li>
+                <li data-page="datatransaksi"><i class="fas fa-info-circle"></i> <span>Rental Status</span></li>
+                <li data-page="datavalidasi"><i class="fas fa-check"></i> <span>Request Validation</span></li>
+                <li><i class="fas fa-road"></i> <span>Rent Pick Up</span></li>
             </ul>
             <div class="divider"></div>
             <li onclick="toggleSubmenu(this)" class="menu-induk"><i class="fas fa-car"></i> <span>Manage Car</span><i class="fas fa-chevron-down arrow"></i></li>
@@ -664,44 +665,134 @@
   </div>
 </div>
 
+<!-- Modal Validasi -->
+<div class="modal fade" id="validasiModal" tabindex="-1" aria-labelledby="validasiModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content bg-dark text-white">
+      <div class="modal-header">
+        <h5 class="modal-title" id="validasiModalLabel">Validasi Transaksi</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+
+        <!-- Lepas Kunci -->
+        <form id="formLepasKunci" class="d-none">
+          <div class="row g-4">
+            <div class="col-md-3 d-flex flex-column align-items-center">
+              <img id="imgKTP" src="" alt="Foto KTP" class="img-fluid mb-2 rounded zoomable">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="checkKTP">
+                <label class="form-check-label" for="checkKTP">Validasi KTP</label>
+              </div>
+            </div>
+            <div class="col-md-3 d-flex flex-column align-items-center">
+              <img id="imgSIM" src="" alt="Foto SIM" class="img-fluid mb-2 rounded zoomable">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="checkSIM">
+                <label class="form-check-label" for="checkSIM">Validasi SIM</label>
+              </div>
+            </div>
+            <div class="col-md-3 d-flex flex-column align-items-center">
+              <img id="imgVerifikasi" src="" alt="Foto Verifikasi" class="img-fluid mb-2 rounded zoomable">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="checkVerifikasi">
+                <label class="form-check-label" for="checkVerifikasi">Validasi Foto Diri</label>
+              </div>
+            </div>
+            <div class="col-md-3 d-flex flex-column align-items-center">
+              <img id="imgBuktiBayarLK" src="" alt="Bukti Bayar" class="img-fluid mb-2 rounded zoomable">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="checkBuktiBayarLK">
+                <label class="form-check-label" for="checkBuktiBayarLK">Validasi Bukti Bayar</label>
+              </div>
+            </div>
+          </div>
+        </form>
+
+        <!-- Dengan Supir -->
+        <form id="formDenganSupir" class="d-none">
+          <div class="row g-4">
+            <div class="col-md-6 offset-md-3 d-flex flex-column align-items-center ">
+              <img id="imgBuktiBayarDS" src="" alt="Bukti Bayar" class="img-fluid mb-2 rounded zoomable">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="checkBuktiBayarDS">
+                <label class="form-check-label" for="checkBuktiBayarDS">Validasi Bukti Bayar</label>
+              </div>
+            </div>
+            <div class="col-12 mt-3">
+              <label for="driverDropdown" class="form-label">Pilih Supir</label>
+              <select id="driverDropdown" class="form-select">
+                <option selected disabled>Pilih salah satu supir</option>
+                <!-- Akan diisi via JavaScript -->
+              </select>
+            </div>
+          </div>
+        </form>
+
+      </div>
+
+      <!-- Footer -->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" id="btnTolak">Tolak</button>
+        <button type="button" class="btn btn-success" id="btnTerima">Terima</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 
     <script type="module" src="../admin/admin.js"> </script>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            async function loadPage(page) {
-              const contentContainer = document.getElementById("content");
-              if (!contentContainer) return;
+          // Global listener registry
+          const firebaseListeners = {};
 
-              try {
-                  const response = await fetch(`content/${page}.html`);
-                  if (!response.ok) throw new Error("Page not found");
-                  const html = await response.text();
-                  contentContainer.innerHTML = html;
+          // Function untuk load halaman dan setup listener
+          async function loadPage(page) {
+            const contentContainer = document.getElementById("content");
+            if (!contentContainer) return;
 
-                  // Hapus script lama sebelum menambahkan yang baru
-                  document.querySelectorAll("script[data-dynamic]").forEach(script => script.remove());
+            try {
+              const response = await fetch(`content/${page}.html`);
+              if (!response.ok) throw new Error("Page not found");
+              const html = await response.text();
+              contentContainer.innerHTML = html;
 
-                  // Hapus CSS lama sebelum menambahkan yang baru
-                  document.querySelectorAll("link[data-dynamic]").forEach(link => link.remove());
+              // Bersihkan CSS & Script lama
+              document.querySelectorAll("script[data-dynamic]").forEach(script => script.remove());
+              document.querySelectorAll("link[data-dynamic]").forEach(link => link.remove());
 
-                  // Load CSS dinamis
-                  const linkElement = document.createElement("link");
-                  linkElement.rel = "stylesheet";
-                  linkElement.href = page === "dataSupir" ? `source/css/datasupir.css` : `source/css/${page}.css`;
-                  linkElement.setAttribute("data-dynamic", "true");
-                  document.head.appendChild(linkElement);
-
-                  // Load JS dinamis dengan import
-                  try {
-                      const modulePath = page === "dataSupir" ? `./script/datasupir.js` : `./script/${page}.js`;
-                      await import(modulePath + `?t=${Date.now()}`); // Mencegah cache
-                  } catch (err) {
-                      console.error(`Error loading script: ${page}.js`, err);
-                  }
-
-              } catch (error) {
-                  contentContainer.innerHTML = "<h2>Page not found</h2>";
+              // Bersihkan Firebase listener jika ada
+              if (firebaseListeners[page]) {
+                firebaseListeners[page](); // Call the detach function
+                delete firebaseListeners[page];
               }
+
+              // Load CSS dinamis
+              const linkElement = document.createElement("link");
+              linkElement.rel = "stylesheet";
+              linkElement.href = page === "dataSupir" ? `source/css/datasupir.css` : `source/css/${page}.css`;
+              linkElement.setAttribute("data-dynamic", "true");
+              document.head.appendChild(linkElement);
+
+              // Load JS dinamis
+              try {
+                const modulePath = page === "dataSupir" ? `./script/datasupir.js` : `./script/${page}.js`;
+                console.log("Loading script:", modulePath);
+                const module = await import(modulePath + `?t=${Date.now()}`);
+                console.log("Module loaded:", module);
+                module.renderTable();
+
+              } catch (err) {
+                console.error(`Error loading script: ${page}.js`, err);
+              }
+
+            } catch (error) {
+              contentContainer.innerHTML = "<h2>Page not found</h2>";
+            }
           }
 
           // Fungsi navigasi halaman
@@ -895,6 +986,29 @@
 
           previewContainer.style.display = 'none';
         }
+
+        // Inisialisasi mediumZoom pada elemen gambar
+        mediumZoom('.zoomable', {
+          container: document.body,
+          background: 'rgba(0, 0, 0, 0.8)',
+          margin: 24,
+          scrollOffset: 0
+        });
+
+        // Menambahkan event listener untuk memastikan gambar kembali ke ukuran semula saat zoom-out
+        document.querySelectorAll('.zoomable').forEach(function(img) {
+          img.addEventListener('zoom', function(event) {
+            if (event.detail.source === 'zoom-out') {
+              // Mengembalikan gambar ke posisi semula saat zoom-out
+              const zoomedImage = event.target;
+              zoomedImage.style.transition = 'transform 0.3s ease, width 0.3s ease, height 0.3s ease';
+              zoomedImage.style.transform = 'translate(-50%, -50%) scale(1)';  // Reset zoom dan posisi ke tengah
+              zoomedImage.style.width = '90%'; // Reset lebar gambar ke ukuran semula
+              zoomedImage.style.height = 'auto'; // Reset tinggi gambar ke ukuran semula
+            }
+          });
+        });
+
 
     </script>
 </body>

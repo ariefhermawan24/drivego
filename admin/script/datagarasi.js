@@ -49,7 +49,7 @@ function populateGarasiOptions() {
 }
 
 // ✅ This function renders the table based on the data (either filtered or all)
-const renderTable = () => {
+export const renderTable = () => {
   const garasiTableBody = document.getElementById('garasiTableBody'); // Make sure this exists in your HTML
   garasiTableBody.innerHTML = '';
 

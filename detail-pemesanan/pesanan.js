@@ -35,6 +35,8 @@ onValue(transaksiRef, (snapshot) => {
                 document.querySelector('.self-drive-option').style.display = 'none';
                 document.querySelector('.lokasi-user').textContent = 'Lokasi Penjemputan';
                 document.querySelector('.jam-penjemputan').textContent = data.jamPenjemputan ? `Pukul ${data.jamPenjemputan}` : 'Tidak ada';
+                document.querySelector('.nama-supir').textContent = data.namasupir || "tidak ada";
+                document.querySelector('.kontak-supir').textContent = data.telephonesupir || "tidak ada";
                 // Ambil lokasiTujuan dari database
                 const tujuanList = data.lokasiTujuan;
 

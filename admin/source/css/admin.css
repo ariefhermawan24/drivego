@@ -1046,3 +1046,44 @@ button:disabled {
 #modalTambahSopir .btn-secondary:hover {
     background-color: #4a5773;
 }
+
+/* Memastikan form-check berada di bawah gambar dengan jarak yang konsisten */
+.form-check {
+    margin-top: 10px;
+}
+
+.zoomable {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    cursor: zoom-in;
+}
+
+.medium-zoom-overlay {
+    z-index: 2000;
+}
+
+/* Gambar yang di-zoom harus memiliki posisi fixed atau absolute */
+.medium-zoom-image--opened {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw !important;
+    /* Full screen width */
+    height: 100vh !important;
+    justify-content: center;
+    align-items: center;
+    z-index: 2001;
+}
+
+/* Gambar dalam keadaan zoom */
+.medium-zoom-image--opened img {
+    width: 90%;
+    /* Ukuran gambar 90% dari layar */
+    height: auto;
+    max-width: none;
+    max-height: none;
+    object-fit: contain;
+    transition: all 0.3s ease;
+    /* Transisi halus pada ukuran */
+}

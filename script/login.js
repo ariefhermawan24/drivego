@@ -417,6 +417,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         sessionStorage.setItem("role", user.role);
                         sessionStorage.setItem("email", user.email);
                         sessionStorage.setItem("soal_verifikasi", user.soal_verifikasi);
+                        sessionStorage.setItem("userKey", key); // 🟢 Simpan key Firebase-nya!
 
                         userName.textContent = user.username;
                         userRole.textContent = user.role;

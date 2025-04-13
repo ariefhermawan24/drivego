@@ -12,6 +12,7 @@ const showToast = (message, type = 'success') => {
   const toast = new bootstrap.Toast(toastElement);
   toast.show();
 };
+
 // Ambil data sopir dari Firebase
 const userRef = ref(database, 'users');
 const sopirTableBody = document.getElementById('sopirTableBody');
@@ -20,26 +21,10 @@ let dataSopir = []; // Menyimpan data sopir
 let filteredDataSopir = []; // Untuk pencarian
 let currentPage = 1;
 let isSearching = false;
-let editSopirId = null;
-
-onValue(userRef, (snapshot) => {
-  const users = snapshot.val() || {};
-  const drivers = [];
-  
-  // Filter user dengan role drivers
-  Object.keys(users).forEach(key => {
-    const user = users[key];
-    if (user && user.role === 'drivers') {
-      drivers.push({ ...user, key }); // Tambahkan key ke data sopir
-    }
-  });
-  
-  dataSopir = drivers;
-  renderTable();
-});
+let userRefCallback = null; // simpan callback listener
 
 // Render tabel
-const renderTable = () => {
+export const renderTable = () => {
   sopirTableBody.innerHTML = '';
   const dataToRender = isSearching ? filteredDataSopir : dataSopir;
 
@@ -213,6 +198,10 @@ onValue(userRef, (snapshot) => {
 document.getElementById('formTambahSopir').addEventListener('submit', async function (e) {
   e.preventDefault();
 
+  // Flag untuk memastikan hanya satu proses yang berjalan pada waktu tertentu
+  if (this.submitting) return; // Jika sudah ada proses, cegah submit lagi
+  this.submitting = true; // Tandai bahwa proses sedang berjalan
+
   try {
     const username = document.getElementById('namaSopir').value.trim();
     const telepon = document.getElementById('teleponSopir').value.trim();
@@ -234,16 +223,19 @@ document.getElementById('formTambahSopir').addEventListener('submit', async func
 
     if (usernameExists) {
       showToast('Username sudah digunakan. Silakan pilih username lain!', 'danger');
+      this.submitting = false; // Reset flag
       return;
     }
 
     if (teleponExists) {
       showToast('Nomor telepon sudah terdaftar. Silakan gunakan nomor lain!', 'danger');
+      this.submitting = false; // Reset flag
       return;
     }
 
     if (emailExists) {
       showToast('Email sudah terdaftar. Silakan gunakan email lain!', 'danger');
+      this.submitting = false; // Reset flag
       return;
     }
 
@@ -265,7 +257,7 @@ document.getElementById('formTambahSopir').addEventListener('submit', async func
     };
 
     await push(sopirRef, sopirData);
-    showToast('Supir berhasil ditambahkan', 'succes');
+    showToast('Supir berhasil ditambahkan', 'success');
     document.getElementById('formTambahSopir').reset();
 
     // Tutup modal
@@ -274,7 +266,9 @@ document.getElementById('formTambahSopir').addEventListener('submit', async func
 
   } catch (error) {
     console.error('Error adding sopir:', error);
-    showToast('gagal menambahkan supir', 'danger');
+    showToast('Gagal menambahkan supir', 'danger');
+  } finally {
+    this.submitting = false; // Reset flag setelah proses selesai
   }
 });
 
@@ -317,3 +311,30 @@ function hapusSopir(key) {
 }
 
 window.hapusSopir = hapusSopir;
+
+function setupListener() {
+  // Kalau sebelumnya sudah ada listener, matikan dulu
+  if (userRefCallback) {
+    off(userRef, userRefCallback);
+  }
+
+  userRefCallback = (snapshot) => {
+    const users = snapshot.val() || {};
+    const drivers = [];
+  
+    Object.keys(users).forEach(key => {
+      const user = users[key];
+      if (user && user.role === 'drivers') {
+        drivers.push({ ...user, key });
+      }
+    });
+  
+    dataSopir = drivers;
+    renderTable();
+  };
+
+  onValue(userRef, userRefCallback);
+}
+
+// Panggil setup listener ketika halaman dipanggil
+setupListener();

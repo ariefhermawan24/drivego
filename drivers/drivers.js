@@ -43,37 +43,29 @@ document.addEventListener("DOMContentLoaded", function () {
         return salt;
     }
 
-    // Fungsi untuk mengambil data pengguna secara real-time
     function fetchUserData() {
+        const userKey = sessionStorage.getItem("userKey"); // 🟢 Ambil key dari session
+
+        if (!userKey) {
+            console.log("❌ User key tidak ditemukan di sessionStorage.");
+            return;
+        }
+
         onValue(usersRef, (snapshot) => {
             if (!snapshot.exists()) {
                 console.log("❌ Database kosong.");
                 return;
             }
 
-            let usersData = snapshot.val();
-            let user = null;
-
-            // 🔹 Ambil username & soal_verifikasi terbaru dari sessionStorage
-            let sessionUsername = sessionStorage.getItem("username");
-            let sessionSoal = sessionStorage.getItem("soal_verifikasi");
-
-            // 🔹 Cari user berdasarkan sessionStorage
-            if (Array.isArray(usersData)) {
-                user = usersData.find(u => u && (u.username === sessionUsername || u.soal_verifikasi === sessionSoal));
-            } else {
-                user = Object.values(usersData).find(u => u.username === sessionUsername || u.soal_verifikasi === sessionSoal);
-            }
+            const usersData = snapshot.val();
+            const user = usersData[userKey];
 
             if (!user) {
-                console.log("❌ User tidak ditemukan.");
+                console.log("❌ User tidak ditemukan di database.");
                 return;
             }
 
-            // 🔹 Tunggu modal muncul sebelum memperbarui isinya
-            waitForModal(() => updateModal(user));
-        }, (error) => {
-            console.error("❌ Error fetching user data:", error);
+            waitForModal(() => updateModal(user)); // ✅ Aman
         });
     }
 

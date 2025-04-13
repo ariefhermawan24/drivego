@@ -713,6 +713,8 @@ async function simpanKeFirebase() {
     batalkanPesananText.innerHTML = 'Memproses<span class="wait-dots"></span>';
 
     try {
+        await updateMobilStatus(formData.namaMobil);
+        console.log("✅ Status mobil berhasil diupdate ke pending!");
         await saveFileName("fotoKTP", "fotoKTP", "fotobukti");
         await saveFileName("fotoSIM", "fotoSIM", "fotobukti");
         await saveFileName("fotoVerifikasi", "fotoVerifikasi", "fotobukti");
@@ -734,9 +736,6 @@ async function simpanKeFirebase() {
         // 🔥 Simpan ke Firebase
         await set(ref(database, "transaksi/" + orderId), firebaseData);
         console.log("✅ Data berhasil disimpan ke Firebase!");
-
-        // 🔥 Update status mobil ke "pending"
-        updateMobilStatus(firebaseData.namaMobil);
     } catch (error) {
         console.error("❌ Terjadi kesalahan:", error);
     } finally {

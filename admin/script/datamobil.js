@@ -58,7 +58,7 @@ const getNamaGarasi = (id_tempat) => {
   return garasi ? garasi.nama_tempat : '-';
 };
 
-const renderTable = () => {
+ export const renderTable = () => {
   mobilTableBody.innerHTML = '';
 
   const dataToRender = isSearching ? filteredDataMobil : dataMobil;
@@ -455,8 +455,12 @@ async function uploadFotoMobil(file, namaMobilFinal) {
 }
 
 // Handle Submit Form
-document.getElementById('formTambahMobil').addEventListener('submit', async (e) => {
+document.getElementById('formTambahMobil').addEventListener('submit', async function (e) {
   e.preventDefault();
+
+  // Flag untuk memastikan hanya satu proses yang berjalan pada waktu tertentu
+  if (this.submitting) return; // Jika sudah ada proses, cegah submit lagi
+  this.submitting = true; // Tandai bahwa proses sedang berjalan
 
   const nama = document.getElementById('namaMobil').value.trim();
   const merk = document.getElementById('merkMobil').value.trim();
@@ -474,25 +478,23 @@ document.getElementById('formTambahMobil').addEventListener('submit', async (e) 
 
   let namaFileFoto = null;
 
+  // Validasi input
   if (!nama || !merk || !tahun || !warna || !transmisi || !bahanBakar || isNaN(jumlahTempatDuduk) || !garasi || !tipemobil || !statusMobil || isNaN(harga)) {
     showToast('Harap lengkapi semua field terlebih dahulu!', 'warning');
+    this.submitting = false; // Reset flag
     return;
   }
 
   const generateInisial = (namaMobil) => {
-  const words = namaMobil.trim().split(' ');
+    const words = namaMobil.trim().split(' ');
+    let depan = words[0].substring(0, 2).toUpperCase();
+    let belakang = words.length > 1 ? words[words.length - 1].substring(0, 2).toUpperCase() : words[0].substring(0, 2).toUpperCase();
+    return depan + belakang;
+  };
 
-  let depan = words[0].substring(0, 2).toUpperCase(); // 2 huruf pertama kata pertama
-  let belakang = words.length > 1 ? words[words.length - 1].substring(0, 2).toUpperCase() : words[0].substring(0, 2).toUpperCase(); // 2 huruf pertama kata terakhir, kalau cuma 1 kata pakai yang sama
-
-  return depan + belakang;
-};
-
-  // Fungsi cari nomor urut terkecil yang belum dipakai
   const cariNomorUrutTersedia = async (namaMobil, inisial) => {
     const snapshot = await get(mobilRef);
     let nomorDipakai = [];
-
     if (snapshot.exists()) {
       snapshot.forEach(childSnapshot => {
         const data = childSnapshot.val();
@@ -518,13 +520,14 @@ document.getElementById('formTambahMobil').addEventListener('submit', async (e) 
     const namaMobilFinal = `${nama} (${inisial} ${nomorUrut})`;
 
     if (file) {
-    try {
-      namaFileFoto = await uploadFotoMobil(file , namaMobilFinal);
-    } catch (error) {
-      showToast('Gagal upload foto mobil!', 'danger');
-      return;
+      try {
+        namaFileFoto = await uploadFotoMobil(file, namaMobilFinal);
+      } catch (error) {
+        showToast('Gagal upload foto mobil!', 'danger');
+        this.submitting = false; // Reset flag
+        return;
+      }
     }
-  }
 
     await push(mobilRef, {
       nama_mobil: namaMobilFinal,
@@ -550,6 +553,8 @@ document.getElementById('formTambahMobil').addEventListener('submit', async (e) 
   } catch (error) {
     console.error('Error saat menambahkan mobil:', error);
     showToast('Terjadi kesalahan saat menambahkan mobil.', 'danger');
+  } finally {
+    this.submitting = false; // Reset flag setelah proses selesai
   }
 });
 

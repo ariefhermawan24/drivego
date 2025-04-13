@@ -58,7 +58,7 @@ const getNamaGarasi = (id_tempat) => {
   return garasi ? garasi.nama_tempat : '-';
 };
 
-const renderTable = () => {
+export const renderTable = () => {
   mobilTableBody.innerHTML = '';
 
   const dataToRender = isSearching ? filteredDataMobil : dataMobil;

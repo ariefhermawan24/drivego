@@ -67,14 +67,13 @@ onValue(mobilRef, (snapshot) => {
 });
 
 
-// Ambil data user untuk menghitung jumlah supir
 onValue(usersRef, (snapshot) => {
     const data = snapshot.val();
     let totalSupir = 0;
 
     if (data) {
-        data.forEach((user, index) => {
-            if (index !== 0 && user && user.role === "drivers") {  // Mengabaikan elemen pertama (null)
+        Object.values(data).forEach(user => {
+            if (user && user.role === "drivers") {
                 totalSupir++;
             }
         });
