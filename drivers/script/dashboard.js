@@ -1,5 +1,5 @@
 import { database } from "../script/config.js";
-import { ref, onValue } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-database.js";
+import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-database.js";
 
 // Referensi ke database
 const mobilRef = ref(database, "mobil");
@@ -29,8 +29,6 @@ onValue(mobilRef, (snapshot) => {
 
     // Update semua elemen DOM
     document.getElementById("jumlah-mobil").textContent = totalMobil;
-    document.getElementById("mobil-tersedia").textContent = mobilTersedia;
-    document.getElementById("mobil-tersewa").textContent = mobilTersewa;
     document.getElementById("jumlah-penyewa").textContent = totalPenyewa;
 });
 
@@ -40,8 +38,8 @@ onValue(usersRef, (snapshot) => {
     let totalSupir = 0;
 
     if (data) {
-        data.forEach((user, index) => {
-            if (index !== 0 && user && user.role === "drivers") {  // Mengabaikan elemen pertama (null)
+        Object.values(data).forEach(user => {
+            if (user && user.role === "drivers") {
                 totalSupir++;
             }
         });
@@ -62,4 +60,33 @@ onValue(garasiRef, (snapshot) => {
   }
   
   document.getElementById("jumlah-garasi").innerText = jumlahGarasi;
+});
+
+// Ambil nama supir dari sessionStorage
+const targetSupir = sessionStorage.getItem("username");
+
+// Inisialisasi database
+const db = getDatabase();
+const transaksiRef = ref(db, "transaksi");
+
+// Langsung pakai onValue untuk listen perubahan data
+onValue(transaksiRef, (snapshot) => {
+    let rentalAktif = 0;
+    let totalSewaDiselesaikan = 0;
+
+    snapshot.forEach((childSnapshot) => {
+        const transaksi = childSnapshot.val();
+
+        if (transaksi.namasupir === targetSupir) {
+            if (transaksi.status === "disewa") {
+                rentalAktif++;
+            } else if (transaksi.status === "selesai") {
+                totalSewaDiselesaikan++;
+            }
+        }
+    });
+
+    // Update text content di HTML
+    document.getElementById("rental-aktif").textContent = rentalAktif;
+    document.getElementById("total-sewa").textContent = totalSewaDiselesaikan;
 });

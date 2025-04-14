@@ -1,0 +1,47 @@
+.dropdown-item {
+    transition: background-color 0.3s, color 0.3s;
+    border-radius: 5px;
+}
+
+.dropdown-item:hover {
+    background-color: #f0f0f0;
+    color: #007bff;
+}
+
+.dropdown-item a {
+    text-decoration: none;
+}
+
+.dropdown-item a:hover {
+    color: #0056b3;
+}
+
+.btn-custom {
+    background-color: #FF7F50;
+    border-color: #FF7F50;
+    color: white;
+}
+
+.btn-custom:hover {
+    background-color: #FF4500;
+    border-color: #FF4500;
+    color: white;
+}
+
+.empty-job i {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.2);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}

@@ -20,7 +20,7 @@ export const renderTable = () => {
   if (dataToRender.length === 0) {
     transaksiTableBody.innerHTML = `
       <tr>
-        <td colspan="12" class="text-center">Belum ada data transaksi yang tersedia.</td>
+        <td colspan="12" class="text-center">Belum ada data validasi transaksi yang tersedia.</td>
       </tr>`;
     return;
   }
@@ -260,91 +260,149 @@ function monitorCheckboxes(data) {
   });
 
   btnTerima.addEventListener('click', () => {
-  // Disable tombol agar tidak double click
-  btnTerima.disabled = true;
+    // Disable tombol agar tidak double click
+    btnTerima.disabled = true;
 
-  const transaksiPath = child(transaksiRef, data.orderId);
+    const transaksiPath = child(transaksiRef, data.orderId);
 
-  // Cek apakah transaksi sudah ada dan status sudah accepted
-  get(transaksiPath).then(snapshot => {
-    if (snapshot.exists() && snapshot.val().status === 'accepted') {
-      alert('Transaksi ini sudah diterima sebelumnya.');
-      btnTerima.disabled = false; // Re-enable tombol
-      return;
-    }
-
-    // Proses validasi untuk kedua jenis sewa
-    if (data.jenisSewa === 'lepasKunci') {
-      if (areAllCheckedLepasKunci()) {
-        const updatedData = { ...data, status: 'accepted' };
-
-        set(transaksiPath, updatedData).then(() => {
-          alert('Transaksi diterima!');
-          $('#validasiModal').modal('hide');
-        }).catch(error => {
-          console.error('Gagal memperbarui status transaksi:', error);
-          alert('Terjadi kesalahan saat menerima transaksi.');
-        }).finally(() => {
-          btnTerima.disabled = false; // Re-enable tombol
-        });
-      } else {
-        alert('Pastikan semua validasi checkbox Lepas Kunci telah dicentang!');
-        btnTerima.disabled = false;
+    // Cek apakah transaksi sudah ada dan status sudah accepted
+    get(transaksiPath).then(snapshot => {
+      if (snapshot.exists() && snapshot.val().status === 'accepted') {
+        alert('Transaksi ini sudah diterima sebelumnya.');
+        btnTerima.disabled = false; // Re-enable tombol
+        return;
       }
-    } else if (data.jenisSewa === 'denganSupir') {
-      if (areAllCheckedDenganSupir()) {
-        const selectedDriverId = document.getElementById('driverDropdown').value;
 
-        if (selectedDriverId) {
-          const driverPath = child(usersRef, selectedDriverId);
+      // Proses validasi untuk kedua jenis sewa
+      if (data.jenisSewa === 'lepasKunci') {
+        if (areAllCheckedLepasKunci()) {
+          const updatedData = { ...data, status: 'disewa' };
 
-          get(driverPath).then(driverSnapshot => {
-            const driverData = driverSnapshot.val();
+          // Set data transaksi
+          set(transaksiPath, updatedData).then(() => {
+            alert('Transaksi diterima!');
+            $('#validasiModal').modal('hide');
 
-            if (driverData) {
-              const updatedData = {
-                ...data,
-                status: 'accepted',
-                telephonesupir: driverData.telepon || '',
-                namasupir: driverData.username || ''
-              };
+            // Mengupdate status mobil yang disewa
+            const targetMobilRef = ref(database, 'mobil');
+            get(targetMobilRef).then(snapshot => {
+              if (snapshot.exists()) {
+                const dataMobil = snapshot.val();
 
-              set(transaksiPath, updatedData).then(() => {
-                // Setelah transaksi sukses, update status supir jadi "bertugas"
-                return set(child(usersRef, `${selectedDriverId}/status`), 'bertugas');
-              }).then(() => {
-                alert('Transaksi diterima dan supir telah ditetapkan!');
-                $('#validasiModal').modal('hide');
-              }).catch(error => {
-                console.error('Gagal memproses transaksi atau update status supir:', error);
-                alert('Terjadi kesalahan saat memproses transaksi.');
-              }).finally(() => {
-                btnTerima.disabled = false;
-              });
-            } else {
-              alert('Supir yang dipilih tidak valid.');
-              btnTerima.disabled = false;
-            }
+                for (const key in dataMobil) {
+                  if (dataMobil[key].nama_mobil === data.namaMobil) {
+                    const mobilRef = ref(database, `mobil/${key}`);
+                    // Update status mobil menjadi 'disewa'
+                    update(mobilRef, { status: 'disewa' })
+                      .then(() => {
+                        console.log('Status mobil berhasil diubah menjadi disewa.');
+                      })
+                      .catch(error => {
+                        console.error('Gagal mengubah status mobil:', error);
+                      });
+                    break;
+                  }
+                }
+              } else {
+                console.error('Mobil tidak ditemukan di database.');
+              }
+            }).catch(error => {
+              console.error('Gagal mengambil data mobil:', error);
+            });
+
           }).catch(error => {
-            console.error('Gagal mengambil data supir:', error);
-            alert('Terjadi kesalahan saat mengambil data supir.');
-            btnTerima.disabled = false;
+            console.error('Gagal memperbarui status transaksi:', error);
+            alert('Terjadi kesalahan saat menerima transaksi.');
+          }).finally(() => {
+            btnTerima.disabled = false; // Re-enable tombol
           });
         } else {
-          alert('Harap pilih supir terlebih dahulu.');
+          alert('Pastikan semua validasi checkbox Lepas Kunci telah dicentang!');
           btnTerima.disabled = false;
         }
-      } else {
-        alert('Pastikan semua validasi checkbox Dengan Supir telah dicentang!');
-        btnTerima.disabled = false;
+      } else if (data.jenisSewa === 'denganSupir') {
+        if (areAllCheckedDenganSupir()) {
+          const selectedDriverId = document.getElementById('driverDropdown').value;
+
+          if (selectedDriverId) {
+            const driverPath = child(usersRef, selectedDriverId);
+
+            get(driverPath).then(driverSnapshot => {
+              const driverData = driverSnapshot.val();
+
+              if (driverData) {
+                const updatedData = {
+                  ...data,
+                  status: 'disewa',
+                  telephonesupir: driverData.telepon || '',
+                  namasupir: driverData.username || ''
+                };
+
+                // Set data transaksi
+                set(transaksiPath, updatedData).then(() => {
+                  // Setelah transaksi sukses, update status supir jadi "bertugas"
+                  return set(child(usersRef, `${selectedDriverId}/status`), 'bertugas');
+                }).then(() => {
+                  alert('Transaksi diterima dan supir telah ditetapkan!');
+                  $('#validasiModal').modal('hide');
+
+                  // Mengupdate status mobil yang disewa
+                  const targetMobilRef = ref(database, 'mobil');
+                  get(targetMobilRef).then(snapshot => {
+                    if (snapshot.exists()) {
+                      const dataMobil = snapshot.val();
+
+                      for (const key in dataMobil) {
+                        if (dataMobil[key].nama_mobil === data.namaMobil) {
+                          const mobilRef = ref(database, `mobil/${key}`);
+                          // Update status mobil menjadi 'disewa'
+                          update(mobilRef, { status: 'disewa' })
+                            .then(() => {
+                              console.log('Status mobil berhasil diubah menjadi disewa.');
+                            })
+                            .catch(error => {
+                              console.error('Gagal mengubah status mobil:', error);
+                            });
+                          break;
+                        }
+                      }
+                    } else {
+                      console.error('Mobil tidak ditemukan di database.');
+                    }
+                  }).catch(error => {
+                    console.error('Gagal mengambil data mobil:', error);
+                  });
+
+                }).catch(error => {
+                  console.error('Gagal memproses transaksi atau update status supir:', error);
+                  alert('Terjadi kesalahan saat memproses transaksi.');
+                }).finally(() => {
+                  btnTerima.disabled = false;
+                });
+              } else {
+                alert('Supir yang dipilih tidak valid.');
+                btnTerima.disabled = false;
+              }
+            }).catch(error => {
+              console.error('Gagal mengambil data supir:', error);
+              alert('Terjadi kesalahan saat mengambil data supir.');
+              btnTerima.disabled = false;
+            });
+          } else {
+            alert('Harap pilih supir terlebih dahulu.');
+            btnTerima.disabled = false;
+          }
+        } else {
+          alert('Pastikan semua validasi checkbox Dengan Supir telah dicentang!');
+          btnTerima.disabled = false;
+        }
       }
-    }
-  }).catch(error => {
-    console.error('Gagal memeriksa transaksi:', error);
-    alert('Terjadi kesalahan saat memeriksa transaksi.');
-    btnTerima.disabled = false;
+    }).catch(error => {
+      console.error('Gagal memeriksa transaksi:', error);
+      alert('Terjadi kesalahan saat memeriksa transaksi.');
+      btnTerima.disabled = false;
+    });
   });
-});
 }
 
 // Ambil dan tampilkan gambar

@@ -960,7 +960,7 @@ function listenTransactionStatus(status, transaksiRef, tokenRef, orderId) {
     // Update tampilan status
     setApprovalStatus(status, transaksiRef, orderId);
 
-    if (status === 'accepted') {
+    if (status === 'disewa') {
         // Pasang listener token setelah status accepted
         listenToken(tokenRef);
     }
@@ -997,7 +997,7 @@ function setApprovalStatus(status, transaksiRef) {
 
     if (status === 'pending') {
         loading.classList.remove('d-none');
-    } else if (status === 'accepted') {
+    } else if (status === 'disewa') {
         accepted.classList.remove('d-none');
 
         get(tokenRef).then(snapshot => {
@@ -1017,7 +1017,64 @@ function setApprovalStatus(status, transaksiRef) {
         setTimeout(() => {
             rejectedIcon.classList.add('show-animation');
         }, 10);
+    } else if (status === 'selesai') {
+        // 🔥 Ambil Data dari LocalStorage
+    // Ambil data formProgress dari localStorage
+    let formData = JSON.parse(localStorage.getItem("formProgress")) || {};
+
+    // Cek apakah nama_mobil ada di formData
+    const namaMobil = formData.namaMobil;
+    console.log('Nama mobil dari formProgress:', namaMobil);
+    console.log('Nama mobil dari localStorage:', namaMobil);
+
+    if (!namaMobil) {
+        console.error('Nama mobil tidak ditemukan di localStorage!');
+        return;
     }
+
+    const mobilRef = ref(database, 'mobil');
+
+    get(mobilRef).then(snapshot => {
+        if (snapshot.exists()) {
+            const data = snapshot.val();
+
+            for (const key in data) {
+                console.log('Cek mobil:', data[key].nama_mobil);
+
+                // Bandingkan nama_mobil dari Firebase dengan namaMobil dari localStorage
+                if (data[key].nama_mobil === namaMobil) {
+                    console.log('Mobil ditemukan, update status...');
+
+                    const targetMobilRef = ref(database, `mobil/${key}`);
+
+                    // Update status mobil jadi 'tersedia'
+                    update(targetMobilRef, { status: 'tersedia' })
+                        .then(() => {
+                            console.log('Status mobil berhasil diupdate ke tersedia.');
+
+                            // Setelah berhasil update, baru hapus localStorage
+                            localStorage.removeItem('formProgress');
+                            localStorage.removeItem('orderId');
+                            localStorage.removeItem('token');
+                            localStorage.removeItem('namaMobil');
+
+                            // Refresh halaman
+                            location.reload();
+                        })
+                        .catch(error => {
+                            console.error('Gagal update status mobil:', error);
+                        });
+
+                    break;
+                }
+            }
+        } else {
+            console.error('Data mobil tidak ditemukan.');
+        }
+    }).catch(error => {
+        console.error('Gagal mengambil data mobil:', error);
+    });
+}
 }
 
 // Generate QR Code dari token

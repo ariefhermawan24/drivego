@@ -34,19 +34,23 @@ const updateLateTransactions = () => {
     if (dataTransaksi) {
       Object.keys(dataTransaksi).forEach((orderId) => {
         const transaksi = dataTransaksi[orderId];
-        const tanggalAkhirSewa = parseTanggal(transaksi.tanggalAkhirSewa);
 
-        // Cek apakah tanggal akhir sewa sudah lewat hari ini
-        if (tanggalAkhirSewa < today) {
-          // Update status di Firebase Realtime Database
-          const transaksiPath = ref(db, `transaksi/${orderId}`);
-          update(transaksiPath, { status: "terlambat" })
-            .then(() => {
-              console.log(`Status transaksi ${orderId} berhasil diperbarui menjadi 'terlambat'`);
-            })
-            .catch((error) => {
-              console.error("Error memperbarui status:", error);
-            });
+        // Hanya proses transaksi yang statusnya 'disewa'
+        if (transaksi.status === "disewa") {
+          const tanggalAkhirSewa = parseTanggal(transaksi.tanggalAkhirSewa);
+
+          // Cek apakah tanggal akhir sewa sudah lewat hari ini
+          if (tanggalAkhirSewa < today) {
+            // Update status di Firebase Realtime Database
+            const transaksiPath = ref(db, `transaksi/${orderId}`);
+            update(transaksiPath, { status: "terlambat" })
+              .then(() => {
+                console.log(`Status transaksi ${orderId} berhasil diperbarui menjadi 'terlambat'`);
+              })
+              .catch((error) => {
+                console.error("Error memperbarui status:", error);
+              });
+          }
         }
       });
     }
@@ -102,6 +106,9 @@ export const renderTable = () => {
   transaksiTableBody.innerHTML = '';
   let dataToRender = isSearching ? filteredDataTransaksi : dataTransaksi;
 
+  // Filter: Buang data yang statusnya 'selesai'
+  dataToRender = dataToRender.filter(item => item.status !== 'selesai');
+
   // Urutkan data - status terlambat pertama
   dataToRender = [...dataToRender].sort((a, b) => {
     if (a.status === 'terlambat' && b.status !== 'terlambat') return -1;
@@ -123,8 +130,6 @@ export const renderTable = () => {
 
   // Render baris tabel
   paginatedData.forEach((transaksi, index) => {
-    const isWithinDateRange = isTodayInRange(transaksi.rangeSewa);
-    const isButtonEnabled = transaksi.status === 'accepted' && transaksi.jenisSewa === 'lepasKunci' && isWithinDateRange;
     const row = `
       <tr>
         <td>${startIndex + index + 1}</td>
@@ -189,12 +194,12 @@ export const renderTable = () => {
           </a>
           <!-- Tombol Pick Up -->
           <button 
-            class="btn btn-primary btn-sm ${isButtonEnabled ? '' : 'disabled'}"
-            ${isButtonEnabled ? '' : 'disabled aria-disabled="true"'}
-            style="${isButtonEnabled ? '' : 'pointer-events: none;'}"
-            onclick="handlePickUp('${transaksi.orderId}')"
+            class="btn btn-primary btn-sm ${transaksi.status === 'disewa' || transaksi.status === 'terlambat' ? '' : 'disabled'}"
+            ${transaksi.status === 'disewa' || transaksi.status === 'terlambat' ? '' : 'disabled aria-disabled="true"'}
+            style="${transaksi.status === 'disewa' || transaksi.status === 'terlambat' ? '' : 'pointer-events: none;'}"
+            onclick="handleReturn('${transaksi.orderId}')"
           >
-            <i class="fas fa-car"></i> Ambil
+            <i class="fas fa-undo"></i> Kembalikan
           </button>
         </td>
       </tr>`;
@@ -301,17 +306,63 @@ onValue(transaksiRef, (snapshot) => {
 window.searchRental = searchRental;
 window.changePage = changePage;
 
-function handlePickUp(orderId) {
-  const transaksiPath = child(transaksiRef, orderId);
+function handleReturn(orderId) {
+  // Tampilkan alert konfirmasi dulu
+  const konfirmasi = confirm(`Apakah Anda yakin ingin menyelesaikan transaksi ${orderId}?`);
 
-  update(transaksiPath, { status: 'tersewa' })
-    .then(() => {
-      alert('Status transaksi berhasil diubah menjadi "Tersewa".');
-    })
-    .catch(error => {
-      console.error('Gagal mengubah status transaksi:', error);
-      alert('Terjadi kesalahan saat mengubah status transaksi.');
-    });
+  if (!konfirmasi) {
+    return; // Kalau user klik "Cancel", proses berhenti di sini
+  }
+
+  const transaksiRef = ref(database, 'transaksi/' + orderId);
+
+  // Ambil dulu data transaksi untuk mendapatkan nama supir
+  get(transaksiRef).then((snapshot) => {
+    if (snapshot.exists()) {
+      const transaksiData = snapshot.val();
+      const namaSupir = transaksiData.namasupir;
+      console.log(namaSupir);
+
+      // Update status transaksi menjadi 'selesai'
+      return update(transaksiRef, { status: 'selesai' })
+        .then(() => {
+          alert(`Transaksi ${orderId} berhasil diubah menjadi Selesai.`);
+
+          if (namaSupir) {
+            const usersRef = ref(database, 'users');
+
+            // Cari user yang rolenya 'driver' dan username-nya sesuai dengan namasupir
+            return get(usersRef).then((usersSnapshot) => {
+              if (usersSnapshot.exists()) {
+                const usersData = usersSnapshot.val();
+
+                for (const userId in usersData) {
+                  const user = usersData[userId];
+
+                  if (user.role === 'drivers' && user.username === namaSupir) {
+                    const driverRef = ref(database, `users/${userId}`);
+
+                    // Update status driver menjadi 'tersedia'
+                    return update(driverRef, { status: 'tersedia' })
+                      .then(() => {
+                        console.log(`Status supir ${namaSupir} berhasil diubah menjadi tersedia.`);
+                        location.reload(); // Optional, refresh tampilan setelah selesai semua proses
+                      });
+                  }
+                }
+              }
+            });
+          } else {
+            location.reload(); // Kalau nggak ada supir, langsung reload
+          }
+        });
+    } else {
+      alert('Data transaksi tidak ditemukan.');
+    }
+  }).catch((error) => {
+    console.error("Gagal update status:", error);
+    alert('Terjadi kesalahan saat mengubah status. Silakan coba lagi.');
+  });
 }
 
-window.handlePickUp = handlePickUp;
+window.handleReturn = handleReturn;

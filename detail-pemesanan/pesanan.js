@@ -37,6 +37,7 @@ onValue(transaksiRef, (snapshot) => {
                 document.querySelector('.jam-penjemputan').textContent = data.jamPenjemputan ? `Pukul ${data.jamPenjemputan}` : 'Tidak ada';
                 document.querySelector('.nama-supir').textContent = data.namasupir || "tidak ada";
                 document.querySelector('.kontak-supir').textContent = data.telephonesupir || "tidak ada";
+                document.querySelector('.tarif-supir').textContent = data.tarifSupir ? `Rp ${data.tarifSupir}` : 'Tidak ada';
                 // Ambil lokasiTujuan dari database
                 const tujuanList = data.lokasiTujuan;
 
