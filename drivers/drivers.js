@@ -317,42 +317,23 @@ document.addEventListener("DOMContentLoaded", function () {
                     .then(resolve)
                     .catch(reject);
             } else {
-                get(ref(database, "users")).then((snapshot) => {
-                    if (snapshot.exists()) {
-                        let users = snapshot.val();
-                        let userKey = null;
+                const userKey = sessionStorage.getItem("userKey"); // 🟢 Ambil key dari session
 
-                        Object.entries(users).forEach(([key, user]) => {
-                            if (type === "user" && user?.soal_verifikasi === originalUserData.soal_verifikasi) {
-                                userKey = key;
-                            } else if (user?.username === originalUserData.username) {
-                                userKey = key;
-                            }
+                if (userKey) {
+                    const userRef = ref(database, `users/${userKey}`);
+                    update(userRef, newData)
+                        .then(() => {
+                            showUpdateToast("✅ Data berhasil diperbarui!");
+                            resolve();
+                        })
+                        .catch((error) => {
+                            showUpdateToast("❌ Gagal memperbarui data!", "error");
+                            reject(error);
                         });
-
-                        if (userKey) {
-                            const userRef = ref(database, `users/${userKey}`);
-                            update(userRef, newData)
-                                .then(() => {
-                                    showUpdateToast("✅ Data berhasil diperbarui!");
-                                    resolve();
-                                })
-                                .catch((error) => {
-                                    showUpdateToast("❌ Gagal memperbarui data!", "error");
-                                    reject(error);
-                                });
-                        } else {
-                            showUpdateToast("❌ User tidak ditemukan!", "error");
-                            reject("User tidak ditemukan.");
-                        }
-                    } else {
-                        showUpdateToast("❌ Database kosong!", "error");
-                        reject("Database kosong.");
-                    }
-                }).catch((error) => {
-                    showUpdateToast("❌ Error mengambil data!", "error");
-                    reject(error);
-                });
+                } else {
+                    showUpdateToast("❌ User key tidak ditemukan di session!", "error");
+                    reject("User key tidak ditemukan di session.");
+                }
             }
         });
     }
@@ -362,14 +343,14 @@ document.addEventListener("DOMContentLoaded", function () {
         return new Promise((resolve, reject) => {
             const userRef = ref(database, `users/${uid}`);
             update(userRef, newData)
-            .then(() => {
-                showUpdateToast("✅ Data berhasil diperbarui untuk UID!");
-                resolve();
-            })
-            .catch((error) => {
-                showUpdateToast("❌ Error memperbarui data!", "error");
-                reject(error);
-            });
+                .then(() => {
+                    showUpdateToast("✅ Data berhasil diperbarui untuk UID!");
+                    resolve();
+                })
+                .catch((error) => {
+                    showUpdateToast("❌ Error memperbarui data!", "error");
+                    reject(error);
+                });
         });
     }
 
@@ -427,12 +408,18 @@ document.addEventListener("DOMContentLoaded", function () {
             btn.disabled = true;
 
             try {
-                let uid = sessionStorage.getItem("uid");
+                let userKey = sessionStorage.getItem("userKey"); // 🟢 Ambil key dari session
                 let username = sessionStorage.getItem("username");
                 let securityQuestion = sessionStorage.getItem("soal_verifikasi");
 
-                let usersRef = ref(database, "users");
-                let snapshot = await get(usersRef);
+                if (!userKey) {
+                    showUpdateToast("❌ User key tidak ditemukan di session!", "error");
+                    btn.disabled = false;
+                    return;
+                }
+
+                const userRef = ref(database, `users/${userKey}`);
+                const snapshot = await get(userRef);
 
                 if (!snapshot.exists()) {
                     showUpdateToast("❌ Data pengguna tidak ditemukan!", "error");
@@ -440,22 +427,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     return;
                 }
 
-                let userKey = null;
-                let userData = null;
-
-                snapshot.forEach((child) => {
-                    let data = child.val();
-                    if ((uid && child.key === uid) || data.username === username || data.soal_verifikasi === securityQuestion) {
-                        userKey = child.key;
-                        userData = data;
-                    }
-                });
-
-                if (!userData) {
-                    showUpdateToast("❌ Pengguna tidak ditemukan!", "error");
-                    btn.disabled = false;
-                    return;
-                }
+                const userData = snapshot.val();
 
                 // Ambil hash password lama & salt
                 const storedHash = userData.password;
@@ -481,7 +453,10 @@ document.addEventListener("DOMContentLoaded", function () {
                         const newSalt = generateSalt(); // Buat salt baru
                         const newHashedPassword = await hashPassword(newPassword, newSalt); // Hash password baru dengan salt baru
 
-                        await updateUserData({ password: newHashedPassword, salt: newSalt }, "user");
+                        await updateUserData({
+                            password: newHashedPassword,
+                            salt: newSalt
+                        }, "user");
 
                         showUpdateToast("✅ Password diperbarui!", "success", function () {
                             btn.disabled = false;
@@ -680,6 +655,8 @@ const showToast = (message, type = 'success') => {
     const toast = new bootstrap.Toast(toastElement);
     toast.show();
 };
+
+window.showToast = showToast;
 
 function listenToStatus() {
     const targetSupir = sessionStorage.getItem("username");

@@ -95,12 +95,23 @@ export const renderTable = () => {
   renderPagination();
 };
 
-// Render paginasi (tetap sama dengan penyesuaian variabel)
 const renderPagination = () => {
   const paginationElement = document.getElementById('pagination');
-  paginationElement.innerHTML = '';
-  const dataToRender = isSearching ? filteredDataTransaksi : dataTransaksi;
+  paginationElement.innerHTML = ''; // Kosongkan elemen pagination sebelumnya
+
+  // Tentukan data yang akan digunakan: apakah hasil pencarian atau data keseluruhan
+  let dataToRender = isSearching ? filteredDataTransaksi : dataTransaksi;
+
+  // Filter: Hanya ambil data dengan status 'pending'
+  dataToRender = dataToRender.filter(transaksi => transaksi.status === 'pending');
+
+  // Tentukan jumlah halaman berdasarkan data yang sudah difilter
   const totalPages = Math.ceil(dataToRender.length / itemsPerPage);
+
+  // Jika data yang tersedia lebih sedikit dari halaman yang dipilih, reset ke halaman 1
+  if (currentPage > totalPages) {
+    currentPage = 1; // Reset ke halaman pertama jika jumlah halaman berkurang
+  }
 
   if (totalPages > 1) {
     // Tombol Previous

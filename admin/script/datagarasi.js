@@ -97,6 +97,7 @@ const renderPagination = () => {
 
   const dataToRender = isSearching ? filteredDataGarasi : dataGarasi;
   const totalPages = Math.ceil(Object.keys(dataToRender).length / itemsPerPage);
+  
 
   if (totalPages > 1) {
     paginationElement.innerHTML += `
@@ -249,6 +250,8 @@ document.getElementById('editGarasiForm').addEventListener('submit', function (e
     isSubmittingEditGarasi = false;
   }
 });
+
+window.editGarasi = editGarasi;
 
 let isDeletingGarasi = false;
 

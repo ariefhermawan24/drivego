@@ -223,12 +223,23 @@ function formatPhoneNumber(num) {
   return cleaned.replace(/^\+?62/, '62');
 }
 
-// Render paginasi (tetap sama dengan penyesuaian variabel)
 const renderPagination = () => {
   const paginationElement = document.getElementById('pagination');
-  paginationElement.innerHTML = '';
-  const dataToRender = isSearching ? filteredDataTransaksi : dataTransaksi;
+  paginationElement.innerHTML = ''; // Kosongkan elemen pagination sebelumnya
+
+  // Tentukan data yang akan digunakan: apakah hasil pencarian atau data keseluruhan
+  let dataToRender = isSearching ? filteredDataTransaksi : dataTransaksi;
+
+  // Filter: Buang data yang statusnya 'selesai'
+  dataToRender = dataToRender.filter(item => item.status !== 'selesai');
+
+  // Tentukan jumlah halaman berdasarkan data yang sudah difilter
   const totalPages = Math.ceil(dataToRender.length / itemsPerPage);
+
+  // Jika data yang tersedia lebih sedikit dari halaman yang dipilih, reset ke halaman 1
+  if (currentPage > totalPages) {
+    currentPage = 1; // Reset ke halaman pertama jika jumlah halaman berkurang
+  }
 
   if (totalPages > 1) {
     // Tombol Previous
@@ -252,6 +263,7 @@ const renderPagination = () => {
       </li>`;
   }
 };
+
 
 // Fungsi paginasi (tetap sama)
 const changePage = (page) => {

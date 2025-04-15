@@ -310,6 +310,13 @@ document.getElementById('formEditMobil').addEventListener('submit', async (e) =>
   const mobilRef = ref(database, 'mobil');
   const editMobilRef = ref(database, `mobil/${key}`);
 
+   // Validasi required
+   if (!namaBaru || !merk || !status || isNaN(harga) || isNaN(jumlahTempatDuduk) ||
+     !warna || !tahun || !tipeMobil || !bahanBakar || !transmisi || !idTempat) {
+     showToast('Semua field wajib diisi dengan benar.', 'danger');
+     return;
+   }
+
   try {
     const snapshot = await get(editMobilRef);
     if (!snapshot.exists()) {

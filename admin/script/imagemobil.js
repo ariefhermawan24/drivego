@@ -237,6 +237,7 @@ async function uploadFotoMobilEdit() {
 
   if (!file) {
     alert('Silakan pilih file gambar terlebih dahulu.');
+    BUEF.disabled = false;
     return;
   }
 

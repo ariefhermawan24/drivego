@@ -1,6 +1,17 @@
 import { database } from "../admin/script/config.js";
 import { ref, onValue , get , update } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-database.js";
+const showToast = (message, type = 'success') => {
+    const toastElement = document.getElementById('toastNotification');
+    const toastBody = toastElement.querySelector('.toast-body');
 
+    toastElement.classList.remove('text-bg-success', 'text-bg-danger', 'text-bg-warning');
+    toastElement.classList.add(`text-bg-${type}`);
+    toastBody.textContent = message;
+
+    const toast = new bootstrap.Toast(toastElement);
+    toast.show();
+};
+window.showToast = showToast;
 document.addEventListener("DOMContentLoaded", function () {
     let email = sessionStorage.getItem("email") || null; // Ambil email dari session storage
     let username = sessionStorage.getItem("username") || "Guest";

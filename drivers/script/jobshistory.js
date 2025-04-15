@@ -110,12 +110,26 @@ function formatPhoneNumber(num) {
   return cleaned.replace(/^\+?62/, '62');
 }
 
-// Render paginasi (tetap sama dengan penyesuaian variabel)
 const renderPagination = () => {
   const paginationElement = document.getElementById('pagination');
-  paginationElement.innerHTML = '';
-  const dataToRender = isSearching ? filteredDataTransaksi : dataTransaksi;
+  paginationElement.innerHTML = ''; // Kosongkan elemen pagination sebelumnya
+
+  // Tentukan data yang akan digunakan: apakah hasil pencarian atau data keseluruhan
+  let dataToRender = isSearching ? filteredDataTransaksi : dataTransaksi;
+
+  // Ambil nama supir dari sessionStorage
+  const targetSupir = sessionStorage.getItem("username");
+
+  // Filter hanya yang statusnya 'selesai' dan namasupir sesuai
+  dataToRender = dataToRender.filter(item =>
+    item.status === 'selesai' && item.namasupir === targetSupir
+  );
+
+  // Jika data yang tersedia lebih sedikit dari halaman yang dipilih, reset ke halaman 1
   const totalPages = Math.ceil(dataToRender.length / itemsPerPage);
+  if (currentPage > totalPages) {
+    currentPage = 1; // Reset ke halaman pertama jika jumlah halaman berkurang
+  }
 
   if (totalPages > 1) {
     // Tombol Previous
@@ -218,7 +232,7 @@ function handleDelete(orderId) {
         const transaksiToDeleteRef = child(transaksiRef, keyToDelete);
         remove(transaksiToDeleteRef)
           .then(() => {
-            alert('Transaksi berhasil dihapus.');
+            showToast('Transaksi berhasil dihapus!', 'success');
           })
           .catch((error) => {
             console.error('Error saat menghapus transaksi:', error);
