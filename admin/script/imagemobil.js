@@ -184,19 +184,34 @@ function searchTable() {
 window.searchTable = searchTable;
 window.changePage = changePage; // jangan lupa supaya pagination jalan
 
+let isEditing = false; // Flag global untuk mencegah double trigger
+
 window.editMobil = (key) => {
+  if (isEditing) return; // Jika sedang dalam proses, langsung hentikan
+  isEditing = true; // Set flag: sedang proses
+
   const modal = new bootstrap.Modal(document.getElementById('modalEditFoto'));
   const editMobilRef = ref(database, `mobil/${key}`);
 
   onValue(editMobilRef, (snapshot) => {
     const mobil = snapshot.val();
     if (mobil) {
-      initialMobilData = { ...mobil, key }; // Simpan data awal
+      initialMobilData = {
+        ...mobil,
+        key
+      }; // Simpan data awal
       isiFormMobil(mobil, key);
       modal.show();
     }
+
+    isEditing = false; // Reset flag setelah proses selesai
+  }, (error) => {
+    console.error('Gagal mengambil data mobil:', error);
+    showToast('Gagal mengambil data mobil.', 'danger');
+    isEditing = false; // Reset flag walaupun gagal
   });
 };
+
 
 function isiFormMobil(mobil, key) {
   document.getElementById('editMobilId').value = key;
@@ -382,9 +397,12 @@ async function uploadFotoMobil(file, namaMobilFinal) {
   });
 }
 
-// Handle Submit Form
+let isSubmitting = false; // Flag global untuk mencegah submit ganda
+
 document.getElementById('formTambahMobil').addEventListener('submit', async (e) => {
   e.preventDefault();
+  if (isSubmitting) return; // Stop kalau sedang proses submit
+  isSubmitting = true; // Set flag: sedang submit
 
   const nama = document.getElementById('namaMobil').value.trim();
   const merk = document.getElementById('merkMobil').value.trim();
@@ -404,19 +422,17 @@ document.getElementById('formTambahMobil').addEventListener('submit', async (e) 
 
   if (!nama || !merk || !tahun || !warna || !transmisi || !bahanBakar || isNaN(jumlahTempatDuduk) || !garasi || !tipemobil || !statusMobil || isNaN(harga)) {
     showToast('Harap lengkapi semua field terlebih dahulu!', 'warning');
+    isSubmitting = false; // Reset flag
     return;
   }
 
   const generateInisial = (namaMobil) => {
-  const words = namaMobil.trim().split(' ');
+    const words = namaMobil.trim().split(' ');
+    let depan = words[0].substring(0, 2).toUpperCase();
+    let belakang = words.length > 1 ? words[words.length - 1].substring(0, 2).toUpperCase() : depan;
+    return depan + belakang;
+  };
 
-  let depan = words[0].substring(0, 2).toUpperCase(); // 2 huruf pertama kata pertama
-  let belakang = words.length > 1 ? words[words.length - 1].substring(0, 2).toUpperCase() : words[0].substring(0, 2).toUpperCase(); // 2 huruf pertama kata terakhir, kalau cuma 1 kata pakai yang sama
-
-  return depan + belakang;
-};
-
-  // Fungsi cari nomor urut terkecil yang belum dipakai
   const cariNomorUrutTersedia = async (namaMobil, inisial) => {
     const snapshot = await get(mobilRef);
     let nomorDipakai = [];
@@ -446,13 +462,14 @@ document.getElementById('formTambahMobil').addEventListener('submit', async (e) 
     const namaMobilFinal = `${nama} (${inisial} ${nomorUrut})`;
 
     if (file) {
-    try {
-      namaFileFoto = await uploadFotoMobil(file , namaMobilFinal);
-    } catch (error) {
-      showToast('Gagal upload foto mobil!', 'danger');
-      return;
+      try {
+        namaFileFoto = await uploadFotoMobil(file, namaMobilFinal);
+      } catch (error) {
+        showToast('Gagal upload foto mobil!', 'danger');
+        isSubmitting = false; // Reset flag
+        return;
+      }
     }
-  }
 
     await push(mobilRef, {
       nama_mobil: namaMobilFinal,
@@ -479,5 +496,6 @@ document.getElementById('formTambahMobil').addEventListener('submit', async (e) 
     console.error('Error saat menambahkan mobil:', error);
     showToast('Terjadi kesalahan saat menambahkan mobil.', 'danger');
   }
-});
 
+  isSubmitting = false; // Reset flag di akhir proses
+});

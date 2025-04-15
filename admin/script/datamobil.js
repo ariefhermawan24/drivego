@@ -188,19 +188,41 @@ function searchTable() {
 window.searchTable = searchTable;
 window.changePage = changePage; // jangan lupa supaya pagination jalan
 
+let isEditingMobil = false; // Flag global
+
 window.editMobil = (key) => {
+  if (isEditingMobil) return; // Cegah eksekusi ganda
+
+  isEditingMobil = true; // Set flag menjadi true saat mulai
+
   const modal = new bootstrap.Modal(document.getElementById('modalEditMobil'));
   const editMobilRef = ref(database, `mobil/${key}`);
 
   onValue(editMobilRef, (snapshot) => {
     const mobil = snapshot.val();
     if (mobil) {
-      initialMobilData = { ...mobil, key }; // Simpan data awal
+      initialMobilData = {
+        ...mobil,
+        key
+      }; // Simpan data awal
       isiFormMobil(mobil, key);
       modal.show();
+
+      // Tambahkan event listener saat modal ditutup untuk reset flag
+      const modalElement = document.getElementById('modalEditMobil');
+      modalElement.addEventListener('hidden.bs.modal', () => {
+        isEditingMobil = false; // Reset flag ketika modal ditutup
+      }, {
+        once: true
+      }); // Hanya sekali, supaya tidak menumpuk event listener
+    } else {
+      isEditingMobil = false; // Reset flag jika data tidak ditemukan
     }
+  }, {
+    onlyOnce: true // Pastikan hanya satu kali ambil data
   });
 };
+
 
 // Function isi form supaya bisa dipakai ulang untuk isi form dan reset
 function isiFormMobil(mobil, key) {
@@ -369,14 +391,24 @@ const cariNomorUrutTersedia = async (namaMobil) => {
 };
 
 
+let isDeletingMobil = false; // Flag global
+
 window.hapusMobil = (key) => {
-  if (confirm('Apakah Anda yakin ingin menghapus mobil ini?')) {
-    remove(ref(database, `mobil/${key}`))
-      .then(() => {
-        showToast('Mobil berhasil dihapus!', 'success');
-      })
-      .catch(() => showToast('Terjadi kesalahan saat menghapus mobil.', 'danger'));
-  }
+  if (isDeletingMobil) return; // Cegah eksekusi ganda
+  if (!confirm('Apakah Anda yakin ingin menghapus mobil ini?')) return;
+
+  isDeletingMobil = true; // Set flag jadi true
+
+  remove(ref(database, `mobil/${key}`))
+    .then(() => {
+      showToast('Mobil berhasil dihapus!', 'success');
+    })
+    .catch(() => {
+      showToast('Terjadi kesalahan saat menghapus mobil.', 'danger');
+    })
+    .finally(() => {
+      isDeletingMobil = false; // Reset flag setelah proses selesai (sukses/gagal)
+    });
 };
 
 // Tambahkan event listener untuk hapus backdrop saat modal ditutup

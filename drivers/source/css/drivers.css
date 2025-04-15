@@ -1,5 +1,8 @@
 body {
     display: flex;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
 }
 
 .sidebar {
@@ -280,12 +283,18 @@ body {
 
 .user-info {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    /* Ubah dari column ke row */
+    align-items: center;
+    /* Supaya teks dan badge sejajar */
     text-align: left;
     margin-right: 10px;
     font-size: 14px;
     font-weight: bold;
+    gap: 6px;
+    /* Jarak antar elemen di dalam */
 }
+
 
 /* Account Icon */
 .account-icon {

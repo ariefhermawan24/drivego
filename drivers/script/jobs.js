@@ -1,6 +1,11 @@
 // jobs.js
-import { database } from "../script/config.js";
-import { ref, onValue } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-database.js";
+import {
+    database
+} from "../script/config.js";
+import {
+    ref,
+    onValue
+} from "https://www.gstatic.com/firebasejs/9.17.1/firebase-database.js";
 
 // Ambil nama supir dari sessionStorage
 const targetSupir = sessionStorage.getItem("username");
@@ -9,28 +14,28 @@ const targetSupir = sessionStorage.getItem("username");
 const transaksiRef = ref(database, "transaksi");
 
 onValue(transaksiRef, (snapshot) => {
+    let foundActiveJob = false;
+
     if (snapshot.exists()) {
         snapshot.forEach((childSnapshot) => {
             const data = childSnapshot.val();
 
-            // Skip jika status selesai
-            if (data.status === "selesai") {
-                 document.querySelector(".empty-job").style.display = "block";
-                 document.querySelector(".active-job").style.display = "none";
-                 document.querySelector(".card-footer").style.display = "none";
-                return; // skip ke data berikutnya
-            }
-
-            // Filter sesuai kondisi
             if (
                 (data.status === "disewa" || data.status === "terlambat") &&
                 data.jenisSewa === "denganSupir" &&
                 data.namasupir === targetSupir
-            ) {// Jika kondisi terpenuhi, tampilkan active job
+            ) {
+                // Ada job aktif yang sesuai
+                foundActiveJob = true;
+                // Tampilkan tampilan job aktif
+                document.querySelector(".active-job").style.display = "block";
+                document.querySelector(".empty-job").style.display = "none";
+                document.querySelector(".card-footer").style.display = "block";
+                // Jika kondisi terpenuhi, tampilkan active job
                 document.querySelector(".empty-job").style.display = "none";
                 document.querySelector(".active-job").style.display = "block";
                 document.querySelector(".card-footer").style.display = "block";
-                
+
                 // Tampilkan data ke HTML
                 document.querySelector(".orderid").textContent = data.orderId;
                 document.querySelector(".tanggal").textContent = data.rangeSewa;
@@ -89,13 +94,13 @@ onValue(transaksiRef, (snapshot) => {
                     const rawNumber = data.nomertelephone.replace(/\D/g, ''); // Hapus semua non-digit
 
                     // Cek jika diawali 0, ganti dengan 62
-                    const formattedNumber = rawNumber.startsWith('0') 
-                        ? '62' + rawNumber.slice(1) 
-                        : rawNumber;
+                    const formattedNumber = rawNumber.startsWith('0') ?
+                        '62' + rawNumber.slice(1) :
+                        rawNumber;
 
                     // Update link WhatsApp
                     kontakLink.href = `https://wa.me/${formattedNumber}`;
-                    
+
                     // Update teks kontak
                     kontakText.textContent = data.nomertelephone;
                 } else {
@@ -186,16 +191,19 @@ onValue(transaksiRef, (snapshot) => {
                     // Jika status lain, bisa default ke info
                     statusAlert.classList.add("alert-info");
                 }
-            } else {
-                document.querySelector(".empty-job").style.display = "block";
-                document.querySelector(".active-job").style.display = "none";
-                document.querySelector(".card-footer").style.display = "none";
             }
         });
+
+        // Jika tidak ditemukan job aktif
+        if (!foundActiveJob) {
+            document.querySelector(".empty-job").style.display = "block";
+            document.querySelector(".active-job").style.display = "none";
+            document.querySelector(".card-footer").style.display = "none";
+        }
     } else {
-        console.log("Tidak ada data transaksi.");
-         document.querySelector(".empty-job").style.display = "block";
-         document.querySelector(".active-job").style.display = "none";
-         document.querySelector(".card-footer").style.display = "none";
+        // Tidak ada data sama sekali
+        document.querySelector(".empty-job").style.display = "block";
+        document.querySelector(".active-job").style.display = "none";
+        document.querySelector(".card-footer").style.display = "none";
     }
 });

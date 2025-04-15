@@ -412,8 +412,15 @@ function tampilkanGambar(formType, data) {
     document.getElementById('imgSIM').src = data.fotoSIM || '';
     document.getElementById('imgVerifikasi').src = data.fotoVerifikasi || '';
     document.getElementById('imgBuktiBayarLK').src = data.buktiBayar || '';
+
+    document.getElementById('linkimgKTP').href = data.fotoKTP || '';
+    document.getElementById('linkimgSIM').href = data.fotoSIM || '';
+    document.getElementById('linkimgVerifikasi').href = data.fotoVerifikasi || '';
+    document.getElementById('linkimgBuktiBayarLK').href = data.buktiBayar || '';
   } else {
     document.getElementById('imgBuktiBayarDS').src = data.buktiBayar || '';
+
+    document.getElementById('linkBuktiBayarDS').href = data.buktiBayar || '';
   }
 }
 

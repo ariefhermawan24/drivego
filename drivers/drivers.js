@@ -668,3 +668,58 @@ document.addEventListener("DOMContentLoaded", function () {
 
     watchUserUpdates();
 });
+
+function listenToStatus() {
+    const targetSupir = sessionStorage.getItem("username");
+
+    onValue(usersRef, (snapshot) => {
+        snapshot.forEach((childSnapshot) => {
+            const userData = childSnapshot.val();
+            if (userData.username === targetSupir && userData.role === "drivers") {
+                const badge = document.querySelector(".status-badge");
+                badge.textContent = userData.status;
+                badge.classList.toggle("bg-success", userData.status === "tersedia");
+                badge.classList.toggle("bg-danger", userData.status !== "tersedia");
+            }
+        });
+    });
+}
+
+const usersRef = ref(database, 'users');
+window.onload = function () {
+    listenToStatus();
+};
+
+window.toggleStatus = function () {
+    const targetSupir = sessionStorage.getItem("username");
+
+    onValue(usersRef, (snapshot) => {
+        snapshot.forEach((childSnapshot) => {
+            const userData = childSnapshot.val();
+            const userKey = childSnapshot.key;
+
+            if (userData.username === targetSupir && userData.role === "drivers") {
+                const currentStatus = userData.status;
+                const newStatus = currentStatus?.toLowerCase() === "tersedia" ? "tidak tersedia" : "tersedia";
+
+                const confirmToggle = confirm(`Apakah kamu yakin ingin mengubah status menjadi "${newStatus}"?`);
+
+                if (confirmToggle) {
+                    // Cegah perubahan jika status sedang bekerja
+                    if (currentStatus === "bekerja") {
+                        alert("Status tidak bisa diganti karena anda sedang bertugas.");
+                        return; // Hentikan eksekusi
+                    } else {
+                        update(ref(database, `users/${userKey}`), {
+                            status: newStatus
+                        }).catch((error) => {
+                            alert("Gagal mengubah status: " + error.message);
+                        });
+                    }
+                }
+            }
+        });
+    }, {
+        onlyOnce: true
+    });
+};

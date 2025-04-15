@@ -28,16 +28,7 @@
             </li>
             <ul class="submenu">
                 <li data-page="jobs"><i class="fas fa-clipboard-list"></i> <span>Jobs Active</span></li>
-            </ul>
-            <div class="divider"></div>
-            <div class="divider"></div>
-
-            <li onclick="toggleSubmenu(this)" class="menu-induk">
-                <i class="fas fa-user-cog"></i> <span>Driver Management</span><i class="fas fa-chevron-down arrow"></i>
-            </li>
-            <ul class="submenu">
-                <li><i class="fas fa-user-check"></i> <span>Driver Status</span></li>
-                <li><i class="fas fa-question-circle"></i> <span>Help & Support</span></li>
+                <li data-page="jobshistory"><i class="fas fa-clipboard-list"></i> <span>Jobs History</span></li>
             </ul>
             <div class="divider"></div>
         </ul>
@@ -56,9 +47,12 @@
             <div class="navbar-right">
                 <div class="account-dropdown">
                     <div class="user-info">
+                        <span class="badge bg-success status-badge">Tersedia</span> <!-- Status di kiri -->
                         <span id="navbarUsername"></span>
                     </div>
+
                     <i class="fas fa-user-circle account-icon" onclick="toggleDropdown()"></i>
+
                     <div class="dropdown-content" id="accountDropdown">
                         <div class="dropdownuser-info">
                             <i class="fas fa-user-circle user-icon"></i>
@@ -68,7 +62,16 @@
                             </div>
                         </div>
                         <div class="dropdown-divider"></div>
-                        <a href="#" data-bs-toggle="modal" data-bs-target="#accountModal"><i class="fas fa-user" ></i> Detail Account</a>
+                        
+                        <a href="#" data-bs-toggle="modal" data-bs-target="#accountModal">
+                            <i class="fas fa-user"></i> Detail Account
+                        </a>
+
+                        <!-- Tombol untuk ubah status -->
+                        <a href="#" onclick="toggleStatus()">
+                            <i class="fas fa-toggle-on"></i> Ubah Status
+                        </a>
+
                         <a class="logout" href="#"><i class="fas fa-sign-out-alt"></i> Logout</a>
                     </div>
                 </div>

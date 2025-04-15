@@ -205,9 +205,14 @@ function editGarasi(key) {
   }
 }
 
-// Fungsi untuk mengupdate data garasi
-document.getElementById('editGarasiForm').addEventListener('submit', function(event) {
+let isSubmittingEditGarasi = false;
+
+document.getElementById('editGarasiForm').addEventListener('submit', function (event) {
   event.preventDefault();
+
+  // Pastikan hanya bisa dieksekusi sekali
+  if (isSubmittingEditGarasi) return;
+  isSubmittingEditGarasi = true;
 
   // Ambil data dari input form
   const updatedData = {
@@ -219,6 +224,7 @@ document.getElementById('editGarasiForm').addEventListener('submit', function(ev
   // Validasi data sebelum diupdate
   if (!updatedData.nama_tempat || !updatedData.alamat || !updatedData.telepon) {
     showToast('Semua Wajib Diisi!', 'danger');
+    isSubmittingEditGarasi = false;
     return;
   }
 
@@ -233,22 +239,28 @@ document.getElementById('editGarasiForm').addEventListener('submit', function(ev
       })
       .catch(error => {
         console.error("Error updating data:", error);
-        showToast('gagal memperbarui data', 'danger');
+        showToast('Gagal memperbarui data', 'danger');
+      })
+      .finally(() => {
+        isSubmittingEditGarasi = false;
       });
   } else {
-    showToast('data tidak ditemukan', 'warning');
+    showToast('Data tidak ditemukan', 'warning');
+    isSubmittingEditGarasi = false;
   }
 });
 
-// Supaya dipanggil dari HTML onclick
-window.editGarasi = editGarasi;
-
+let isDeletingGarasi = false;
 
 function hapusGarasi(key) {
+  // Pastikan hanya bisa dieksekusi sekali
+  if (isDeletingGarasi) return;
+  isDeletingGarasi = true;
+
   if (confirm("Apakah Anda yakin ingin menghapus data ini?")) {
     const db = getDatabase(); // Ambil instance dari database
     const garasiRef = ref(db, 'garasi/' + key); // Referensi ke data garasi yang ingin dihapus berdasarkan key
-    
+
     // Menghapus data dari Firebase berdasarkan key
     remove(garasiRef)
       .then(() => {
@@ -258,48 +270,61 @@ function hapusGarasi(key) {
       .catch(error => {
         console.error("Error deleting data:", error);
         alert('Gagal menghapus data');
+      })
+      .finally(() => {
+        isDeletingGarasi = false;
       });
+  } else {
+    isDeletingGarasi = false;
   }
 }
 
-
 window.hapusGarasi = hapusGarasi;
 
+
+let isSubmittingGarasi = false;
+
 function tambahGarasi() {
+  if (isSubmittingGarasi) return;
+  isSubmittingGarasi = true;
+
   // Ambil nilai dari input form
-  const namaTempat = document.getElementById("namaTempat").value;
-  const alamat = document.getElementById("alamat").value;
-  const telepon = document.getElementById("telepon").value;
+  const namaTempat = document.getElementById("namaTempat").value.trim();
+  const alamat = document.getElementById("alamat").value.trim();
+  const telepon = document.getElementById("telepon").value.trim();
 
   // Validasi input
   if (!namaTempat || !alamat || !telepon) {
     showToast('Semua kolom wajib diisi!', 'danger');
+    isSubmittingGarasi = false;
     return;
   }
 
   // Ambil instance database
   const db = getDatabase();
-  const garasiRef = ref(db, 'garasi'); // Referensi ke lokasi garasi dalam database
+  const garasiRef = ref(db, 'garasi');
 
   // Menambahkan data baru ke Firebase
   push(garasiRef, {
-    nama_tempat: namaTempat,
-    alamat: alamat,
-    telepon: telepon
-  })
-  .then(() => {
-    showToast('Garasi berhasil ditambahkan!', 'success');
-    renderTable(); // Render ulang tabel setelah data ditambahkan
-    // Tutup modal setelah berhasil menambah
-    const modal = bootstrap.Modal.getInstance(document.getElementById('modalTambahGarasi'));
-    modal.hide();
-    // Reset form setelah data ditambahkan
-    document.getElementById("formTambahGarasi").reset();
-  })
-  .catch((error) => {
-    console.error("Error adding data: ", error);
-    showToast('Gagal menambahkan data!', 'danger');
-  });
+      nama_tempat: namaTempat,
+      alamat: alamat,
+      telepon: telepon
+    })
+    .then(() => {
+      showToast('Garasi berhasil ditambahkan!', 'success');
+      renderTable();
+
+      const modal = bootstrap.Modal.getInstance(document.getElementById('modalTambahGarasi'));
+      modal.hide();
+      document.getElementById("formTambahGarasi").reset();
+    })
+    .catch((error) => {
+      console.error("Error adding data: ", error);
+      showToast('Gagal menambahkan data!', 'danger');
+    })
+    .finally(() => {
+      isSubmittingGarasi = false;
+    });
 }
 
 window.tambahGarasi = tambahGarasi;

@@ -158,31 +158,41 @@ td {
         background-color: #f9f9f9;
     }
 
-
     .table td {
-        text-align: center;
-        padding-left: 0;
+        text-align: right;
+        padding-left: 45%;
         position: relative;
         padding-top: 8px;
         padding-bottom: 8px;
         font-size: 14px;
         border-bottom: 1px solid #ccc;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        flex-direction: column;
     }
 
     .table td::before {
-        position: relative;
+        position: absolute;
+        left: 10px;
         content: attr(data-label);
         font-weight: bold;
-        text-align: center;
+        text-align: left;
         color: #555;
         font-size: 13px;
-        margin-bottom: 5px;
     }
 
+    .table td {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        padding-left: 0;
+    }
+
+    .table td::before {
+        position: static;
+        font-weight: bold;
+        text-align: center;
+        display: block;
+        margin-bottom: 5px;
+    }
 
     /* Atur tombol agar rata */
     .table td .btn {
@@ -216,52 +226,8 @@ td {
         align-items: center;
         padding: 0;
     }
-
-    #dataTransaksi td {
-        text-align: center !important;
-        vertical-align: middle !important;
-    }
 }
 
 .text-primary:hover {
     color: blue !important;
-}
-
-/* Perkecil font dan padding tabel */
-#transaksiTable {
-    font-size: 0.85rem;
-}
-
-#transaksiTable th,
-#transaksiTable td {
-    padding: 0.5rem;
-}
-
-/* Perkecil tombol */
-#transaksiTable .btn {
-    padding: 0.25rem 0.5rem;
-    font-size: 0.75rem;
-}
-
-/* Jika perlu, lebar kolom dikontrol */
-#transaksiTable th:nth-child(1),
-#transaksiTable td:nth-child(1) {
-    width: 30px;
-}
-
-#transaksiTable th:nth-child(5),
-#transaksiTable td:nth-child(5) {
-    width: 120px;
-}
-
-#transaksiTable th:nth-child(6),
-#transaksiTable td:nth-child(6) {
-    width: 160px;
-}
-
-.btn.disabled,
-button:disabled {
-    cursor: not-allowed !important;
-    opacity: 0.65;
-    background-color: red;
 }
