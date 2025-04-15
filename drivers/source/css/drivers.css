@@ -977,3 +977,9 @@ button:disabled {
         margin-bottom: 50px !important;
     }
 }
+
+.status-badge-dropdown {
+    display: block;
+    margin: 0 auto;
+    width: fit-content;
+}

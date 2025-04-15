@@ -344,7 +344,7 @@ function handleReturn(orderId) {
 
                     // Update status driver menjadi 'tersedia'
                     return update(driverRef, { status: 'tersedia' })
-                      .then(() => {
+                      .then(() => {                
                         console.log(`Status supir ${namaSupir} berhasil diubah menjadi tersedia.`);
                         location.reload(); // Optional, refresh tampilan setelah selesai semua proses
                       });

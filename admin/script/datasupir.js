@@ -297,7 +297,7 @@ function hapusSopir(key) {
       const sopirRef = ref(database, `users/${key}`);
       remove(sopirRef)
         .then(() => {
-          showToast('Supir berhasil dihapus', 'succes');
+          showToast('Supir berhasil dihapus', 'success');
         })
         .catch((error) => {
           console.error('Gagal menghapus sopir:', error);

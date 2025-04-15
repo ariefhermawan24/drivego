@@ -1,6 +1,18 @@
 import { database } from "./config.js";
 import {  getDatabase, ref, onValue, push, update, child , get , set } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-database.js";
 
+const showToast = (message, type = 'success') => {
+  const toastElement = document.getElementById('toastNotification');
+  const toastBody = toastElement.querySelector('.toast-body');
+
+  toastElement.classList.remove('text-bg-success', 'text-bg-danger', 'text-bg-warning');
+  toastElement.classList.add(`text-bg-${type}`);
+  toastBody.textContent = message;
+
+  const toast = new bootstrap.Toast(toastElement);
+  toast.show();
+};
+
 // Ambil data transaksi dari Firebase
 const transaksiRef = ref(database, 'transaksi');
 const transaksiTableBody = document.getElementById('transaksiTableBody'); // Sesuaikan ID jika perlu
@@ -251,7 +263,7 @@ function monitorCheckboxes(data) {
   btnTolak.addEventListener('click', () => {
     const transaksiPath = child(transaksiRef, data.orderId);
     set(transaksiPath, { ...data, status: 'rejected' }).then(() => {
-      alert('Transaksi ditolak!');
+      showToast('Transaksi Ditolak!', 'danger');
       $('#validasiModal').modal('hide');
     }).catch(error => {
       console.error('Gagal memperbarui status transaksi:', error);
@@ -268,7 +280,7 @@ function monitorCheckboxes(data) {
     // Cek apakah transaksi sudah ada dan status sudah accepted
     get(transaksiPath).then(snapshot => {
       if (snapshot.exists() && snapshot.val().status === 'accepted') {
-        alert('Transaksi ini sudah diterima sebelumnya.');
+        showToast('Transaksi ini sudah diterima sebelumnya.', 'danger');
         btnTerima.disabled = false; // Re-enable tombol
         return;
       }
@@ -343,7 +355,7 @@ function monitorCheckboxes(data) {
                   // Setelah transaksi sukses, update status supir jadi "bertugas"
                   return set(child(usersRef, `${selectedDriverId}/status`), 'bertugas');
                 }).then(() => {
-                  alert('Transaksi diterima dan supir telah ditetapkan!');
+                  showToast('Transaksi diterima dan supir telah ditetapkan!', 'succes');
                   $('#validasiModal').modal('hide');
 
                   // Mengupdate status mobil yang disewa

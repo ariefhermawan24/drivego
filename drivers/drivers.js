@@ -669,6 +669,18 @@ document.addEventListener("DOMContentLoaded", function () {
     watchUserUpdates();
 });
 
+const showToast = (message, type = 'success') => {
+    const toastElement = document.getElementById('toastNotification');
+    const toastBody = toastElement.querySelector('.toast-body');
+
+    toastElement.classList.remove('text-bg-success', 'text-bg-danger', 'text-bg-warning');
+    toastElement.classList.add(`text-bg-${type}`);
+    toastBody.textContent = message;
+
+    const toast = new bootstrap.Toast(toastElement);
+    toast.show();
+};
+
 function listenToStatus() {
     const targetSupir = sessionStorage.getItem("username");
 
@@ -677,9 +689,13 @@ function listenToStatus() {
             const userData = childSnapshot.val();
             if (userData.username === targetSupir && userData.role === "drivers") {
                 const badge = document.querySelector(".status-badge");
+                const dropdownbadge = document.querySelector(".status-badge-dropdown");
                 badge.textContent = userData.status;
                 badge.classList.toggle("bg-success", userData.status === "tersedia");
                 badge.classList.toggle("bg-danger", userData.status !== "tersedia");
+                dropdownbadge.textContent = userData.status;
+                dropdownbadge.classList.toggle("bg-success", userData.status === "tersedia");
+                dropdownbadge.classList.toggle("bg-danger", userData.status !== "tersedia");
             }
         });
     });
@@ -707,9 +723,10 @@ window.toggleStatus = function () {
                 if (confirmToggle) {
                     // Cegah perubahan jika status sedang bekerja
                     if (currentStatus === "bekerja") {
-                        alert("Status tidak bisa diganti karena anda sedang bertugas.");
+                        showToast('Status tidak bisa diganti karena anda sedang bertugas!', 'danger');
                         return; // Hentikan eksekusi
                     } else {
+                        showToast('Status berhasil diubah!', 'success');
                         update(ref(database, `users/${userKey}`), {
                             status: newStatus
                         }).catch((error) => {
