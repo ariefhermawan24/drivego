@@ -699,7 +699,7 @@ window.toggleStatus = function () {
 
                 if (confirmToggle) {
                     // Cegah perubahan jika status sedang bekerja
-                    if (currentStatus === "bekerja") {
+                    if (currentStatus === "bertugas") {
                         showToast('Status tidak bisa diganti karena anda sedang bertugas!', 'danger');
                         return; // Hentikan eksekusi
                     } else {
