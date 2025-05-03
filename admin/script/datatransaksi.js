@@ -106,8 +106,9 @@ export const renderTable = () => {
   transaksiTableBody.innerHTML = '';
   let dataToRender = isSearching ? filteredDataTransaksi : dataTransaksi;
 
-  // Filter: Buang data yang statusnya 'selesai'
-  dataToRender = dataToRender.filter(item => item.status !== 'selesai');
+  dataToRender = dataToRender.filter(item =>
+    !['selesai', 'dibatalkan'].includes(item.status)
+  );
 
   // Urutkan data - status terlambat pertama
   dataToRender = [...dataToRender].sort((a, b) => {
@@ -230,8 +231,8 @@ const renderPagination = () => {
   // Tentukan data yang akan digunakan: apakah hasil pencarian atau data keseluruhan
   let dataToRender = isSearching ? filteredDataTransaksi : dataTransaksi;
 
-  // Filter: Buang data yang statusnya 'selesai'
-  dataToRender = dataToRender.filter(item => item.status !== 'selesai');
+  // Filter: Buang data yang statusnya 'selesai' atau 'dibatalkan'
+  dataToRender = dataToRender.filter(item => item.status !== 'selesai' && item.status !== 'dibatalkan');
 
   // Tentukan jumlah halaman berdasarkan data yang sudah difilter
   const totalPages = Math.ceil(dataToRender.length / itemsPerPage);
@@ -328,46 +329,75 @@ function handleReturn(orderId) {
 
   const transaksiRef = ref(database, 'transaksi/' + orderId);
 
-  // Ambil dulu data transaksi untuk mendapatkan nama supir
+  // Ambil dulu data transaksi untuk mendapatkan nama supir dan mobil
   get(transaksiRef).then((snapshot) => {
     if (snapshot.exists()) {
       const transaksiData = snapshot.val();
       const namaSupir = transaksiData.namasupir;
-      console.log(namaSupir);
+      const mobil = transaksiData.namaMobil;
 
-      // Update status transaksi menjadi 'selesai'
-      return update(transaksiRef, { status: 'selesai' })
-        .then(() => {
-          alert(`Transaksi ${orderId} berhasil diubah menjadi Selesai.`);
+      // Cari mobil yang memiliki nama_mobil yang sesuai dengan nama mobil di transaksi
+      const mobilRef = ref(database, 'mobil'); // Path untuk data mobil
+      return get(mobilRef).then((mobilSnapshot) => {
+        if (mobilSnapshot.exists()) {
+          const mobilData = mobilSnapshot.val();
 
-          if (namaSupir) {
-            const usersRef = ref(database, 'users');
+          // Mencari mobil yang statusnya sesuai dengan nama_mobil dari transaksi
+          for (const mobilId in mobilData) {
+            const mobilItem = mobilData[mobilId];
+            if (mobilItem.nama_mobil === mobil) {
+              const mobilRefUpdate = ref(database, `mobil/${mobilId}`);
 
-            // Cari user yang rolenya 'driver' dan username-nya sesuai dengan namasupir
-            return get(usersRef).then((usersSnapshot) => {
-              if (usersSnapshot.exists()) {
-                const usersData = usersSnapshot.val();
+              // Update status mobil menjadi 'tersedia'
+              return update(mobilRefUpdate, {
+                  status: 'tersedia'
+                })
+                .then(() => {
+                  console.log(`Status mobil ${mobil} berhasil diubah menjadi tersedia.`);
 
-                for (const userId in usersData) {
-                  const user = usersData[userId];
+                  // Setelah mobil selesai, update status transaksi menjadi 'selesai'
+                  const transaksiRefUpdate = ref(database, 'transaksi/' + orderId);
+                  return update(transaksiRefUpdate, {
+                      status: 'selesai'
+                    })
+                    .then(() => {
+                      alert(`Transaksi ${orderId} berhasil diubah menjadi Selesai.`);
 
-                  if (user.role === 'drivers' && user.username === namaSupir) {
-                    const driverRef = ref(database, `users/${userId}`);
+                      if (namaSupir) {
+                        const usersRef = ref(database, 'users');
 
-                    // Update status driver menjadi 'tersedia'
-                    return update(driverRef, { status: 'tersedia' })
-                      .then(() => {                
-                        console.log(`Status supir ${namaSupir} berhasil diubah menjadi tersedia.`);
-                        location.reload(); // Optional, refresh tampilan setelah selesai semua proses
-                      });
-                  }
-                }
-              }
-            });
-          } else {
-            location.reload(); // Kalau nggak ada supir, langsung reload
+                        // Cari user yang rolenya 'driver' dan username-nya sesuai dengan namasupir
+                        return get(usersRef).then((usersSnapshot) => {
+                          if (usersSnapshot.exists()) {
+                            const usersData = usersSnapshot.val();
+
+                            for (const userId in usersData) {
+                              const user = usersData[userId];
+
+                              if (user.role === 'drivers' && user.username === namaSupir) {
+                                const driverRef = ref(database, `users/${userId}`);
+
+                                // Update status driver menjadi 'tersedia'
+                                return update(driverRef, {
+                                    status: 'tersedia'
+                                  })
+                                  .then(() => {
+                                    console.log(`Status supir ${namaSupir} berhasil diubah menjadi tersedia.`);
+                                    location.reload(); // Optional, refresh tampilan setelah selesai semua proses
+                                  });
+                              }
+                            }
+                          }
+                        });
+                      } else {
+                        location.reload(); // Kalau nggak ada supir, langsung reload
+                      }
+                    });
+                });
+            }
           }
-        });
+        }
+      });
     } else {
       alert('Data transaksi tidak ditemukan.');
     }
@@ -376,5 +406,6 @@ function handleReturn(orderId) {
     alert('Terjadi kesalahan saat mengubah status. Silakan coba lagi.');
   });
 }
+
 
 window.handleReturn = handleReturn;

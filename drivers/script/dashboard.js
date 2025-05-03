@@ -18,18 +18,11 @@ onValue(mobilRef, (snapshot) => {
             .filter(mobil => mobil !== null) // Filter null terlebih dahulu
             .forEach((mobil) => {
                 totalMobil++;
-                if (mobil.status === "tersedia") {
-                    mobilTersedia++;
-                } else if (mobil.status === "disewa") {
-                    mobilTersewa++;
-                    totalPenyewa++; // Asumsi 1 penyewa per mobil yang disewa
-                }
             });
     }
 
     // Update semua elemen DOM
     document.getElementById("jumlah-mobil").textContent = totalMobil;
-    document.getElementById("jumlah-penyewa").textContent = totalPenyewa;
 });
 
 // Ambil data user untuk menghitung jumlah supir
@@ -73,6 +66,7 @@ const transaksiRef = ref(db, "transaksi");
 onValue(transaksiRef, (snapshot) => {
     let rentalAktif = 0;
     let totalSewaDiselesaikan = 0;
+    let totalRentalDibatalkan = 0; // Variabel untuk rental yang dibatalkan
 
     snapshot.forEach((childSnapshot) => {
         const transaksi = childSnapshot.val();
@@ -82,6 +76,8 @@ onValue(transaksiRef, (snapshot) => {
                 rentalAktif++;
             } else if (transaksi.status === "selesai") {
                 totalSewaDiselesaikan++;
+            } else if (transaksi.status === "dibatalkan") { // Menambahkan kondisi untuk status dibatalkan
+                totalRentalDibatalkan++;
             }
         }
     });
@@ -89,4 +85,5 @@ onValue(transaksiRef, (snapshot) => {
     // Update text content di HTML
     document.getElementById("rental-aktif").textContent = rentalAktif;
     document.getElementById("total-sewa").textContent = totalSewaDiselesaikan;
+    document.getElementById("rental-dibatalkan").textContent = totalRentalDibatalkan; // Update jumlah rental dibatalkan
 });

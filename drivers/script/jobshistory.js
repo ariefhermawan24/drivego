@@ -18,9 +18,9 @@ export const renderTable = () => {
   // Ambil nama supir dari sessionStorage
   const targetSupir = sessionStorage.getItem("username");
 
-  // Filter hanya yang statusnya 'selesai' dan namasupir sesuai
+  const allowedStatuses = ['selesai', 'dibatalkan'];
   dataToRender = dataToRender.filter(item =>
-    item.status === 'selesai' && item.namasupir === targetSupir
+    allowedStatuses.includes(item.status) && item.namasupir === targetSupir
   );
 
   // Urutkan data - status 'terlambat' dulu jika ada (meskipun di atas kita hanya ambil yang 'selesai')
@@ -74,11 +74,13 @@ export const renderTable = () => {
           })()}
         </td>
         <td>
-          <span class="badge bg-${
-            transaksi.status === 'selesai' ? 'primary' : 'primary'
-          }">
-            ${transaksi.status || '-'}
-          </span>
+          <span class = "badge bg-${
+            transaksi.status === 'selesai' ? 'primary' :
+            transaksi.status === 'dibatalkan' ? 'danger' :
+            'secondary'
+            }">
+          ${transaksi.status || '-'} 
+          </span> 
         </td>
         <td>${transaksi.namaMobil || '-'}</td>
         <td>
@@ -120,10 +122,7 @@ const renderPagination = () => {
   // Ambil nama supir dari sessionStorage
   const targetSupir = sessionStorage.getItem("username");
 
-  // Filter hanya yang statusnya 'selesai' dan namasupir sesuai
-  dataToRender = dataToRender.filter(item =>
-    item.status === 'selesai' && item.namasupir === targetSupir
-  );
+  dataToRender = dataToRender.filter(item => ['selesai', 'dibatalkan'].includes(item.status) && item.namasupir === targetSupir);
 
   // Jika data yang tersedia lebih sedikit dari halaman yang dipilih, reset ke halaman 1
   const totalPages = Math.ceil(dataToRender.length / itemsPerPage);

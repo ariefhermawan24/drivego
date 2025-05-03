@@ -746,7 +746,7 @@ async function simpanKeFirebase() {
         // 🔄 Tambahkan delay 2 detik sebelum reload
         setTimeout(() => {
             location.reload();
-        }, 2000);
+        }, 500);
     }
 }
 
@@ -795,7 +795,18 @@ function updateStep4Details() {
     document.querySelector('.range-sewa').textContent = formData.rangeSewa || "-";
     document.querySelector('.total-harga').textContent = `Rp ${formData.totalHarga?.toLocaleString() || "0"}`;
     document.querySelector('.dp').textContent = `Rp ${formData.pembayaranDP?.toLocaleString() || "0"}`;
-    document.querySelector('.pembayaran-di-tempat').textContent = `Rp ${formData.pembayaranDiTempat?.toLocaleString() || "0"}`;
+    const totalPembayaran = formData.pembayaranDiTempat || 0;
+
+    let tambahanBiaya = 0;
+    if (formData.jenisSewa === 'denganSupir') {
+        tambahanBiaya = formData.tarifSupir || 0;
+    } else if (formData.jenisSewa === 'lepasKunci') {
+        tambahanBiaya = formData.kompensasi || 0;
+    }
+
+    const hasil = totalPembayaran + tambahanBiaya;
+
+    document.querySelector('.pembayaran-di-tempat').textContent = `Rp ${hasil.toLocaleString()}`;
 
     function appendDetail(label, value, className) {
         const li = document.createElement('li');
@@ -871,51 +882,118 @@ function batalkanPesanan() {
 }
 
 function processCancellation(orderId, namaMobil) {
-    remove(ref(database, `transaksi/${orderId}`))
-        .then(() => get(mobilRef))
-        .then((snapshot) => {
-            if (snapshot.exists()) {
-                snapshot.forEach((childSnapshot) => {
-                    const data = childSnapshot.val();
-                    if (data.nama_mobil === namaMobil) {
-                        update(ref(database, `mobil/${childSnapshot.key}`), {
-                            status: "tersedia"
-                        });
-                    }
-                });
+    const batalkanPesananButton = document.getElementById("batalkan-pesanan");
+    const batalkanPesananSpinner = document.getElementById("batalkanPesananSpinner");
+    const batalkanPesananText = document.getElementById("batalkanPesananText");
+
+    // Sebelum proses mulai
+    batalkanPesananButton.disabled = true;
+    batalkanPesananSpinner.classList.remove('d-none');
+    batalkanPesananText.innerHTML = 'Memproses<span class="wait-dots"></span>';
+    const orderTransRef = ref(database, `transaksi/${orderId}`);
+    const mobilRef = ref(database, 'mobil');
+
+    get(orderTransRef)
+        .then((orderSnapshot) => {
+            if (!orderSnapshot.exists()) {
+                throw new Error("Transaksi tidak ditemukan.");
             }
 
+            const orderData = orderSnapshot.val();
+            const jenisSewa = orderData.jenisSewa;
+            const namaSupir = orderData.namasupir;
+
+            // Update status transaksi jadi dibatalkan
+            return update(orderTransRef, {
+                status: "dibatalkan"
+            }).then(() => {
+                // Setelah update status transaksi, ambil data mobil
+                return get(mobilRef).then((snapshot) => {
+                    const updateMobilPromises = [];
+
+                    if (snapshot.exists()) {
+                        snapshot.forEach((childSnapshot) => {
+                            const data = childSnapshot.val();
+                            if (data.nama_mobil === namaMobil) {
+                                const updatePromise = update(ref(database, `mobil/${childSnapshot.key}`), {
+                                    status: "tersedia"
+                                });
+                                updateMobilPromises.push(updatePromise);
+                            }
+                        });
+                    }
+
+                    return Promise.all(updateMobilPromises).then(() => ({
+                        jenisSewa,
+                        namaSupir
+                    }));
+                });
+            });
+        })
+        .then(({
+            jenisSewa,
+            namaSupir
+        }) => {
+            // Ubah status supir hanya jika jenis sewa dengan supir DAN namaSupir ada
+            if (jenisSewa === "denganSupir" && namaSupir) {
+                return get(ref(database, 'users')).then((usersSnapshot) => {
+                    const updateUserPromises = [];
+
+                    if (usersSnapshot.exists()) {
+                        usersSnapshot.forEach((userSnap) => {
+                            const userData = userSnap.val();
+                            if (userData.username === namaSupir) {
+                                const updatePromise = update(ref(database, `users/${userSnap.key}`), {
+                                    status: "tersedia"
+                                });
+                                updateUserPromises.push(updatePromise);
+                            }
+                        });
+                    }
+
+                    return Promise.all(updateUserPromises);
+                });
+            }
+        })
+        .then(() => {
             localStorage.removeItem("formProgress");
 
             const transaksiModalElement = document.getElementById('transaksiModal');
             const transaksiModal = bootstrap.Modal.getInstance(transaksiModalElement);
 
+            // Setelah proses selesai
+            batalkanPesananButton.disabled = false;
+            batalkanPesananSpinner.classList.add('d-none');
+            batalkanPesananText.textContent = "Batalkan Pesanan";
+
             const finish = () => {
                 showCustomToast("Pesanan berhasil dibatalkan", "success");
-
-                // Tunggu 2.5 detik, lalu reload dengan anchor ke #garasi
                 setTimeout(() => {
                     location.href = location.pathname + location.search + '#garasi';
                     location.reload();
-                }, 2500);
+                }, 500);
             };
 
             if (transaksiModal) {
-                // 1. Tampilkan toast sukses dulu
                 finish();
-
-                // 2. Delay sebentar biar toast muncul duluan, baru modal di-hide
                 setTimeout(() => {
                     transaksiModalElement.addEventListener('hidden.bs.modal', function handleModalHidden() {
                         transaksiModalElement.removeEventListener('hidden.bs.modal', handleModalHidden);
-                        // Tidak perlu apa-apa di sini, reload sudah dihandle di toast
                     });
 
                     transaksiModal.hide();
-                }, 2000); // delay supaya toast kelihatan
+                }, 500);
             } else {
+                // Setelah proses selesai
+                batalkanPesananButton.disabled = false;
+                batalkanPesananSpinner.classList.add('d-none');
+                batalkanPesananText.textContent = "Batalkan Pesanan";
                 finish();
             }
+            // Clean up the listener
+            return () => {
+                off(orderTransRef);
+            };
         })
         .catch((error) => {
             console.error("Gagal membatalkan pesanan:", error);

@@ -319,6 +319,9 @@ function monitorCheckboxes(data) {
                     update(mobilRef, { status: 'disewa' })
                       .then(() => {
                         console.log('Status mobil berhasil diubah menjadi disewa.');
+                        setTimeout(() => {
+                          location.reload();
+                        }, 500);
                       })
                       .catch(error => {
                         console.error('Gagal mengubah status mobil:', error);
@@ -382,6 +385,9 @@ function monitorCheckboxes(data) {
                           update(mobilRef, { status: 'disewa' })
                             .then(() => {
                               console.log('Status mobil berhasil diubah menjadi disewa.');
+                              setTimeout(() => {
+                                location.reload();
+                              }, 500);
                             })
                             .catch(error => {
                               console.error('Gagal mengubah status mobil:', error);

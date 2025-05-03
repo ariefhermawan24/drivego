@@ -17,6 +17,15 @@ onValue(transaksiRef, (snapshot) => {
         const data = snapshot.val();
 
         if (data.token === token) {
+            if (data.status === 'dibatalkan') {
+                showToastAndRedirect('Pesanan ini telah dibatalkan.');
+            }
+            if (data.status === 'selesai') {
+                showToastAndRedirect('Pesanan ini telah selesai.');
+            }
+            if (data.jenisSewa != jenisSewa) {
+                showToastAndRedirect('jenis sewa tidak cocok.');
+            }
             console.log('Token valid. Data ditemukan:', data);
 
             document.querySelector('.kode-booking').textContent = orderId;
@@ -38,6 +47,8 @@ onValue(transaksiRef, (snapshot) => {
                 document.querySelector('.nama-supir').textContent = data.namasupir || "tidak ada";
                 document.querySelector('.kontak-supir').textContent = data.telephonesupir || "tidak ada";
                 document.querySelector('.tarif-supir').textContent = data.tarifSupir ? `Rp ${data.tarifSupir}` : 'Tidak ada';
+                const textModeEl = document.querySelector('.text-mode');
+                textModeEl.textContent = 'supir menjemput';
                 // Ambil lokasiTujuan dari database
                 const tujuanList = data.lokasiTujuan;
 
@@ -69,6 +80,8 @@ onValue(transaksiRef, (snapshot) => {
                 document.querySelector('.driver-option').style.display = 'none';
                 document.querySelector('.self-drive-option').style.display = 'block';
                 document.querySelector('.text-mode').textContent = 'pengambilan mobil';
+                const textModeEl = document.querySelector('.text-mode');
+                textModeEl.textContent = 'mengambil mobil di garasi';
                 if (blurOverlay) {
                     blurOverlay.remove();
                 }

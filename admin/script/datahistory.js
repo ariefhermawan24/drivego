@@ -15,15 +15,8 @@ export const renderTable = () => {
   transaksiTableBody.innerHTML = '';
   let dataToRender = isSearching ? filteredDataTransaksi : dataTransaksi;
   
-  // Filter hanya yang statusnya 'selesai'
-  dataToRender = dataToRender.filter(item => item.status === 'selesai');
-
-  // Urutkan data - status terlambat pertama
-  dataToRender = [...dataToRender].sort((a, b) => {
-    if (a.status === 'terlambat' && b.status !== 'terlambat') return -1;
-    if (b.status === 'terlambat' && a.status !== 'terlambat') return 1;
-    return 0;
-  });
+  // Filter hanya yang statusnya 'selesai' atau 'dibatalkan'
+  dataToRender = dataToRender.filter(item => item.status === 'selesai' || item.status === 'dibatalkan');
 
   if (dataToRender.length === 0) {
     transaksiTableBody.innerHTML = `
@@ -68,9 +61,11 @@ export const renderTable = () => {
           })()}
         </td>
         <td>
-          <span class="badge bg-${
-            transaksi.status === 'selesai' ? 'primary' : 'primary'
-          }">
+          <span class = "badge bg-${
+            transaksi.status === 'selesai' ? 'primary' :
+            transaksi.status === 'dibatalkan' ? 'danger' :
+              'secondary'
+            } ">
             ${transaksi.status || '-'}
           </span>
         </td>
@@ -111,8 +106,9 @@ const renderPagination = () => {
   // Tentukan data yang akan digunakan: apakah hasil pencarian atau data keseluruhan
   let dataToRender = isSearching ? filteredDataTransaksi : dataTransaksi;
 
-  // Filter hanya yang statusnya 'selesai'
-  dataToRender = dataToRender.filter(item => item.status === 'selesai');
+  dataToRender = dataToRender.filter(item =>
+    item.status === 'selesai' || item.status === 'dibatalkan'
+  );
 
   // Jika data yang tersedia lebih sedikit dari halaman yang dipilih, reset ke halaman 1
   const totalPages = Math.ceil(dataToRender.length / itemsPerPage);

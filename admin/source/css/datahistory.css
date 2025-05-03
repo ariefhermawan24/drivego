@@ -1,7 +1,6 @@
 /* RESPONSIVE TABLE */
 .table-responsive {
-    overflow-x: auto;
-    /* Agar tabel bisa di-scroll di layar kecil */
+    overflow-x: auto !important;
 }
 
 .table thead {
