@@ -45,3 +45,15 @@
         transform: scale(1);
     }
 }
+
+@media (max-width: 580px) {
+    .card-header {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .order-id {
+        margin-top: 10px;
+        text-align: center;
+    }
+}

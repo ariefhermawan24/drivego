@@ -163,6 +163,26 @@
         </div>
     </div>
 
+   <!-- Toast Notifikasi Responsif -->
+   <div aria-live="polite" aria-atomic="true" class="position-fixed toast-container-custom p-3" style="z-index: 1080;">
+       <div id="bootstrapToast" class="toast align-items-center text-white bg-success border-0 shadow" role="alert">
+           <div class="d-flex">
+               <div class="toast-body d-flex align-items-center gap-2" id="bootstrapToastBody">
+                   <i class="fas fa-check-circle fa-lg"></i>
+                   <span>Status berhasil diubah!</span>
+               </div>
+               <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+           </div>
+       </div>
+   </div>
+
+    <!-- Toast Konfirmasi Tengah (Dark Theme) -->
+    <div id="centeredToast"
+        class="position-fixed top-50 start-50 translate-middle bg-dark text-white border border-secondary shadow-lg p-4 rounded-4 d-none"
+        style="z-index: 1090; max-width: 90%; width: 380px;">
+        <div class="text-center" id="centeredToastContent"></div>
+    </div>
+
     <script type="module" src="../drivers/drivers.js"> </script>
     <script>
 

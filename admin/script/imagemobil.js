@@ -207,7 +207,7 @@ window.editMobil = (key) => {
     isEditing = false; // Reset flag setelah proses selesai
   }, (error) => {
     console.error('Gagal mengambil data mobil:', error);
-    showToast('Gagal mengambil data mobil.', 'danger');
+    showToastalert('Gagal mengambil data mobil.', 'danger');
     isEditing = false; // Reset flag walaupun gagal
   });
 };
@@ -299,7 +299,7 @@ async function uploadFotoMobilEdit() {
       resetFileEdit();
       BUEF.disabled = false;
       bootstrap.Modal.getInstance(document.getElementById('modalEditFoto')).hide();
-      showToast('Mobil berhasil ditambahkan!', 'success');
+      showToastalert('Mobil berhasil ditambahkan!', 'success');
     }, 1500);
 
   } catch (error) {
@@ -312,16 +312,107 @@ async function uploadFotoMobilEdit() {
 }
 
 window.uploadFotoMobilEdit = uploadFotoMobilEdit;
-
+let isDeletingMobil = false; // Flag global
 window.hapusMobil = (key) => {
-  if (confirm('Apakah Anda yakin ingin menghapus mobil ini?')) {
-    remove(ref(database, `mobil/${key}`))
-      .then(() => {
-        showToast('Mobil berhasil dihapus!', 'success');
-      })
-      .catch(() => showToast('Terjadi kesalahan saat menghapus mobil.', 'danger'));
-  }
+  if (isDeletingMobil) return; // Cegah eksekusi ganda
+
+  showCenterToast(
+    'Apakah Anda yakin ingin menghapus data mobil ini?',
+    'fas fa-car-crash',
+    'Konfirmasi Hapus Mobil',
+    () => {
+      isDeletingMobil = true;
+
+      remove(ref(database, `mobil/${key}`))
+        .then(() => {
+          showToastalert('Mobil berhasil dihapus!', 'success', 'fas fa-check-circle');
+        })
+        .catch(() => {
+          showToastalert('Terjadi kesalahan saat menghapus mobil.', 'danger', 'fas fa-times-circle');
+        })
+        .finally(() => {
+          isDeletingMobil = false;
+        });
+    }
+  );
 };
+
+function showCenterToast(message, icon = 'fas fa-info-circle', title = 'Konfirmasi', onConfirm) {
+  const container = document.getElementById('centeredToast');
+  const content = document.getElementById('centeredToastContent');
+
+  content.innerHTML = `
+    <div class="text-center">
+      <i class="${icon} fa-2x text-warning mb-3 d-block"></i>
+      <h5 class="fw-bold mb-2">${title}</h5>
+      <p class="mb-3">${message}</p>
+      <div class="d-flex justify-content-center gap-2">
+        <button id="confirmDeleteBtn" class="btn btn-danger px-3">
+          <i class="fas fa-trash-alt me-1"></i> Hapus
+        </button>
+        <button id="cancelDeleteBtn" class="btn btn-secondary px-3">
+          <i class="fas fa-times me-1"></i> Batal
+        </button>
+      </div>
+    </div>
+  `;
+
+  // Tampilkan toast
+  container.classList.remove('d-none');
+
+  // Tunggu tombol ditambahkan ke DOM
+  setTimeout(() => {
+    const confirmBtn = document.getElementById('confirmDeleteBtn');
+    const cancelBtn = document.getElementById('cancelDeleteBtn');
+
+    if (confirmBtn) {
+      confirmBtn.onclick = () => {
+        container.classList.add('d-none');
+        onConfirm(); // Jalankan fungsi yang dikirim
+      };
+    }
+
+    if (cancelBtn) {
+      cancelBtn.onclick = () => {
+        container.classList.add('d-none'); // Sembunyikan tanpa melakukan apapun
+      };
+    }
+  }, 50);
+}
+
+function showToastalert(message, type = 'success', icon = null) {
+  const toastEl = document.getElementById('bootstrapToast');
+  const toastBody = document.getElementById('bootstrapToastBody');
+
+  // Map default icon berdasarkan type
+  const defaultIcons = {
+    success: 'fas fa-check-circle',
+    danger: 'fas fa-times-circle',
+    warning: 'fas fa-exclamation-circle',
+    info: 'fas fa-info-circle'
+  };
+
+  const toastType = ['success', 'danger', 'warning', 'info'].includes(type) ? type : 'success';
+
+  // Reset background dan set yang baru
+  toastEl.classList.remove('bg-success', 'bg-danger', 'bg-warning', 'bg-info');
+  toastEl.classList.add(`bg-${toastType}`);
+
+  const iconClass = icon || defaultIcons[toastType];
+
+  toastBody.innerHTML = `<i class="${iconClass} me-2"></i>${message}`;
+
+  const toast = new bootstrap.Toast(toastEl);
+  toast.show();
+}
+
+// Tambahkan event listener untuk hapus backdrop saat modal ditutup
+document.getElementById('modalEditMobil').addEventListener('hidden.bs.modal', () => {
+  const backdrop = document.querySelector('.modal-backdrop');
+  if (backdrop) {
+    backdrop.remove();
+  }
+});
 
 // Tambahkan event listener untuk hapus backdrop saat modal ditutup
 document.getElementById('modalEditFoto').addEventListener('hidden.bs.modal', () => {
@@ -422,7 +513,7 @@ document.getElementById('formTambahMobil').addEventListener('submit', async (e) 
   let namaFileFoto = null;
 
   if (!nama || !merk || !tahun || !warna || !transmisi || !bahanBakar || isNaN(jumlahTempatDuduk) || !garasi || !tipemobil || !statusMobil || isNaN(harga)) {
-    showToast('Harap lengkapi semua field terlebih dahulu!', 'warning');
+    showToastalert('Harap lengkapi semua field terlebih dahulu!', 'warning');
     isSubmitting = false; // Reset flag
     return;
   }
@@ -466,7 +557,7 @@ document.getElementById('formTambahMobil').addEventListener('submit', async (e) 
       try {
         namaFileFoto = await uploadFotoMobil(file, namaMobilFinal);
       } catch (error) {
-        showToast('Gagal upload foto mobil!', 'danger');
+        showToastalert('Gagal upload foto mobil!', 'danger');
         isSubmitting = false; // Reset flag
         return;
       }
@@ -488,14 +579,14 @@ document.getElementById('formTambahMobil').addEventListener('submit', async (e) 
     });
 
     console.log('Data berhasil ditambahkan!');
-    showToast('Mobil berhasil ditambahkan!', 'success');
+    showToastalert('Mobil berhasil ditambahkan!', 'success');
     document.getElementById('formTambahMobil').reset();
     fileInput.value = '';
     resetFileButton.classList.add('d-none');
     bootstrap.Modal.getInstance(document.getElementById('modalTambahMobil')).hide();
   } catch (error) {
     console.error('Error saat menambahkan mobil:', error);
-    showToast('Terjadi kesalahan saat menambahkan mobil.', 'danger');
+    showToastalert('Terjadi kesalahan saat menambahkan mobil.', 'danger');
   }
 
   isSubmitting = false; // Reset flag di akhir proses

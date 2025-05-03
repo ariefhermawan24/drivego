@@ -983,3 +983,54 @@ button:disabled {
     margin: 0 auto;
     width: fit-content;
 }
+
+#centered-toast {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1055;
+    background: white;
+    border: 1px solid #ddd;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    padding: 20px;
+    max-width: 90%;
+    width: 350px;
+}
+
+#centeredToast button:hover i {
+    transform: scale(1.1);
+}
+
+.toast-container-custom {
+    bottom: 20px;
+    right: 20px;
+    position: fixed;
+}
+
+/* Responsif untuk mobile */
+@media (max-width: 576px) {
+    .toast-container-custom {
+        left: 50%;
+        transform: translateX(-50%);
+        right: auto;
+        bottom: 20px;
+        max-width: 90vw;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+    }
+
+    .toast {
+        width: 100%;
+        max-width: 360px;
+    }
+}
+
+@media (max-width: 480px) {
+    #centeredToast {
+        width: 95% !important;
+        font-size: 0.95rem;
+    }
+}

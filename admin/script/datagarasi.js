@@ -224,7 +224,7 @@ document.getElementById('editGarasiForm').addEventListener('submit', function (e
 
   // Validasi data sebelum diupdate
   if (!updatedData.nama_tempat || !updatedData.alamat || !updatedData.telepon) {
-    showToast('Semua Wajib Diisi!', 'danger');
+    showToastalert('Semua Wajib Diisi!', 'danger');
     isSubmittingEditGarasi = false;
     return;
   }
@@ -234,55 +234,121 @@ document.getElementById('editGarasiForm').addEventListener('submit', function (e
     // Update data menggunakan Firebase Modular SDK
     update(ref(database, 'garasi/' + editGarasiId), updatedData)
       .then(() => {
-        showToast('Data garasi berhasil diperbarui', 'success');
+        showToastalert('Data garasi berhasil diperbarui', 'success');
         bootstrap.Modal.getInstance(document.getElementById('editGarasiModal')).hide();
         renderTable(); // Render ulang tabel setelah update
       })
       .catch(error => {
         console.error("Error updating data:", error);
-        showToast('Gagal memperbarui data', 'danger');
+        showToastalert('Gagal memperbarui data', 'danger');
       })
       .finally(() => {
         isSubmittingEditGarasi = false;
       });
   } else {
-    showToast('Data tidak ditemukan', 'warning');
+    showToastalert('Data tidak ditemukan', 'warning');
     isSubmittingEditGarasi = false;
   }
 });
 
 window.editGarasi = editGarasi;
 
-let isDeletingGarasi = false;
-
 function hapusGarasi(key) {
-  // Pastikan hanya bisa dieksekusi sekali
-  if (isDeletingGarasi) return;
-  isDeletingGarasi = true;
 
-  if (confirm("Apakah Anda yakin ingin menghapus data ini?")) {
-    const db = getDatabase(); // Ambil instance dari database
-    const garasiRef = ref(db, 'garasi/' + key); // Referensi ke data garasi yang ingin dihapus berdasarkan key
+  // Tampilkan konfirmasi di tengah layar
+  showCenterToast(
+    'Apakah Anda yakin ingin menghapus data garasi ini?',
+    'fas fa-warehouse',
+    'Konfirmasi Penghapusan',
+    () => {
+      const db = getDatabase();
+      const garasiRef = ref(db, 'garasi/' + key);
 
-    // Menghapus data dari Firebase berdasarkan key
-    remove(garasiRef)
-      .then(() => {
-        showToast('Data garasi berhasil dihapus!', 'success');
-        renderTable(); // Render ulang tabel setelah data dihapus
-      })
-      .catch(error => {
-        console.error("Error deleting data:", error);
-        alert('Gagal menghapus data');
-      })
-      .finally(() => {
-        isDeletingGarasi = false;
-      });
-  } else {
-    isDeletingGarasi = false;
-  }
+      remove(garasiRef)
+        .then(() => {
+          showToastalert('Data garasi berhasil dihapus!', 'success', 'fas fa-check-circle');
+          renderTable(); // Render ulang tabel setelah penghapusan
+        })
+        .catch(error => {
+          console.error("Error deleting data:", error);
+          showToastalert('Gagal menghapus data garasi.', 'danger', 'fas fa-times-circle');
+        })
+        .finally(() => {
+        });
+    }
+  );
 }
 
 window.hapusGarasi = hapusGarasi;
+
+function showCenterToast(message, icon = 'fas fa-info-circle', title = 'Konfirmasi', onConfirm) {
+  const container = document.getElementById('centeredToast');
+  const content = document.getElementById('centeredToastContent');
+
+  content.innerHTML = `
+    <div class="text-center">
+      <i class="${icon} fa-2x text-warning mb-3 d-block"></i>
+      <h5 class="fw-bold mb-2">${title}</h5>
+      <p class="mb-3">${message}</p>
+      <div class="d-flex justify-content-center gap-2">
+        <button id="confirmDeleteBtn" class="btn btn-danger px-3">
+          <i class="fas fa-trash-alt me-1"></i> Hapus
+        </button>
+        <button id="cancelDeleteBtn" class="btn btn-secondary px-3">
+          <i class="fas fa-times me-1"></i> Batal
+        </button>
+      </div>
+    </div>
+  `;
+
+  // Tampilkan toast
+  container.classList.remove('d-none');
+
+  // Tunggu tombol ditambahkan ke DOM
+  setTimeout(() => {
+    const confirmBtn = document.getElementById('confirmDeleteBtn');
+    const cancelBtn = document.getElementById('cancelDeleteBtn');
+
+    if (confirmBtn) {
+      confirmBtn.onclick = () => {
+        container.classList.add('d-none');
+        onConfirm(); // Jalankan fungsi yang dikirim
+      };
+    }
+
+    if (cancelBtn) {
+      cancelBtn.onclick = () => {
+        container.classList.add('d-none'); // Sembunyikan tanpa melakukan apapun
+      };
+    }
+  }, 50);
+}
+
+function showToastalert(message, type = 'success', icon = null) {
+  const toastEl = document.getElementById('bootstrapToast');
+  const toastBody = document.getElementById('bootstrapToastBody');
+
+  // Map default icon berdasarkan type
+  const defaultIcons = {
+    success: 'fas fa-check-circle',
+    danger: 'fas fa-times-circle',
+    warning: 'fas fa-exclamation-circle',
+    info: 'fas fa-info-circle'
+  };
+
+  const toastType = ['success', 'danger', 'warning', 'info'].includes(type) ? type : 'success';
+
+  // Reset background dan set yang baru
+  toastEl.classList.remove('bg-success', 'bg-danger', 'bg-warning', 'bg-info');
+  toastEl.classList.add(`bg-${toastType}`);
+
+  const iconClass = icon || defaultIcons[toastType];
+
+  toastBody.innerHTML = `<i class="${iconClass} me-2"></i>${message}`;
+
+  const toast = new bootstrap.Toast(toastEl);
+  toast.show();
+}
 
 
 let isSubmittingGarasi = false;
@@ -298,7 +364,7 @@ function tambahGarasi() {
 
   // Validasi input
   if (!namaTempat || !alamat || !telepon) {
-    showToast('Semua kolom wajib diisi!', 'danger');
+    showToastalert('Semua kolom wajib diisi!', 'danger');
     isSubmittingGarasi = false;
     return;
   }
@@ -314,7 +380,7 @@ function tambahGarasi() {
       telepon: telepon
     })
     .then(() => {
-      showToast('Garasi berhasil ditambahkan!', 'success');
+      showToastalert('Garasi berhasil ditambahkan!', 'success');
       renderTable();
 
       const modal = bootstrap.Modal.getInstance(document.getElementById('modalTambahGarasi'));
@@ -323,7 +389,7 @@ function tambahGarasi() {
     })
     .catch((error) => {
       console.error("Error adding data: ", error);
-      showToast('Gagal menambahkan data!', 'danger');
+      showToastalert('Gagal menambahkan data!', 'danger');
     })
     .finally(() => {
       isSubmittingGarasi = false;

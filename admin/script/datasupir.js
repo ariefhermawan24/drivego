@@ -79,23 +79,29 @@ function getStatusButtonClass(status) {
   }
 }
 
-// Fungsi toggle status dengan konfirmasi
 async function toggleStatus(key, currentStatus) {
   const action = currentStatus === 'tersedia' ? 'menonaktifkan' : 'mengaktifkan';
-  
-  if(!confirm(`Anda yakin ingin ${action} sopir ini?`)) {
-    return;
-  }
 
-  const newStatus = currentStatus === 'tersedia' ? 'tidak tersedia' : 'tersedia';
-  
-  try {
-    const sopirRef = ref(database, `users/${key}`);
-    await update(sopirRef, { status: newStatus });
-  } catch (error) {
-    console.error('Gagal update status:', error);
-    alert('Gagal mengubah status');
-  }
+  // Menampilkan toast konfirmasi
+  showCenterToast2(
+    `Apakah Anda yakin ingin ${action} sopir ini?`,
+    'fas fa-exclamation-triangle',
+    'Konfirmasi',
+    async () => {
+      const newStatus = currentStatus === 'tersedia' ? 'tidak tersedia' : 'tersedia';
+
+      try {
+        const sopirRef = ref(database, `users/${key}`);
+        await update(sopirRef, {
+          status: newStatus
+        });
+        showToastalert('Status berhasil diubah!', 'success', 'fas fa-check-circle');
+      } catch (error) {
+        console.error('Gagal update status:', error);
+        showToastalert('Gagal mengubah status', 'danger', 'fas fa-times-circle');
+      }
+    }
+  );
 }
 
 window.toggleStatus = toggleStatus;
@@ -222,19 +228,19 @@ document.getElementById('formTambahSopir').addEventListener('submit', async func
     });
 
     if (usernameExists) {
-      showToast('Username sudah digunakan. Silakan pilih username lain!', 'danger');
+      showToastalert('Username sudah digunakan. Silakan pilih username lain!', 'danger');
       this.submitting = false; // Reset flag
       return;
     }
 
     if (teleponExists) {
-      showToast('Nomor telepon sudah terdaftar. Silakan gunakan nomor lain!', 'danger');
+      showToastalert('Nomor telepon sudah terdaftar. Silakan gunakan nomor lain!', 'danger');
       this.submitting = false; // Reset flag
       return;
     }
 
     if (emailExists) {
-      showToast('Email sudah terdaftar. Silakan gunakan email lain!', 'danger');
+      showToastalert('Email sudah terdaftar. Silakan gunakan email lain!', 'danger');
       this.submitting = false; // Reset flag
       return;
     }
@@ -257,7 +263,7 @@ document.getElementById('formTambahSopir').addEventListener('submit', async func
     };
 
     await push(sopirRef, sopirData);
-    showToast('Supir berhasil ditambahkan', 'success');
+    showToastalert('Supir berhasil ditambahkan', 'success');
     document.getElementById('formTambahSopir').reset();
 
     // Tutup modal
@@ -266,7 +272,7 @@ document.getElementById('formTambahSopir').addEventListener('submit', async func
 
   } catch (error) {
     console.error('Error adding sopir:', error);
-    showToast('Gagal menambahkan supir', 'danger');
+    showToastalert('Gagal menambahkan supir', 'danger');
   } finally {
     this.submitting = false; // Reset flag setelah proses selesai
   }
@@ -292,25 +298,123 @@ async function hashPassword(password) {
 }
 
 function hapusSopir(key) {
-  if (confirm('Apakah Anda yakin ingin menghapus sopir ini?')) {
-    try {
-      const sopirRef = ref(database, `users/${key}`);
-      remove(sopirRef)
-        .then(() => {
-          showToast('Supir berhasil dihapus', 'success');
-        })
-        .catch((error) => {
-          console.error('Gagal menghapus sopir:', error);
-          alert('Gagal menghapus sopir');
-        });
-    } catch (error) {
-      console.error('Error:', error);
-      alert('Terjadi kesalahan saat menghapus');
+  showCenterToast(
+    'Apakah Anda yakin ingin menghapus sopir ini?',
+    'fas fa-user-times',
+    'Konfirmasi Hapus',
+    () => {
+      try {
+        const sopirRef = ref(database, `users/${key}`);
+        remove(sopirRef)
+          .then(() => {
+            showToastalert('Sopir berhasil dihapus.', 'success', 'fas fa-check-circle');
+          })
+          .catch((error) => {
+            console.error('Gagal menghapus sopir:', error);
+            showToastalert('Gagal menghapus sopir.', 'danger', 'fas fa-times-circle');
+          });
+      } catch (error) {
+        console.error('Error:', error);
+        showToastalert('Terjadi kesalahan saat menghapus.', 'danger', 'fas fa-times-circle');
+      }
     }
-  }
+  );
 }
 
 window.hapusSopir = hapusSopir;
+
+function showToastalert(message, type = 'success', icon = null) {
+  const toastEl = document.getElementById('bootstrapToast');
+  const toastBody = document.getElementById('bootstrapToastBody');
+
+  // Map default icon berdasarkan type
+  const defaultIcons = {
+    success: 'fas fa-check-circle',
+    danger: 'fas fa-times-circle',
+    warning: 'fas fa-exclamation-circle',
+    info: 'fas fa-info-circle'
+  };
+
+  const toastType = ['success', 'danger', 'warning', 'info'].includes(type) ? type : 'success';
+
+  // Reset background dan set yang baru
+  toastEl.classList.remove('bg-success', 'bg-danger', 'bg-warning', 'bg-info');
+  toastEl.classList.add(`bg-${toastType}`);
+
+  const iconClass = icon || defaultIcons[toastType];
+
+  toastBody.innerHTML = `<i class="${iconClass} me-2"></i>${message}`;
+
+  const toast = new bootstrap.Toast(toastEl);
+  toast.show();
+}
+
+function showCenterToast2(message, icon = 'fas fa-info-circle', title = 'Konfirmasi', onConfirm) {
+  const container = document.getElementById('centeredToast');
+  const content = document.getElementById('centeredToastContent');
+
+  content.innerHTML = `
+    <div class="text-center">
+      <i class="${icon} fa-3x text-warning mb-3"></i>
+      <h5 class="fw-bold mb-3">${title}</h5>
+      <p class="mb-4">${message}</p>
+      <div class="d-flex justify-content-center gap-3">
+        <button class="btn btn-success px-4" id="confirmBtn"><i class="fas fa-check-circle me-2"></i>${title.toLowerCase()}</button>
+        <button class="btn btn-secondary px-4" onclick="document.getElementById('centeredToast').classList.add('d-none')">
+          <i class="fas fa-times me-2"></i>Batal
+        </button>
+      </div>
+    </div>
+  `;
+
+  // Show the toast in the center of the screen
+  container.classList.remove('d-none');
+
+  // Event for the Confirm button
+  setTimeout(() => {
+    const confirmBtn = document.getElementById('confirmBtn');
+    if (confirmBtn) {
+      confirmBtn.onclick = () => {
+        container.classList.add('d-none');
+        onConfirm(); // Call the onConfirm function if the user confirms
+      };
+    }
+  }, 100);
+}
+
+function showCenterToast(message, icon = 'fas fa-info-circle', title = 'Konfirmasi', onConfirm) {
+  const container = document.getElementById('centeredToast');
+  const content = document.getElementById('centeredToastContent');
+
+  content.innerHTML = `
+    <div class="text-center">
+      <i class="${icon} fa-3x text-warning mb-3"></i>
+      <h5 class="fw-bold mb-3">${title}</h5>
+      <p class="mb-4">${message}</p>
+      <div class="d-flex justify-content-center gap-3">
+        <button class="btn btn-danger px-4" id="confirmDeleteBtn"><i class="fas fa-trash-alt me-2"></i>Hapus</button>
+        <button class="btn btn-secondary px-4" onclick="document.getElementById('centeredToast').classList.add('d-none')">
+          <i class="fas fa-times me-2"></i>Batal
+        </button>
+      </div>
+    </div>
+  `;
+
+  // Show the toast in the center of the screen
+  container.classList.remove('d-none');
+
+  // Event for the Confirm button
+  setTimeout(() => {
+    const confirmBtn = document.getElementById('confirmDeleteBtn');
+    if (confirmBtn) {
+      confirmBtn.onclick = () => {
+        container.classList.add('d-none');
+        onConfirm();
+      };
+    }
+  }, 100);
+}
+
 
 function setupListener() {
   // Kalau sebelumnya sudah ada listener, matikan dulu

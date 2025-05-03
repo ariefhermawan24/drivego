@@ -38,6 +38,7 @@ onValue(transaksiRef, (snapshot) => {
 
                 // Tampilkan data ke HTML
                 document.querySelector(".orderid").textContent = data.orderId;
+                document.querySelector(".jam-jemput").textContent = `Pukul ${data.jamPenjemputan}`;
                 document.querySelector(".tanggal").textContent = data.rangeSewa;
                 document.querySelector('.nama-penyewa').textContent = data.namaPenyewa;
                 // Hitung total pelunasan

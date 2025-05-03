@@ -320,92 +320,140 @@ window.searchRental = searchRental;
 window.changePage = changePage;
 
 function handleReturn(orderId) {
-  // Tampilkan alert konfirmasi dulu
-  const konfirmasi = confirm(`Apakah Anda yakin ingin menyelesaikan transaksi ${orderId}?`);
+  showCenterToast(
+    `
+    Apakah Anda yakin ingin menyelesaikan transaksi <strong>${orderId}</strong>?<br>
+    <small class="text-warning d-block mt-2"><i class="fas fa-exclamation-circle me-1"></i>Pastikan mobil sudah kembali sebelum diselesaikan.</small>
+    `,
+    'fas fa-clipboard-check',
+    'Konfirmasi Selesaikan Transaksi',
+    () => {
+      const transaksiRef = ref(database, 'transaksi/' + orderId);
 
-  if (!konfirmasi) {
-    return; // Kalau user klik "Cancel", proses berhenti di sini
-  }
+      get(transaksiRef).then((snapshot) => {
+        if (snapshot.exists()) {
+          const transaksiData = snapshot.val();
+          const namaSupir = transaksiData.namasupir;
+          const mobil = transaksiData.namaMobil;
 
-  const transaksiRef = ref(database, 'transaksi/' + orderId);
+          const mobilRef = ref(database, 'mobil');
 
-  // Ambil dulu data transaksi untuk mendapatkan nama supir dan mobil
-  get(transaksiRef).then((snapshot) => {
-    if (snapshot.exists()) {
-      const transaksiData = snapshot.val();
-      const namaSupir = transaksiData.namasupir;
-      const mobil = transaksiData.namaMobil;
+          return get(mobilRef).then((mobilSnapshot) => {
+            if (mobilSnapshot.exists()) {
+              const mobilData = mobilSnapshot.val();
 
-      // Cari mobil yang memiliki nama_mobil yang sesuai dengan nama mobil di transaksi
-      const mobilRef = ref(database, 'mobil'); // Path untuk data mobil
-      return get(mobilRef).then((mobilSnapshot) => {
-        if (mobilSnapshot.exists()) {
-          const mobilData = mobilSnapshot.val();
+              for (const mobilId in mobilData) {
+                const mobilItem = mobilData[mobilId];
+                if (mobilItem.nama_mobil === mobil) {
+                  const mobilRefUpdate = ref(database, `mobil/${mobilId}`);
 
-          // Mencari mobil yang statusnya sesuai dengan nama_mobil dari transaksi
-          for (const mobilId in mobilData) {
-            const mobilItem = mobilData[mobilId];
-            if (mobilItem.nama_mobil === mobil) {
-              const mobilRefUpdate = ref(database, `mobil/${mobilId}`);
-
-              // Update status mobil menjadi 'tersedia'
-              return update(mobilRefUpdate, {
-                  status: 'tersedia'
-                })
-                .then(() => {
-                  console.log(`Status mobil ${mobil} berhasil diubah menjadi tersedia.`);
-
-                  // Setelah mobil selesai, update status transaksi menjadi 'selesai'
-                  const transaksiRefUpdate = ref(database, 'transaksi/' + orderId);
-                  return update(transaksiRefUpdate, {
+                  return update(mobilRefUpdate, {
+                    status: 'tersedia'
+                  }).then(() => {
+                    const transaksiRefUpdate = ref(database, 'transaksi/' + orderId);
+                    return update(transaksiRefUpdate, {
                       status: 'selesai'
-                    })
-                    .then(() => {
-                      alert(`Transaksi ${orderId} berhasil diubah menjadi Selesai.`);
+                    }).then(() => {
+                      showToastalert(`Transaksi <strong>${orderId}</strong> berhasil diselesaikan.`, 'success', 'fas fa-check-circle');
 
                       if (namaSupir) {
                         const usersRef = ref(database, 'users');
-
-                        // Cari user yang rolenya 'driver' dan username-nya sesuai dengan namasupir
                         return get(usersRef).then((usersSnapshot) => {
                           if (usersSnapshot.exists()) {
                             const usersData = usersSnapshot.val();
 
                             for (const userId in usersData) {
                               const user = usersData[userId];
-
                               if (user.role === 'drivers' && user.username === namaSupir) {
                                 const driverRef = ref(database, `users/${userId}`);
-
-                                // Update status driver menjadi 'tersedia'
                                 return update(driverRef, {
-                                    status: 'tersedia'
-                                  })
-                                  .then(() => {
-                                    console.log(`Status supir ${namaSupir} berhasil diubah menjadi tersedia.`);
-                                    location.reload(); // Optional, refresh tampilan setelah selesai semua proses
-                                  });
+                                  status: 'tersedia'
+                                }).then(() => {
+                                  showToastalert(`Supir <strong>${namaSupir}</strong> sekarang tersedia.`, 'info', 'fas fa-user-check');
+                                  setTimeout(() => location.reload(), 1000);
+                                });
                               }
                             }
                           }
                         });
                       } else {
-                        location.reload(); // Kalau nggak ada supir, langsung reload
+                        setTimeout(() => location.reload(), 1000);
                       }
                     });
-                });
+                  });
+                }
+              }
             }
-          }
+          });
+        } else {
+          showToastalert('Data transaksi tidak ditemukan.', 'warning', 'fas fa-exclamation-triangle');
         }
+      }).catch((error) => {
+        console.error("Gagal update status:", error);
+        showToastalert('Terjadi kesalahan saat mengubah status.', 'danger', 'fas fa-times-circle');
       });
-    } else {
-      alert('Data transaksi tidak ditemukan.');
     }
-  }).catch((error) => {
-    console.error("Gagal update status:", error);
-    alert('Terjadi kesalahan saat mengubah status. Silakan coba lagi.');
-  });
+  );
+}
+
+window.handleReturn = handleReturn;
+
+function showToastalert(message, type = 'success', icon = null) {
+  const toastEl = document.getElementById('bootstrapToast');
+  const toastBody = document.getElementById('bootstrapToastBody');
+
+  // Map default icon berdasarkan type
+  const defaultIcons = {
+    success: 'fas fa-check-circle',
+    danger: 'fas fa-times-circle',
+    warning: 'fas fa-exclamation-circle',
+    info: 'fas fa-info-circle'
+  };
+
+  const toastType = ['success', 'danger', 'warning', 'info'].includes(type) ? type : 'success';
+
+  // Reset background dan set yang baru
+  toastEl.classList.remove('bg-success', 'bg-danger', 'bg-warning', 'bg-info');
+  toastEl.classList.add(`bg-${toastType}`);
+
+  const iconClass = icon || defaultIcons[toastType];
+
+  toastBody.innerHTML = `<i class="${iconClass} me-2"></i>${message}`;
+
+  const toast = new bootstrap.Toast(toastEl);
+  toast.show();
 }
 
 
-window.handleReturn = handleReturn;
+function showCenterToast(message, icon = 'fas fa-info-circle', title = 'Konfirmasi', onConfirm, confirmLabel = 'selesaikan') {
+  const container = document.getElementById('centeredToast');
+  const content = document.getElementById('centeredToastContent');
+
+  content.innerHTML = `
+    <div class="text-center px-3">
+      <i class="${icon} fa-3x text-warning mb-3"></i>
+      <h5 class="fw-bold mb-3">${title}</h5>
+      <p class="mb-3">${message}</p>
+      <div class="d-flex justify-content-center gap-3">
+        <button class="btn btn-success px-4" id="confirmBtn">
+          <i class="fas fa-check-circle me-2"></i>${confirmLabel}
+        </button>
+        <button class="btn btn-secondary px-4" onclick="document.getElementById('centeredToast').classList.add('d-none')">
+          <i class="fas fa-times me-2"></i>Batal
+        </button>
+      </div>
+    </div>
+  `;
+
+  container.classList.remove('d-none');
+
+  setTimeout(() => {
+    const confirmBtn = document.getElementById('confirmBtn');
+    if (confirmBtn) {
+      confirmBtn.onclick = () => {
+        container.classList.add('d-none');
+        onConfirm();
+      };
+    }
+  }, 100);
+}

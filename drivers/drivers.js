@@ -695,25 +695,73 @@ window.toggleStatus = function () {
                 const currentStatus = userData.status;
                 const newStatus = currentStatus?.toLowerCase() === "tersedia" ? "tidak tersedia" : "tersedia";
 
-                const confirmToggle = confirm(`Apakah kamu yakin ingin mengubah status menjadi "${newStatus}"?`);
-
-                if (confirmToggle) {
-                    // Cegah perubahan jika status sedang bekerja
-                    if (currentStatus === "bertugas") {
-                        showToast('Status tidak bisa diganti karena anda sedang bertugas!', 'danger');
-                        return; // Hentikan eksekusi
-                    } else {
-                        showToast('Status berhasil diubah!', 'success');
-                        update(ref(database, `users/${userKey}`), {
-                            status: newStatus
-                        }).catch((error) => {
-                            alert("Gagal mengubah status: " + error.message);
-                        });
-                    }
+                if (currentStatus === "bertugas") {
+                    showBootstrapToast('Status tidak bisa diganti karena Anda sedang bertugas!', 'danger');
+                    return;
                 }
+
+                const reasonText = newStatus === "tersedia" ?
+                    `<i class="fas fa-bolt text-warning me-1"></i> Dengan mengubah status ini, Anda akan terbuka menerima tugas dan siap untuk bertugas.` :
+                    `<i class="fas fa-moon text-info me-1"></i> Dengan mengubah status ini, Anda tidak akan menerima tugas.`;
+
+                const html = `
+                    <div class="mb-3">
+                        <h5 class="fw-semibold text-white"><i class="fas fa-exchange-alt text-primary me-2"></i>Konfirmasi Perubahan</h5>
+                        <p class="text-white-50">${reasonText}</p>
+                        <p class="mt-3 mb-2">Apakah kamu yakin ingin mengubah status menjadi <strong>"${newStatus}"</strong>?</p>
+                    </div>
+                    <div class="d-flex justify-content-center gap-3 mt-3">
+                        <button class="btn btn-success px-4" id="confirmYes">
+                            <i class="fas fa-check me-1"></i> Ubah
+                        </button>
+                        <button class="btn btn-danger px-4" id="confirmNo">
+                            <i class="fas fa-times me-1"></i> Batal
+                        </button>
+                    </div>
+                `;
+
+                showCenteredToast(html);
+
+                document.getElementById("confirmYes").onclick = () => {
+                    update(ref(database, `users/${userKey}`), {
+                        status: newStatus
+                    }).then(() => {
+                        showBootstrapToast("Status berhasil diubah!", 'success');
+                    }).catch((error) => {
+                        showBootstrapToast("Gagal mengubah status: " + error.message, 'danger');
+                    });
+                    hideCenteredToast();
+                };
+
+                document.getElementById("confirmNo").onclick = hideCenteredToast;
             }
         });
     }, {
         onlyOnce: true
     });
 };
+
+function showBootstrapToast(message, type = 'success') {
+    const toastEl = document.getElementById("bootstrapToast");
+    const toastBody = document.getElementById("bootstrapToastBody");
+
+    let icon = '<i class="fas fa-info-circle fa-lg"></i>';
+    if (type === 'success') icon = '<i class="fas fa-check-circle fa-lg"></i>';
+    else if (type === 'danger') icon = '<i class="fas fa-exclamation-triangle fa-lg"></i>';
+
+    toastBody.innerHTML = `${icon}<span>${message}</span>`;
+    toastEl.className = `toast align-items-center text-white bg-${type} border-0 shadow`;
+
+    const toast = new bootstrap.Toast(toastEl);
+    toast.show();
+}
+
+function showCenteredToast(contentHTML) {
+    const centered = document.getElementById("centeredToast");
+    document.getElementById("centeredToastContent").innerHTML = contentHTML;
+    centered.classList.remove("d-none");
+}
+
+function hideCenteredToast() {
+    document.getElementById("centeredToast").classList.add("d-none");
+}

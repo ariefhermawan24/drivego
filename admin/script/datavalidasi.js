@@ -274,7 +274,7 @@ function monitorCheckboxes(data) {
   btnTolak.addEventListener('click', () => {
     const transaksiPath = child(transaksiRef, data.orderId);
     set(transaksiPath, { ...data, status: 'rejected' }).then(() => {
-      showToast('Transaksi Ditolak!', 'danger');
+      showToastalert('Transaksi Ditolak!', 'success');
       $('#validasiModal').modal('hide');
     }).catch(error => {
       console.error('Gagal memperbarui status transaksi:', error);
@@ -291,7 +291,7 @@ function monitorCheckboxes(data) {
     // Cek apakah transaksi sudah ada dan status sudah accepted
     get(transaksiPath).then(snapshot => {
       if (snapshot.exists() && snapshot.val().status === 'accepted') {
-        showToast('Transaksi ini sudah diterima sebelumnya.', 'danger');
+        showToastalert('Transaksi ini sudah diterima sebelumnya.', 'danger');
         btnTerima.disabled = false; // Re-enable tombol
         return;
       }
@@ -369,7 +369,7 @@ function monitorCheckboxes(data) {
                   // Setelah transaksi sukses, update status supir jadi "bertugas"
                   return set(child(usersRef, `${selectedDriverId}/status`), 'bertugas');
                 }).then(() => {
-                  showToast('Transaksi diterima dan supir telah ditetapkan!', 'succes');
+                  showToastalert('Transaksi diterima dan supir telah ditetapkan!', 'success');
                   $('#validasiModal').modal('hide');
 
                   // Mengupdate status mobil yang disewa
@@ -491,3 +491,29 @@ function loadSupir() {
 
 // Memanggil fungsi validasi
 window.validasi = validasi;
+
+function showToastalert(message, type = 'success', icon = null) {
+  const toastEl = document.getElementById('bootstrapToast');
+  const toastBody = document.getElementById('bootstrapToastBody');
+
+  // Map default icon berdasarkan type
+  const defaultIcons = {
+    success: 'fas fa-check-circle',
+    danger: 'fas fa-times-circle',
+    warning: 'fas fa-exclamation-circle',
+    info: 'fas fa-info-circle'
+  };
+
+  const toastType = ['success', 'danger', 'warning', 'info'].includes(type) ? type : 'success';
+
+  // Reset background dan set yang baru
+  toastEl.classList.remove('bg-success', 'bg-danger', 'bg-warning', 'bg-info');
+  toastEl.classList.add(`bg-${toastType}`);
+
+  const iconClass = icon || defaultIcons[toastType];
+
+  toastBody.innerHTML = `<i class="${iconClass} me-2"></i>${message}`;
+
+  const toast = new bootstrap.Toast(toastEl);
+  toast.show();
+}

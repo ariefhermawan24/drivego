@@ -687,3 +687,4 @@ document.addEventListener("DOMContentLoaded", function () {
 
     watchUserUpdates();
 });
+

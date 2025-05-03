@@ -192,47 +192,103 @@ onValue(transaksiRef, (snapshot) => {
 window.searchRental = searchRental;
 window.changePage = changePage;
 
-// Function untuk handle delete
 function handleDelete(orderId) {
-  // Konfirmasi sebelum hapus
-  if (!confirm('Apakah Anda yakin ingin menghapus transaksi ini?')) {
-    return;
-  }
+  // Tampilkan konfirmasi menggunakan toast tengah
+  showCenterToast(
+    'Apakah Anda yakin ingin menghapus History Transaksi ini?',
+    'fas fa-exclamation-triangle',
+    'Konfirmasi Hapus',
+    () => {
+      // Jika dikonfirmasi, lanjut hapus
+      get(transaksiRef).then((snapshot) => {
+        if (snapshot.exists()) {
+          const transaksiData = snapshot.val();
+          let keyToDelete = null;
 
-  // Cari transaksi dengan orderId yang sesuai
-  get(transaksiRef).then((snapshot) => {
-    if (snapshot.exists()) {
-      const transaksiData = snapshot.val();
-      let keyToDelete = null;
-
-      // Loop data untuk cari key yang sesuai dengan orderId
-      Object.keys(transaksiData).forEach((key) => {
-        if (transaksiData[key].orderId === orderId) {
-          keyToDelete = key;
-        }
-      });
-
-      if (keyToDelete) {
-        // Hapus data berdasarkan key yang ditemukan
-        const transaksiToDeleteRef = child(transaksiRef, keyToDelete);
-        remove(transaksiToDeleteRef)
-          .then(() => {
-            showToast('Transaksi berhasil dihapus!', 'success');
-          })
-          .catch((error) => {
-            console.error('Error saat menghapus transaksi:', error);
-            alert('Terjadi kesalahan saat menghapus transaksi.');
+          Object.keys(transaksiData).forEach((key) => {
+            if (transaksiData[key].orderId === orderId) {
+              keyToDelete = key;
+            }
           });
-      } else {
-        alert('Transaksi tidak ditemukan.');
-      }
-    } else {
-      alert('Tidak ada data transaksi.');
+
+          if (keyToDelete) {
+            const transaksiToDeleteRef = child(transaksiRef, keyToDelete);
+            remove(transaksiToDeleteRef)
+              .then(() => {
+                showToastalert('Transaksi berhasil dihapus!', 'success', 'fas fa-check-circle');
+              })
+              .catch((error) => {
+                console.error('Error saat menghapus transaksi:', error);
+                showToastalert('Gagal menghapus transaksi.', 'danger', 'fas fa-times-circle');
+              });
+          } else {
+            showToastalert('Transaksi tidak ditemukan.', 'warning', 'fas fa-info-circle');
+          }
+        } else {
+          showToastalert('Tidak ada data transaksi.', 'warning', 'fas fa-info-circle');
+        }
+      }).catch((error) => {
+        console.error('Error saat mengambil data transaksi:', error);
+        showToastalert('Terjadi kesalahan saat mengambil data.', 'danger', 'fas fa-times-circle');
+      });
     }
-  }).catch((error) => {
-    console.error('Error saat mengambil data transaksi:', error);
-    alert('Terjadi kesalahan saat mengambil data transaksi.');
-  });
+  );
 }
 
 window.handleDelete = handleDelete;
+
+function showToastalert(message, type = 'success', icon = null) {
+  const toastEl = document.getElementById('bootstrapToast');
+  const toastBody = document.getElementById('bootstrapToastBody');
+
+  // Map default icon berdasarkan type
+  const defaultIcons = {
+    success: 'fas fa-check-circle',
+    danger: 'fas fa-times-circle',
+    warning: 'fas fa-exclamation-circle',
+    info: 'fas fa-info-circle'
+  };
+
+  const toastType = ['success', 'danger', 'warning', 'info'].includes(type) ? type : 'success';
+
+  // Reset background dan set yang baru
+  toastEl.classList.remove('bg-success', 'bg-danger', 'bg-warning', 'bg-info');
+  toastEl.classList.add(`bg-${toastType}`);
+
+  const iconClass = icon || defaultIcons[toastType];
+
+  toastBody.innerHTML = `<i class="${iconClass} me-2"></i>${message}`;
+
+  const toast = new bootstrap.Toast(toastEl);
+  toast.show();
+}
+
+
+function showCenterToast(message, icon = 'fas fa-info-circle', title = 'Konfirmasi', onConfirm) {
+  const container = document.getElementById('centeredToast');
+  const content = document.getElementById('centeredToastContent');
+
+  content.innerHTML = `
+    <i class="${icon} fa-2x text-warning mb-3"></i>
+    <h5 class="fw-bold mb-2">${title}</h5>
+    <p class="mb-3">${message}</p>
+    <div class="d-flex justify-content-center gap-2">
+      <button class="btn btn-danger px-3" id="confirmDeleteBtn"><i class="fas fa-trash-alt me-1"></i>Hapus</button>
+      <button class="btn btn-secondary px-3" onclick="document.getElementById('centeredToast').classList.add('d-none')">
+        <i class="fas fa-times me-1"></i>Batal
+      </button>
+    </div>
+  `;
+  container.classList.remove('d-none');
+
+  // Bind tombol konfirmasi
+  setTimeout(() => {
+    const confirmBtn = document.getElementById('confirmDeleteBtn');
+    if (confirmBtn) {
+      confirmBtn.onclick = () => {
+        container.classList.add('d-none');
+        onConfirm();
+      };
+    }
+  }, 100);
+}
