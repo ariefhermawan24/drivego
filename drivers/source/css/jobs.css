@@ -16,6 +16,42 @@
     color: #0056b3;
 }
 
+.dropdown-menu .dropdown-item.location-item {
+    white-space: normal !important;
+    /* Ini override style Bootstrap */
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    gap: 10px !important;
+    word-break: break-word !important;
+    padding: 0.5rem 1rem !important;
+}
+
+.location-item {
+    display: flex !important;
+    align-items: center !important;
+    padding: 0.5rem 1rem !important;
+    text-decoration: none !important;
+    gap: 10px !important;
+    white-space: normal !important;
+    /* override bootstrap */
+}
+
+.location-text {
+    flex: 1 1 auto !important;
+    white-space: normal !important;
+    word-break: break-word !important;
+    font-size: 0.9rem !important;
+    line-height: 1.2 !important;
+}
+
+.location-icon {
+    font-size: 1rem !important;
+    flex-shrink: 0 !important;
+    align-self: center !important;
+}
+
+
 .btn-custom {
     background-color: #FF7F50;
     border-color: #FF7F50;

@@ -144,16 +144,21 @@ onValue(transaksiRef, (snapshot) => {
 
                         // Buat <a>
                         const a = document.createElement("a");
-                        a.className = "dropdown-item d-flex justify-content-between align-items-center";
+                        a.className = "dropdown-item location-item";
                         a.href = `https://www.google.com/maps/search/${encodeURIComponent(tujuan)}`;
                         a.target = "_blank";
-                        a.textContent = tujuan;
+
+                        // Buat <div> untuk teks tujuan
+                        const textDiv = document.createElement("div");
+                        textDiv.className = "location-text";
+                        textDiv.textContent = tujuan;
 
                         // Buat icon
                         const icon = document.createElement("i");
-                        icon.className = "fas fa-map-marker-alt";
+                        icon.className = "fas fa-map-marker-alt location-icon";
 
-                        // Masukkan icon ke dalam <a>
+                        // Tambahkan text dan icon ke dalam <a>
+                        a.appendChild(textDiv);
                         a.appendChild(icon);
 
                         // Masukkan <a> ke dalam <li>
