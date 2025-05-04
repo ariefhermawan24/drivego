@@ -744,17 +744,30 @@ window.toggleStatus = function () {
 function showBootstrapToast(message, type = 'success') {
     const toastEl = document.getElementById("bootstrapToast");
     const toastBody = document.getElementById("bootstrapToastBody");
+    const toastContainer = document.getElementById("bootstrapToastContainer");
 
+    // Tampilkan container (jika sempat disembunyikan)
+    toastContainer.classList.remove("d-none");
+
+    // Ganti ikon berdasarkan tipe
     let icon = '<i class="fas fa-info-circle fa-lg"></i>';
     if (type === 'success') icon = '<i class="fas fa-check-circle fa-lg"></i>';
     else if (type === 'danger') icon = '<i class="fas fa-exclamation-triangle fa-lg"></i>';
 
+    // Ubah isi toast
     toastBody.innerHTML = `${icon}<span>${message}</span>`;
     toastEl.className = `toast align-items-center text-white bg-${type} border-0 shadow`;
 
+    // Tampilkan toast
     const toast = new bootstrap.Toast(toastEl);
     toast.show();
+
+    // Sembunyikan container setelah toast menghilang (opsional)
+    toastEl.addEventListener('hidden.bs.toast', () => {
+        toastContainer.classList.add("d-none");
+    });
 }
+
 
 function showCenteredToast(contentHTML) {
     const centered = document.getElementById("centeredToast");

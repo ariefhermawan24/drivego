@@ -495,6 +495,10 @@ window.validasi = validasi;
 function showToastalert(message, type = 'success', icon = null) {
   const toastEl = document.getElementById('bootstrapToast');
   const toastBody = document.getElementById('bootstrapToastBody');
+  const toastContainer = document.getElementById("bootstrapToastContainer");
+
+  // Tampilkan container (jika sempat disembunyikan)
+  toastContainer.classList.remove("d-none");
 
   // Map default icon berdasarkan type
   const defaultIcons = {
@@ -516,4 +520,9 @@ function showToastalert(message, type = 'success', icon = null) {
 
   const toast = new bootstrap.Toast(toastEl);
   toast.show();
+
+  // Sembunyikan container setelah toast menghilang (opsional)
+  toastEl.addEventListener('hidden.bs.toast', () => {
+    toastContainer.classList.add("d-none");
+  });
 }

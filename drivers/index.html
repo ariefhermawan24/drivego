@@ -164,8 +164,10 @@
     </div>
 
    <!-- Toast Notifikasi Responsif -->
-   <div aria-live="polite" aria-atomic="true" class="position-fixed toast-container-custom p-3" style="z-index: 1080;">
-       <div id="bootstrapToast" class="toast align-items-center text-white bg-success border-0 shadow" role="alert">
+   <div aria-live="polite" aria-atomic="true" class="position-fixed toast-container-custom p-3 d-none"
+       style="z-index: 1080;" id="bootstrapToastContainer">
+       <div id="bootstrapToast" class="toast align-items-center text-white bg-success border-0 shadow" role="alert"
+           data-bs-delay="3000" data-bs-autohide="true">
            <div class="d-flex">
                <div class="toast-body d-flex align-items-center gap-2" id="bootstrapToastBody">
                    <i class="fas fa-check-circle fa-lg"></i>
