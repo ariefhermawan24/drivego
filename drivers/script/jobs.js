@@ -213,3 +213,20 @@ onValue(transaksiRef, (snapshot) => {
         document.querySelector(".card-footer").style.display = "none";
     }
 });
+
+document.addEventListener('DOMContentLoaded', function () {
+    const dropdownToggle = document.querySelector('.dropdown-toggle');
+    const dropdown = document.querySelector('.dropdown');
+
+    // Saat dropdown ditampilkan
+    dropdown.addEventListener('show.bs.dropdown', function () {
+        dropdownToggle.classList.add('show');
+    });
+
+    // Saat dropdown disembunyikan
+    dropdown.addEventListener('hide.bs.dropdown', function () {
+        dropdownToggle.classList.remove('show');
+    });
+});
+
+

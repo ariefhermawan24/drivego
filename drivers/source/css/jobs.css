@@ -93,3 +93,114 @@
         text-align: center;
     }
 }
+
+/* Default (Desktop) */
+.btn-custom,
+.btn,
+.dropdown-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    overflow: hidden;
+}
+
+/* Wrapper teks dan ikon */
+.btn-icon-text {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    width: 100%;
+    min-width: 0;
+    /* mencegah melar di kontainer fleksibel */
+}
+
+/* Ikon di kiri */
+.icon-left {
+    position: absolute;
+}
+
+/* Teks di tengah, aman dari ikon */
+.btn-icon-text span {
+    text-align: center;
+    width: 100%;
+    padding-left: 8px;
+    overflow: hidden;
+    display: block;
+    min-width: 0;
+    /* penting agar shrink di flex */
+}
+
+/* Dropdown khusus */
+.dropdown-toggle-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+/* Menambahkan properti untuk memastikan teks berada di tengah */
+.dropdown-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.dropdown-toggle .dropdown-toggle-content {
+    width: 100%;
+}
+
+.dropdown-toggle .dropdown-toggle-content span {
+    margin: 0 auto;
+    /* Ini memastikan teks di tengah */
+}
+
+/* Atur transisi dan posisi awal panah bawaan Bootstrap */
+.dropdown-toggle::after {
+    transition: transform 0.3s ease-in-out;
+}
+
+/* Ketika dropdown aktif, putar panah ke atas */
+.dropdown-toggle.show::after {
+    transform: rotate(180deg);
+}
+
+
+/* Mobile adjustments */
+@media (max-width: 400px) {
+
+    /* Jika tombol menyempit, text bisa turun */
+    .btn-icon-text {
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .dropdown-toggle-content {
+        flex-wrap: wrap;
+        /* Membuat elemen fleksibel agar bisa turun */
+        justify-content: center;
+        /* Menyusun konten di tengah */
+        align-items: center;
+    }
+
+    .dropdown-toggle-content i {
+        margin-bottom: 5px;
+        margin-left: 12px;
+        /* Memberikan jarak antara ikon dan teks */
+    }
+
+    .dropdown-toggle-content span {
+        text-align: center;
+        /* Mengatur agar teks di tengah */
+        order: 1;
+        /* Membuat teks berada di bawah ikon */
+    }
+
+    /* Teks di tengah, aman dari ikon */
+    .btn-icon-text span {
+        padding-left: 0px !important;
+        /* penting agar shrink di flex */
+    }
+}

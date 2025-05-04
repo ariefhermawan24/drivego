@@ -154,33 +154,21 @@
     <div class="card-footer bg-light" style="margin-top: -30px !important;">
         <div class="d-flex flex-wrap gap-2">
             <a href="https://wa.me/081284714214" target="_blank"
-                class="link-kontak btn btn-success d-flex w-100 align-items-center position-relative flex-fill flex-md-grow-0">
-                <!-- Icon -->
-                <i class="fab fa-whatsapp position-absolute start-0 ms-3"></i>
-
-                <!-- Invisible spacer untuk keseimbangan layout -->
-                <span class="invisible">.</span>
-
-                <!-- Text -->
-                <span class="mx-auto">Hubungi Penyewa</span>
+                class="link-kontak btn btn-success flex-fill flex-md-grow-0">
+                <div class="btn-icon-text">
+                    <i class="fab fa-whatsapp"></i>
+                    <span>Hubungi Penyewa</span>
+                </div>
             </a>
 
-            <div class="dropdown d-block flex-fill">
-                <button class="btn btn-primary w-100 dropdown-toggle d-flex align-items-center position-relative"
-                    type="button" data-bs-toggle="dropdown">
-                    <!-- Icon -->
-                    <div class="d-flex align-items-center">
-                        <i class="fas fa-map-marked-alt"></i>
-                    </div>
-
-                    <!-- Text -->
-                    <div class="flex-fill text-center">
-                        Lihat Lokasi
-                    </div>
-
-                    <!-- Spacer kosong untuk keseimbangan -->
-                    <div style="width: 1.5em;"></div>
-                </button>
+           <div class="dropdown d-block flex-fill">
+               <button class="btn btn-primary w-100 dropdown-toggle" type="button" data-bs-toggle="dropdown"
+                   aria-expanded="false">
+                   <div class="dropdown-toggle-content">
+                       <i class="fas fa-map-marked-alt"></i>
+                       <span class="heading">Lihat Lokasi</span>
+                   </div>
+               </button>
                <ul class="dropdown-menu w-100">
                    <li>
                        <a class="dropdown-item location-item" href="https://www.google.com/maps/search/Hotel+Sahid+Jaya"
@@ -190,13 +178,16 @@
                        </a>
                    </li>
                </ul>
-            </div>
+           </div>
 
-            <a class="lokasi-jemput-link btn btn-custom d-flex align-items-center justify-content-between flex-fill flex-md-grow-0"
+            <a class="lokasi-jemput-link btn btn-custom flex-fill flex-md-grow-0"
                 href="https://www.google.com/maps/search/Bandara+Adi+Soemarmo" target="_blank">
-                <i class="fas fa-map-marker-alt me-2"></i>
-                <span class="text-center flex-fill">Lokasi Penjemputan</span>
+                <div class="btn-icon-text">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>Lokasi Jemput</span>
+                </div>
             </a>
+
         </div>
     </div>
 </div>
